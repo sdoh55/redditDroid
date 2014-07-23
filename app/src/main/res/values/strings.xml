@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Reddit</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Drawer Menu Items -->
+    <array name="drawer_menu_items">
+        <item>Login</item>
+        <item>Subreddits</item>
+    </array>
+
+    <!-- Options Menu Strings -->
+    <string name="option_menu_submission_comments">Show Comments</string>
+    <string name="option_menu_submission_option1">Another Option</string>
+
+    <!-- Image contentDescription Strings -->
+    <string name="content_description_submission_thumbnail">link thumbnail</string>
+    <string name="content_description_submission_up_vote">up vote link</string>
+    <string name="content_description_submission_down_vote">down vote link</string>
+
+    <string name="content_description_comment_depth_indicator">comment depth indicator</string>
+    <string name="content_description_comment_up_vote">up vote comment</string>
+    <string name="content_description_comment_down_vote">down vote comment</string>
+
+    <!-- Placeholder Strings -->
+    <string name="placeholder_score">score</string>
+    <string name="placeholder_title">Title</string>
+
+    <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
+    <string name="placeholder_submission_num_comments">number of comments</string>
+
+    <string name="placeholder_comment_username">username</string>
+    <string name="placeholder_comment_time_created">time created</string>
+    <string name="placeholder_comment_body">comment body</string>
+
+
+</resources>

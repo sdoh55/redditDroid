@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!--<dimen name="activity_horizontal_margin">16dp</dimen>-->
+    <!--<dimen name="activity_vertical_margin">16dp</dimen>-->
+
+    <!-- Action Bar Dimensions -->
+    <dimen name="action_bar_progress_bar_height">6dp</dimen>
+
+    <!-- Drawer Menu Dimensions -->
+    <dimen name="drawer_icon_size">26dp</dimen>
+    <dimen name="slidingmenu_offset">160dp</dimen>
+    <dimen name="list_padding">10dp</dimen>
+    <dimen name="shadow_width">5dp</dimen>
+
+    <integer name="num_cols">1</integer>
+
+
+    <!-- Submission Dimensions -->
+    <dimen name="submission_title_font_size">14sp</dimen>
+    <dimen name="submission_subtitle_font_size">11sp</dimen>
+    <dimen name="submission_num_comments_font_size">12sp</dimen>
+
+    <!-- Comment Dimensions -->
+    <dimen name="comment_margin">5dp</dimen>
+    <dimen name="comment_bottom_padding">10dp</dimen>
+    <dimen name="comment_depth_indicator_margin">2dp</dimen>
+
+    <dimen name="comment_username_font_size">11sp</dimen>
+    <dimen name="comment_score_font_size">13sp</dimen>
+    <dimen name="comment_time_created_font_size">11sp</dimen>
+
+
+
+
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#fff</color>
+    <color name="drawer_font_color">#ffc6c6c6</color>
+    <color name="drawer_font_color_dark">#ffefefef</color>
+
+    <color name="drawer_background_light">#ffe8e7d9</color>
+    <color name="drawer_background_dark">#ffc7797e</color>
+    <color name="action_bar_background">#dae3682e</color>
+</resources>

@@ -1,0 +1,162 @@
+package com.danny_oh.reddit;
+
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.Window;
+
+import com.github.jreddit.entity.Submission;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+
+public class MainActivity
+        extends ActionBarActivity
+        implements FragmentManager.OnBackStackChangedListener,
+            SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
+            DrawerMenuListFragment.OnDrawerMenuInteractionListener,
+            SubmissionFragment.OnSubmissionFragmentInteractionListener {
+
+    private SlidingMenu mSlidingMenu;
+    private FragmentManager mFragmentManager;
+
+
+    @Override
+    public void onBackStackChanged() {
+        boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
+    }
+
+    /**
+     * OnDrawerMenuInteractionListener interface implementation
+     * @param submission the submission that was clicked by the user
+     */
+    public void onSubmissionClick(Submission submission) {
+        Log.d("MainActivity", "Received fragment interaction. Selection: " + submission.getFullName());
+
+        SubmissionFragment submissionFragment = SubmissionFragment.newInstance(submission.getURL());
+        mFragmentManager
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.content_frame, submissionFragment)
+                .commit();
+
+        mSlidingMenu.setSlidingEnabled(false);
+    }
+
+    /**
+     * OnSubmissionFragmentInteractionListener interface implementaion
+     */
+    @Override
+    public void onSubmissionDetach() {
+        mSlidingMenu.setSlidingEnabled(true);
+    }
+
+
+    @Override
+    public void onDrawerItemClick(int position) {
+
+        mSlidingMenu.showContent();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // request FEATURE_PROGRESS to show progress bar while loading links
+        getWindow().requestFeature(Window.FEATURE_PROGRESS);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+
+        mFragmentManager = getSupportFragmentManager();
+
+        // register for changes to fragment manager back stack
+        mFragmentManager.addOnBackStackChangedListener(this);
+
+        setContentView(R.layout.activity_main);
+
+        // set up the sliding side menu
+        mSlidingMenu = new SlidingMenu(this);
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+//        mSlidingMenu.setTouchmodeMarginThreshold();
+        mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
+        mSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        mSlidingMenu.setFadeDegree(0.35f);
+        mSlidingMenu.setMenu(R.layout.activity_main_drawer);
+        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
+
+
+//        mSlidingMenu.setSelectorEnabled(true);
+//        mSlidingMenu.setSelectorDrawable(R.drawable.ic_drawer);
+//        mSlidingMenu.setSelectedView(mSlidingMenu.getContent());
+
+
+        mFragmentManager
+                .beginTransaction()
+                .replace(R.id.menu_frame, new DrawerMenuListFragment())
+                .commit();
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        if (savedInstanceState == null) {
+            mFragmentManager.beginTransaction()
+                    .add(R.id.content_frame, new SubmissionListFragment())
+                    .commit();
+        }
+
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home: {
+
+                if (mFragmentManager.getBackStackEntryCount() > 0) {
+                    mFragmentManager.popBackStack();
+                    return true;
+                }
+
+                if (mSlidingMenu.isMenuShowing()) {
+                    mSlidingMenu.showContent();
+                } else {
+                    mSlidingMenu.showMenu();
+                }
+
+                return true;
+            }
+
+            case R.id.action_settings: {
+                return true;
+            }
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (mSlidingMenu.isMenuShowing()) {
+            mSlidingMenu.showContent();
+        } else {
+            super.onBackPressed();
+        }
+    }
+}

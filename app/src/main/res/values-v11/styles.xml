@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!--<item name="android:homeAsUpIndicator">@drawable/ic_drawer</item>-->
+        <item name="android:actionBarStyle">@style/MainActionBarStyle</item>
+    </style>
+
+    <style name="MainActionBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/action_bar_background</item>
+        <item name="android:progressBarStyle">@style/MainProgressBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="MainProgressBarStyle" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:minHeight">@dimen/action_bar_progress_bar_height</item>
+        <item name="android:progressDrawable">@drawable/horizontal_progress_bar</item>
+    </style>
+
+</resources>
+
