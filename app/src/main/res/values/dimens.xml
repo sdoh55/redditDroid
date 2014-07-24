@@ -15,6 +15,9 @@
 
     <integer name="num_cols">1</integer>
 
+    <!-- Login Dialog Dimensions -->
+    <dimen name="dialog_input_horizontal_margin">8dp</dimen>
+    <dimen name="dialog_input_vertical_margin">16dp</dimen>
 
     <!-- Submission Dimensions -->
     <dimen name="submission_title_font_size">14sp</dimen>

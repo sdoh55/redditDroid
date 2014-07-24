@@ -1,4 +1,4 @@
-package com.danny_oh.reddit.helpers;
+package com.danny_oh.reddit.util;
 
 import android.widget.AbsListView;
 

@@ -43,7 +43,7 @@
 
             <TextView
                 android:id="@+id/comment_username"
-                android:text="@string/placeholder_comment_username"
+                android:text="@string/placeholder_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"

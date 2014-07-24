@@ -11,6 +11,10 @@
         <item>Subreddits</item>
     </array>
 
+    <string name="button_login">Login</string>
+    <string name="button_cancel">Cancel</string>
+
+
     <!-- Options Menu Strings -->
     <string name="option_menu_submission_comments">Show Comments</string>
     <string name="option_menu_submission_option1">Another Option</string>
@@ -31,7 +35,9 @@
     <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
     <string name="placeholder_submission_num_comments">number of comments</string>
 
-    <string name="placeholder_comment_username">username</string>
+    <string name="placeholder_username">username</string>
+    <string name="placeholder_password">password</string>
+
     <string name="placeholder_comment_time_created">time created</string>
     <string name="placeholder_comment_body">comment body</string>
 

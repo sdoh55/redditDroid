@@ -7,13 +7,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.fragments.DrawerMenuListFragment;
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.fragments.LoginDialogFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionListFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
+import com.github.jreddit.entity.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 
@@ -21,10 +25,13 @@ public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,
         SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-        DrawerMenuListFragment.OnDrawerMenuInteractionListener {
+        DrawerMenuListFragment.OnDrawerMenuInteractionListener,
+        LoginDialogFragment.LoginDialogListener {
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
+
+    private User mUser;
 
     /**
      * OnSubmissionListFragmentInteractionListener interface implementation
@@ -62,12 +69,27 @@ public class MainActivity
         switch (position) {
             // login
             case 0:
-                
+                new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
         }
 
         mSlidingMenu.showContent();
     }
 
+    /**
+     * LoginDialogListener interface implementation
+     * @param username
+     * @param password
+     */
+    @Override
+    public void onLoginClick(String username, String password) {
+        SessionManager.getInstance().userLogIn(username, password, new SessionManager.SessionListener<User>() {
+            @Override
+            public void onResponse(User object) {
+                Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
+                Toast.makeText(getApplicationContext(), "Logged in as " + object.getUsername(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     /**
      * Listener for FragmentManager back stack changes to handle action bar home icon and side menu sliding options
