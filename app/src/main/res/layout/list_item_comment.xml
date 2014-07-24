@@ -51,29 +51,34 @@
                 android:layout_alignParentStart="false"
                 android:layout_marginRight="@dimen/comment_margin"
                 android:layout_centerVertical="true"
-                android:textSize="@dimen/comment_username_font_size" />
+                android:textSize="@dimen/comment_username_font_size"
+                android:textStyle="bold"
+                android:textColor="@color/comment_username_font_color" />
 
             <TextView
                 android:id="@+id/comment_score"
                 android:text="@string/placeholder_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/comment_username"
-                android:layout_toRightOf="@id/comment_username"
                 android:textSize="@dimen/comment_score_font_size"
                 android:layout_marginRight="@dimen/comment_margin"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="false"
+                android:layout_toRightOf="@+id/comment_username"
+                android:layout_toEndOf="@id/comment_username"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/comment_time_created"
                 android:text="@string/placeholder_comment_time_created"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/comment_score"
-                android:layout_toEndOf="@id/comment_score"
                 android:layout_marginRight="@dimen/comment_margin"
                 android:layout_centerVertical="true"
-                android:textSize="@dimen/comment_time_created_font_size" />
+                android:textSize="@dimen/comment_time_created_font_size"
+                android:layout_toEndOf="@id/comment_score"
+                android:layout_toRightOf="@+id/comment_score" />
         </RelativeLayout>
 
         <TextView

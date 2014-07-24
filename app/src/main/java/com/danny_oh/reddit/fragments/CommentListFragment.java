@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -11,15 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
+import com.danny_oh.reddit.adapters.CommentMapAdapter;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.github.jreddit.entity.Comment;
 import com.github.jreddit.retrieval.Comments;
 import com.github.jreddit.retrieval.params.CommentSort;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class CommentListFragment extends ListFragment {
 
     // the fullname of a reddit 'Thing'
     private String mSubmissionId;
-    private CommentSort mCommentSort = CommentSort.TOP;
+    private CommentSort mCommentSort = CommentSort.CONFIDENCE;
 
 
     private List<Comment> mCommentsList;
@@ -74,7 +73,7 @@ public class CommentListFragment extends ListFragment {
             Comments comments = new Comments(new PoliteHttpRestClient(), null);
 
             // params: submissionId, commentId, parentsShown, depth, limit, CommentSort
-            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, 100, mCommentSort);
+            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort);
             mCommentMap = CommentsListHelper.listToMap(mCommentsList);
 
             Log.d("CommentListFragment", "mCommentList count: " + mCommentsList.size());

@@ -3,14 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.danny_oh.reddit.SubmissionListFragment">
+    tools:context="com.danny_oh.reddit.fragments.SubmissionListFragment">
 
     <com.danny_oh.reddit.SubmissionListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="?attr/actionBarSize"
         android:clipToPadding="false" />
+    <!--Apply padding when using ActionBar overlay mode-->
+        <!--android:paddingTop="?attr/actionBarSize"-->
+
 
     <TextView
         android:id="@android:id/empty"

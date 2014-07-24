@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.adapters.SubredditAdapter;
 import com.github.jreddit.entity.Subreddit;
 import com.github.jreddit.retrieval.Subreddits;
 import com.github.jreddit.retrieval.params.SubredditsView;

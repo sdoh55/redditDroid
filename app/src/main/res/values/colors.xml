@@ -6,5 +6,7 @@
 
     <color name="drawer_background_light">#ffe8e7d9</color>
     <color name="drawer_background_dark">#ffc7797e</color>
-    <color name="action_bar_background">#dae3682e</color>
+    <color name="action_bar_background">#ffe37c29</color>
+
+    <color name="comment_username_font_color">#ff6287d0</color>
 </resources>
