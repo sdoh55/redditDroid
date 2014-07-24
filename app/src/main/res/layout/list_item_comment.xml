@@ -7,14 +7,13 @@
 
     <View
         android:id="@+id/comment_depth_indicator"
-        android:layout_width="8dp"
+        android:layout_width="6dp"
         android:layout_height="10dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="#ffdaa34d"
         android:layout_alignBottom="@+id/comment_container"
-        android:layout_marginRight="@dimen/comment_margin"
-        android:layout_marginLeft="@dimen/comment_depth_indicator_margin" />
+        android:layout_marginRight="@dimen/comment_margin" />
 
     <RelativeLayout
         android:id="@+id/comment_container"

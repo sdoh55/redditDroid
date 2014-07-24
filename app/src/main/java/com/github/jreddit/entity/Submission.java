@@ -108,6 +108,10 @@ public class Submission extends Thing {
 		this.clicked = clicked;
 	}
 
+    public Submission(String name) {
+        super(name);
+    }
+
 	/**
      * Create a Submission from a JSONObject
      *

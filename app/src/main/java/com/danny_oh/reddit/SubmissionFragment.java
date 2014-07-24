@@ -20,6 +20,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.util.ExtendedSubmission;
+import com.github.jreddit.entity.Submission;
+
 
 /**
  * A {@link Fragment} subclass for viewing submission links.
@@ -30,18 +33,12 @@ import android.widget.Toast;
 public class SubmissionFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_URL = "url";
+    private static final String ARG_SUBMISSION = "submission";
 
     private String mUrl;
     private WebView mWebView;
 
-    private OnSubmissionFragmentInteractionListener mListener;
-
-
-    public interface OnSubmissionFragmentInteractionListener {
-        public void onSubmissionDetach();
-    }
-
-
+    private Submission mSubmission;
 
 
     /**
@@ -52,10 +49,11 @@ public class SubmissionFragment extends Fragment {
      * @return A new instance of fragment SubmissionFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SubmissionFragment newInstance(String url) {
+    public static SubmissionFragment newInstance(ExtendedSubmission submission) {
         SubmissionFragment fragment = new SubmissionFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_URL, url);
+        args.putParcelable(ARG_SUBMISSION, submission);
+        args.putString(ARG_URL, submission.getURL());
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,12 +73,6 @@ public class SubmissionFragment extends Fragment {
     public void onAttach(Activity activity) {
         Log.d("SubmissionFragment", "onAttach() called.");
         super.onAttach(activity);
-
-        try {
-            mListener = (OnSubmissionFragmentInteractionListener)activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(e.getMessage() + "\nNeed to implement OnSubmissionFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -88,6 +80,7 @@ public class SubmissionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mUrl = getArguments().getString(ARG_URL);
+            mSubmission = (ExtendedSubmission)getArguments().getParcelable(ARG_SUBMISSION);
         } else {
             throw new InstantiationException("Fragments must be instantiated using factory method newInstance.", new Exception());
         }
@@ -158,9 +151,6 @@ public class SubmissionFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-
-        mListener.onSubmissionDetach();
-
         Log.d("SubmissionFragment", "onDetach() called.");
     }
 
@@ -176,7 +166,18 @@ public class SubmissionFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO: handle options menu selections
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.show_comments:
+                getFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.content_frame, CommentListFragment.newInstance(mSubmission.getIdentifier()))
+                        .commit();
+                return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

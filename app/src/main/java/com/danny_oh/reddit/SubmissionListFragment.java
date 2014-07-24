@@ -10,14 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 
+import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Submissions;
+import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,12 +34,20 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class SubmissionListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class SubmissionListFragment extends Fragment implements AbsListView.OnItemClickListener, SubmissionAdapter.OnSubmissionAdapterInteractionListener {
+
+    private SubmissionSort mSubmissionSort = SubmissionSort.HOT;
+    // default number of submissions to load per page
+    private int mSubmissionsPerPage = 25;
+    // this threshold is equal to the number of submissions that are not yet visible at the bottom of the list view
+    private int mLoadMoreThreshold = 3;
+    private boolean mShowAll = false;
 
     private OnSubmissionListFragmentInteractionListener mListener;
-    private List<Submission> mSubmissionsList;
+    private PagedSubmissionsList mPagedSubmissionsList;
 
-
+    private Submissions mSubmissionsController;
+    private ProgressBar mProgressBar;
 
     /**
      * The fragment's ListView/GridView.
@@ -45,34 +58,21 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private SubmissionAdapter mAdapter;
 
 
-    /**
-     * AsyncTask subclass that retrieves submissions from a specified subreddit
-     */
-    private class GetSubmissionsAsyncTask extends AsyncTask<String, Integer, Void> {
-        private AbsListView.OnItemClickListener mListener;
+    private EndlessScrollListener mEndlessListener;
 
-        public GetSubmissionsAsyncTask(AbsListView.OnItemClickListener listener) {
-            mListener = listener;
-        }
 
-        protected Void doInBackground(String... subreddit) {
-            Submissions submissions = new Submissions(new PoliteHttpRestClient());
-            mSubmissionsList = submissions.parse("/.json");
-
-            return null;
-        }
-
-        protected void onPostExecute(Void v) {
-            mListView.setAdapter(new SubmissionAdapter(getActivity(), mSubmissionsList));
-            mListView.setOnItemClickListener(mListener);
-        }
+    private static class SubmissionFetchParam {
+        private String subreddit;
+        private SubmissionSort sort;
+        private int count;
+        private int limit;
+        private Submission before;
+        private Submission after;
+        private boolean show;
     }
-
-
-
 
 
     /**
@@ -84,23 +84,72 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
      */
     public interface OnSubmissionListFragmentInteractionListener {
         public void onSubmissionClick(Submission submission);
+
+//        public void onSubmissionCommentsClick(Submission submission);
     }
 
 
 
+
+
+    /**
+     * AsyncTask subclass that retrieves submissions from a specified subreddit
+     */
+    private class GetSubmissionsAsyncTask extends AsyncTask<SubmissionFetchParam, Integer, Void> {
+
+        public GetSubmissionsAsyncTask() {
+        }
+
+        protected Void doInBackground(SubmissionFetchParam... params) {
+            SubmissionFetchParam param = params[0];
+            loadMore(param);
+
+            return null;
+        }
+
+        protected void onPostExecute(Void v) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    private void loadMore(SubmissionFetchParam param) {
+        List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
+        mPagedSubmissionsList.add(list);
+    }
+
+
+    /**
+     * OnItemClick listener to handle item clicks on mListView
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
 
-            Submission submission = mSubmissionsList.get(position);
-
+            Submission submission = (Submission)mAdapter.getItem(position);
             mListener.onSubmissionClick(submission);
         }
     }
 
-
+    /**
+     * OnSubmissionAdapterInteractionListener interface implementation
+     * Listener for clicks on the 'number of comments' View from submissions list view.
+     * @param submission
+     */
+    @Override
+    public void onCommentsClick(Submission submission) {
+        getFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.content_frame, CommentListFragment.newInstance(submission.getIdentifier()))
+                .commit();
+    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -114,8 +163,11 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // passing empty string requests for the reddit frontpage
-        new GetSubmissionsAsyncTask(this).execute("");
+        mSubmissionsController = new Submissions(new PoliteHttpRestClient());
+        mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
+
+        mAdapter = new SubmissionAdapter(getActivity(), mPagedSubmissionsList);
+        mAdapter.setOnSubmissionAdapterInteractionListener(this);
     }
 
     @Override
@@ -123,11 +175,52 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_submission_list, container, false);
 
-        // Set the adapter
+        mProgressBar = (ProgressBar)view.findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.GONE);
+
         mListView = (ListView)view.findViewById(android.R.id.list);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                Submission lastSubmission = (Submission)mAdapter.getItem(totalItemsCount-1);
+
+                // passing empty string requests for the reddit frontpage
+                SubmissionFetchParam param = new SubmissionFetchParam();
+                param.subreddit = "";
+                param.sort = mSubmissionSort;
+                param.count = 0;
+                param.limit = mSubmissionsPerPage;
+                param.after = lastSubmission;
+                param.before = null;
+                param.show = mShowAll;
+
+                new GetSubmissionsAsyncTask().execute(param);
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onLoadComplete() {
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+
+
+        // passing empty string requests for the reddit frontpage
+        SubmissionFetchParam param = new SubmissionFetchParam();
+        param.subreddit = "";
+        param.sort = mSubmissionSort;
+        param.count = 0;
+        param.limit = mSubmissionsPerPage;
+        param.after = null;
+        param.before = null;
+        param.show = mShowAll;
+
+        new GetSubmissionsAsyncTask().execute(param);
 
         return view;
     }

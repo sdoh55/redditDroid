@@ -146,15 +146,17 @@ public class Submissions implements ActorDriven {
      * @return 					The linked list containing submissions
      */
     protected List<Submission> ofSubreddit(String subreddit, String sort, String count, String limit, String after, String before, String show) throws RetrievalFailedException, RedditError {
-    	assert subreddit != null && user != null;
-    	
-    	// Encode the reddit name for the URL:
-    	try {
-			subreddit = URLEncoder.encode(subreddit, "ISO-8859-1");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-    	
+//    	assert subreddit != null && user != null;
+
+
+        // Encode the reddit name for the URL:
+        try {
+            subreddit = URLEncoder.encode(subreddit, "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
     	// Format parameters
     	String params = "";
     	
@@ -164,9 +166,17 @@ public class Submissions implements ActorDriven {
     	params = ParamFormatter.addParameter(params, "after", after);
     	params = ParamFormatter.addParameter(params, "before", before);
     	params = ParamFormatter.addParameter(params, "show", show);
-    	
+
+        String parsedUrl;
+
+        // if no subreddit is specified, fetch front page
+        if (subreddit.isEmpty())
+            parsedUrl = String.format("/.json?%s", params);
+        else
+            parsedUrl = String.format(ApiEndpointUtils.SUBMISSIONS_GET, subreddit, params);
+
         // Retrieve submissions from the given URL
-        return parse(String.format(ApiEndpointUtils.SUBMISSIONS_GET, subreddit, params));
+        return parse(parsedUrl);
         
     }
     
@@ -184,7 +194,7 @@ public class Submissions implements ActorDriven {
      */
     public List<Submission> ofSubreddit(String subreddit, SubmissionSort sort, int count, int limit, Submission after, Submission before, boolean show_all) throws RetrievalFailedException, RedditError {
     	
-    	if (subreddit == null || subreddit.isEmpty()) {
+    	if (subreddit == null) { // || subreddit.isEmpty()) {
     		throw new IllegalArgumentException("The subreddit must be defined.");
     	}
     	

@@ -18,4 +18,12 @@
         android:layout_height="match_parent"
         android:gravity="center" />
 
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center_horizontal|bottom"
+        android:indeterminate="true" />
+
 </FrameLayout>

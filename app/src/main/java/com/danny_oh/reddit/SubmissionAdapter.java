@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.Subreddit;
 import com.squareup.picasso.Picasso;
@@ -21,8 +22,18 @@ import java.util.List;
  */
 public class SubmissionAdapter extends BaseAdapter {
     private Context mContext;
-    private List<Submission> mSubmissions;
 
+    private PagedSubmissionsList mPagedSubmissions;
+    private OnSubmissionAdapterInteractionListener mListener;
+
+    public interface OnSubmissionAdapterInteractionListener {
+        public void onCommentsClick(Submission submission);
+    }
+
+    /*
+     * Holder for the View that represents the list item in the list
+     * The view holder allows obtaining a contained item without using findViewById
+     */
     static class ViewHolder {
         private ImageView upvote;
         private ImageView downvote;
@@ -33,14 +44,23 @@ public class SubmissionAdapter extends BaseAdapter {
         private TextView numComments;
     }
 
-    public SubmissionAdapter(Context context, List<Submission> submissions) {
+//    public SubmissionAdapter(Context context, List<Submission> submissions) {
+//        mContext = context;
+//        mSubmissions = submissions;
+//    }
+
+    public SubmissionAdapter(Context context, PagedSubmissionsList pagedSubmissions) {
         mContext = context;
-        mSubmissions = submissions;
+        mPagedSubmissions = pagedSubmissions;
+    }
+
+    public void setOnSubmissionAdapterInteractionListener(OnSubmissionAdapterInteractionListener listener) {
+        mListener = listener;
     }
 
     @Override
     public int getCount() {
-        return mSubmissions.size();
+        return mPagedSubmissions.count();
     }
 
     @Override
@@ -50,11 +70,11 @@ public class SubmissionAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int i) {
-        return mSubmissions.get(i);
+        return mPagedSubmissions.getSubmissionAtIndex(i);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
             view = LayoutInflater.from(mContext).inflate(R.layout.list_item_submission, parent, false);
@@ -66,10 +86,20 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.title = (TextView)view.findViewById(R.id.submission_title);
             viewHolder.subtitle = (TextView)view.findViewById(R.id.submission_subtitle);
             viewHolder.numComments = (TextView)view.findViewById(R.id.submission_num_comments);
+
+            if (mListener != null) {
+                viewHolder.numComments.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onCommentsClick(mPagedSubmissions.getSubmissionAtIndex(position));
+                    }
+                });
+            }
+
             view.setTag(viewHolder);
         }
 
-        Submission submission = mSubmissions.get(position);
+        Submission submission = (Submission)getItem(position);
 
         if (submission != null) {
             ViewHolder viewHolder = (ViewHolder) view.getTag();

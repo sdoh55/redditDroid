@@ -46,6 +46,10 @@ public class Comment extends Thing {
 //    String num_reports = null;
 //    String distinguished = null;
 
+    public Comment(String name) {
+        super(name);
+    }
+
     public Comment(JSONObject obj) {
     	super(safeJsonToString(obj.get("name")));
     	

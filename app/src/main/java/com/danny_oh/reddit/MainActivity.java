@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
+import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -16,51 +17,62 @@ public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,
             SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-            DrawerMenuListFragment.OnDrawerMenuInteractionListener,
-            SubmissionFragment.OnSubmissionFragmentInteractionListener {
+            DrawerMenuListFragment.OnDrawerMenuInteractionListener {
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
 
-
-    @Override
-    public void onBackStackChanged() {
-        boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
-    }
-
     /**
-     * OnDrawerMenuInteractionListener interface implementation
+     * OnSubmissionListFragmentInteractionListener interface implementation
      * @param submission the submission that was clicked by the user
      */
     public void onSubmissionClick(Submission submission) {
         Log.d("MainActivity", "Received fragment interaction. Selection: " + submission.getFullName());
 
-        SubmissionFragment submissionFragment = SubmissionFragment.newInstance(submission.getURL());
+
+        SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(submission));
         mFragmentManager
                 .beginTransaction()
                 .addToBackStack(null)
                 .add(R.id.content_frame, submissionFragment)
                 .commit();
 
+        /*
+        CommentListFragment commentListFragment = CommentListFragment.newInstance(submission.getIdentifier());
+        mFragmentManager
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.content_frame, commentListFragment)
+                .commit();
+        */
+
         mSlidingMenu.setSlidingEnabled(false);
     }
 
     /**
-     * OnSubmissionFragmentInteractionListener interface implementaion
+     * OnDrawerMenuInteractionListener interface implementation
+     * @param position
      */
-    @Override
-    public void onSubmissionDetach() {
-        mSlidingMenu.setSlidingEnabled(true);
-    }
-
-
     @Override
     public void onDrawerItemClick(int position) {
 
         mSlidingMenu.showContent();
     }
 
+
+    /**
+     * Listener for FragmentManager back stack changes to handle action bar home icon and side menu sliding options
+     */
+    @Override
+    public void onBackStackChanged() {
+        boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
+        mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+    }
+
+    /*
+     * Fragment Lifecycle Methods
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
