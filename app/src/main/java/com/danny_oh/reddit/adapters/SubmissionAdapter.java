@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
 import android.text.format.Time;
@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.Subreddit;
@@ -87,15 +88,6 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.subtitle = (TextView)view.findViewById(R.id.submission_subtitle);
             viewHolder.numComments = (TextView)view.findViewById(R.id.submission_num_comments);
 
-            if (mListener != null) {
-                viewHolder.numComments.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mListener.onCommentsClick(mPagedSubmissions.getSubmissionAtIndex(position));
-                    }
-                });
-            }
-
             view.setTag(viewHolder);
         }
 
@@ -124,6 +116,15 @@ public class SubmissionAdapter extends BaseAdapter {
             }
 
             viewHolder.numComments.setText(submission.getCommentCount().toString() + " comments");
+
+            if (mListener != null) {
+                viewHolder.numComments.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onCommentsClick(mPagedSubmissions.getSubmissionAtIndex(position));
+                    }
+                });
+            }
 
 //            viewHolder.upvote.setOnClickListener(new View.OnClickListener() {
 //                @Override

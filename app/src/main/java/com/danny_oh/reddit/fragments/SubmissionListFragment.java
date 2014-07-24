@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -10,19 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
 
+import com.danny_oh.reddit.helpers.EndlessScrollListener;
+import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.adapters.SubmissionAdapter;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -128,6 +128,8 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mListView.getItemAtPosition(position);
+
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.

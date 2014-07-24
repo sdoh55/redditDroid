@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.activities;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
@@ -8,6 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
+import com.danny_oh.reddit.fragments.DrawerMenuListFragment;
+import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.fragments.SubmissionFragment;
+import com.danny_oh.reddit.fragments.SubmissionListFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -16,8 +20,8 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,
-            SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-            DrawerMenuListFragment.OnDrawerMenuInteractionListener {
+        SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
+        DrawerMenuListFragment.OnDrawerMenuInteractionListener {
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
@@ -55,6 +59,11 @@ public class MainActivity
      */
     @Override
     public void onDrawerItemClick(int position) {
+        switch (position) {
+            // login
+            case 0:
+                
+        }
 
         mSlidingMenu.showContent();
     }
@@ -79,7 +88,7 @@ public class MainActivity
 
         // request FEATURE_PROGRESS to show progress bar while loading links
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
-        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+//        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         mFragmentManager = getSupportFragmentManager();
 

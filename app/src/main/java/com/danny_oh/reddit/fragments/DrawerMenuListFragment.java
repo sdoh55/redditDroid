@@ -1,4 +1,4 @@
-package com.danny_oh.reddit;
+package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,16 +7,16 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.danny_oh.reddit.R;
 
 /**
  * Created by danny on 7/22/14.
  */
 public class DrawerMenuListFragment extends ListFragment {
-
     private OnDrawerMenuInteractionListener mListener;
 
 
@@ -77,8 +77,13 @@ public class DrawerMenuListFragment extends ListFragment {
         return view;
     }
 
+    private static class ViewHolder {
+        private TextView title;
+    }
 
     private class DrawerMenuAdapter extends BaseAdapter {
+
+
         private String[] mMenuItems;
         private Context mContext;
 
@@ -109,10 +114,13 @@ public class DrawerMenuListFragment extends ListFragment {
             if (view == null) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.list_item_drawer_menu, viewGroup, false);
 
+                ViewHolder viewHolder = new ViewHolder();
+                viewHolder.title = (TextView)view.findViewById(android.R.id.text1);
+                view.setTag(viewHolder);
             }
 
-            TextView menuItem = (TextView)view.findViewById(android.R.id.text1);
-            menuItem.setText(mMenuItems[position]);
+            ViewHolder viewHolder = (ViewHolder)view.getTag();
+            viewHolder.title.setText(mMenuItems[position]);
 
             return view;
         }
