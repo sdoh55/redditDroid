@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 
-import com.danny_oh.reddit.helpers.EndlessScrollListener;
+import com.danny_oh.reddit.util.EndlessScrollListener;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
