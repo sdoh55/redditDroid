@@ -18,6 +18,12 @@
     <!-- Options Menu Strings -->
     <string name="option_menu_submission_comments">Show Comments</string>
     <string name="option_menu_submission_option1">Another Option</string>
+    <string name="new_subreddits">New</string>
+    <string name="popular_subreddits">Popular</string>
+    <string name="search_subreddits">Search Subreddits</string>
+
+    <!-- General -->
+    <string name="ok">Ok</string>
 
     <!-- Image contentDescription Strings -->
     <string name="content_description_submission_thumbnail">link thumbnail</string>

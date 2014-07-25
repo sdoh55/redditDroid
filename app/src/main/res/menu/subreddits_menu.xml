@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/search_subreddits"
+        android:title="@string/search_subreddits"
+        app:showAsAction="always"
+        android:icon="@android:drawable/ic_menu_search"/>
+    <item android:id="@+id/new_subreddits"
+        android:title="@string/new_subreddits"
+        app:showAsAction="never"/>
+    <item android:id="@+id/popular_subreddits"
+        android:title="@string/popular_subreddits"
+        app:showAsAction="never"/>
+</menu>

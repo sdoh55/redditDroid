@@ -1,5 +1,6 @@
 package com.danny_oh.reddit.activities;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionListFragment;
+import com.danny_oh.reddit.fragments.SubredditFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
@@ -70,6 +72,11 @@ public class MainActivity
             // login
             case 0:
                 new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
+                break;
+            case 1:
+                // subreddits_menu
+                showFragment(new SubredditFragment());
+                break;
         }
 
         mSlidingMenu.showContent();
@@ -201,5 +208,11 @@ public class MainActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void showFragment(Fragment fragment){
+        mFragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment)
+                .commit();
     }
 }
