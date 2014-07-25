@@ -79,7 +79,7 @@ public class DrawerMenuListFragment extends Fragment implements AdapterView.OnIt
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_main_drawer, null);
+        View view = inflater.inflate(R.layout.activity_main_drawer, container, false);
 
         mListView = (ListView)view.findViewById(android.R.id.list);
         mListView.setOnItemClickListener(this);

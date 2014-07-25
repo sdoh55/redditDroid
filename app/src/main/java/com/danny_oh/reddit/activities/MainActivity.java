@@ -2,6 +2,7 @@ package com.danny_oh.reddit.activities;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -87,7 +88,7 @@ public class MainActivity
                 break;
             case 1:
                 // subreddits_menu
-                showFragment(new SubredditFragment());
+                showFragment(new SubredditFragment(), true);
                 break;
         }
 
@@ -225,9 +226,14 @@ public class MainActivity
         }
     }
 
-    private void showFragment(Fragment fragment){
-        mFragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
+    // Added backstack transaction option (allows back button to work go back to previous fragment)
+    private void showFragment(Fragment fragment, boolean addToBackStack){
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+
+        if (addToBackStack)
+            transaction.addToBackStack(null);
+
+        transaction.replace(R.id.content_frame, fragment)
                 .commit();
     }
 }
