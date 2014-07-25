@@ -1,6 +1,9 @@
 package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.Subreddit;
@@ -36,8 +41,8 @@ public class SubmissionAdapter extends BaseAdapter {
      * The view holder allows obtaining a contained item without using findViewById
      */
     static class ViewHolder {
-        private ImageView upvote;
-        private ImageView downvote;
+        private ImageViewWithVoteState upvote;
+        private ImageViewWithVoteState downvote;
         private TextView score;
         private ImageView thumbnail;
         private TextView title;
@@ -77,11 +82,12 @@ public class SubmissionAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
+        final ViewHolder viewHolder;
         if (view == null) {
             view = LayoutInflater.from(mContext).inflate(R.layout.list_item_submission, parent, false);
-            ViewHolder viewHolder = new ViewHolder();
-            viewHolder.upvote = (ImageView)view.findViewById(R.id.submission_up_vote);
-            viewHolder.downvote = (ImageView)view.findViewById(R.id.submission_down_vote);
+            viewHolder = new ViewHolder();
+            viewHolder.upvote = (ImageViewWithVoteState)view.findViewById(R.id.submission_up_vote);
+            viewHolder.downvote = (ImageViewWithVoteState)view.findViewById(R.id.submission_down_vote);
             viewHolder.score = (TextView)view.findViewById(R.id.submission_score);
             viewHolder.thumbnail = (ImageView)view.findViewById(R.id.submission_thumbnail);
             viewHolder.title = (TextView)view.findViewById(R.id.submission_title);
@@ -89,12 +95,13 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.numComments = (TextView)view.findViewById(R.id.submission_num_comments);
 
             view.setTag(viewHolder);
+        } else {
+             viewHolder = (ViewHolder) view.getTag();
         }
 
-        Submission submission = (Submission)getItem(position);
+        final Submission submission = (Submission)getItem(position);
 
         if (submission != null) {
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
             viewHolder.score.setText(submission.getScore().toString());
             viewHolder.title.setText(submission.getTitle().toString());
 
@@ -126,13 +133,73 @@ public class SubmissionAdapter extends BaseAdapter {
                 });
             }
 
-//            viewHolder.upvote.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    View parent = (View)view.getParent();
-//
-//                }
-//            });
+
+//            /*
+
+            if (submission.isLiked() == null) {
+
+                viewHolder.upvote.setStateVoted(false);
+                viewHolder.downvote.setStateVoted(false);
+            } else {
+                if (submission.isLiked()) {
+                    viewHolder.upvote.setStateVoted(true);
+                    viewHolder.downvote.setStateVoted(false);
+                } else {
+                    viewHolder.upvote.setStateVoted(false);
+                    viewHolder.downvote.setStateVoted(true);
+                }
+            }
+//            */
+
+
+            viewHolder.upvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    final int direction;
+
+                    if (submission.isLiked() == null || !submission.isLiked()) {
+                        direction = 1;
+                    } else {
+                        direction = 0;
+                    }
+
+                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                        @Override
+                        public void onResponse(Boolean object) {
+                            // if vote was successful
+                            if (object) {
+                                submission.setLiked(direction);
+                                notifyDataSetChanged();
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            viewHolder.downvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final int direction;
+
+                    if (submission.isLiked() == null || submission.isLiked()) {
+                        direction = -1;
+                    } else {
+                        direction = 0;
+                    }
+
+                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                        @Override
+                        public void onResponse(Boolean object) {
+                            // if vote was successful
+                            if (object) {
+                                submission.setLiked(direction);
+                                notifyDataSetChanged();
+                            }
+                        }
+                    });
+                }
+            });
         }
 
         return view;

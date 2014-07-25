@@ -43,24 +43,25 @@ public class LoginDialogFragment extends DialogFragment {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
 
         final View dialogView = inflater.inflate(R.layout.dialog_login, null);
-        Button loginButton = (Button)dialogView.findViewById(R.id.button_login);
 
+        builder.setView(dialogView)
+                .setPositiveButton(R.string.button_login, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String username = ((TextView)dialogView.findViewById(R.id.username)).getText().toString();
+                        String password = ((TextView)dialogView.findViewById(R.id.password)).getText().toString();
 
-        builder.setView(dialogView);
-        final Dialog dialog = builder.create();
+                        mListener.onLoginClick(username, password);
+                    }
+                })
+                .setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        LoginDialogFragment.this.dismiss();
+                    }
+                });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String username = ((TextView)dialogView.findViewById(R.id.username)).getText().toString();
-                String password = ((TextView)dialogView.findViewById(R.id.password)).getText().toString();
-
-                mListener.onLoginClick(username, password);
-                dialog.dismiss();
-            }
-        });
-
-        return dialog;
+        return builder.create();
     }
 
 

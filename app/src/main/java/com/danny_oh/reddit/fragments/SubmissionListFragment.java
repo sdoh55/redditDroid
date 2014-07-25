@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 
+import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.util.EndlessScrollListener;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
@@ -192,7 +193,7 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
                 Submission lastSubmission = (Submission)mAdapter.getItem(totalItemsCount-1);
 
                 // passing empty string requests for the reddit frontpage
-                SubmissionFetchParam param = new SubmissionFetchParam();
+                SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
                 param.subreddit = "";
                 param.sort = mSubmissionSort;
                 param.count = 0;
@@ -201,7 +202,13 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
                 param.before = null;
                 param.show = mShowAll;
 
-                new GetSubmissionsAsyncTask().execute(param);
+                SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+                    @Override
+                    public void onResponse(List<Submission> list) {
+                        mPagedSubmissionsList.add(list);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
                 mProgressBar.setVisibility(View.VISIBLE);
             }
 
@@ -213,7 +220,7 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
 
         // passing empty string requests for the reddit frontpage
-        SubmissionFetchParam param = new SubmissionFetchParam();
+        SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
         param.subreddit = "";
         param.sort = mSubmissionSort;
         param.count = 0;
@@ -222,7 +229,13 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
         param.before = null;
         param.show = mShowAll;
 
-        new GetSubmissionsAsyncTask().execute(param);
+        SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+            @Override
+            public void onResponse(List<Submission> list) {
+                mPagedSubmissionsList.add(list);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
         return view;
     }
