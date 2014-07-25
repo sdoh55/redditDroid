@@ -1,21 +1,27 @@
 package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubredditAdapter;
+import com.danny_oh.reddit.tasks.SubredditSearchTask;
 import com.github.jreddit.entity.Subreddit;
 import com.github.jreddit.retrieval.Subreddits;
 import com.github.jreddit.retrieval.params.SubredditsView;
@@ -32,7 +38,8 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class SubredditFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class SubredditFragment extends Fragment implements AbsListView.OnItemClickListener,
+        SubredditSearchTask.SubredditSearchListener{
 
     private List<Subreddit> mSubredditList;
     private SubredditAdapter mSubredditAdapter;
@@ -46,6 +53,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     private String mParam1;
     private String mParam2;
 
+    private Activity mActivity;
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -53,17 +61,19 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
      */
     private ListView mListView;
 
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
-    private ListAdapter mAdapter;
+    AsyncTask mSubredditsTask;
 
 
     private class GetSubredditsTask extends AsyncTask<Void, Integer, Void> {
+        SubredditsView view;
+
+        protected GetSubredditsTask(SubredditsView subredditsView){
+            super();
+            view = subredditsView;
+        }
         protected Void doInBackground(Void... voids) {
             Subreddits subreddits = new Subreddits(new PoliteHttpRestClient());
-            mSubredditList = subreddits.get(SubredditsView.POPULAR, 0, 25, null, null);
+            mSubredditList = subreddits.get(view, 0, 25, null, null);
 
             return null;
         }
@@ -75,12 +85,6 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         }
     }
 
-
-
-
-
-
-
     // TODO: Rename and change types of parameters
     public static SubredditFragment newInstance(String param1, String param2) {
         SubredditFragment fragment = new SubredditFragment();
@@ -91,34 +95,16 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         return fragment;
     }
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public SubredditFragment() {
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        Subreddits subreddits = new Subreddits(PoliteRestClient.get());
-//        mSubredditList = subreddits.listDefault();
-
-
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        // TODO: Change Adapter to display your content
-//        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-//                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
-
-//        mSubredditAdapter = new ArrayAdapter<Subreddit>(getActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, mSubredditList);
-
-        new GetSubredditsTask().execute();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -127,9 +113,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         View view = inflater.inflate(R.layout.fragment_subreddit_list, container, false);
 
         // Set the adapter
-        mListView = (ListView)view.findViewById(android.R.id.list);
-//        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
-//        mListView.setAdapter(mSubredditAdapter);
+        mListView = (ListView)view.findViewById(R.id.subreddit_list_listview);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -138,14 +122,23 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                + " must implement OnFragmentInteractionListener");
-        }
+        mActivity = activity;
+        //TODO: what is this interface for??
+//        try {
+//            mListener = (OnFragmentInteractionListener) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString()
+//                + " must implement OnFragmentInteractionListener");
+//        }
     }
 
     @Override
@@ -199,4 +192,57 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         public void onFragmentInteraction(String id);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.subreddits_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.search_subreddits:
+                showBuilder();
+                break;
+
+            case R.id.new_subreddits:
+                mSubredditsTask = new GetSubredditsTask(SubredditsView.NEW).execute();
+                break;
+
+            case R.id.popular_subreddits:
+                mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSearchFinished(List<Subreddit> list) {
+        setupAdapter(list);
+    }
+
+    private void setupAdapter(List<Subreddit> subreddits){
+        mSubredditAdapter = new SubredditAdapter(getActivity(), R.layout.list_item_subreddit, R.id.submission_score, subreddits);
+        mListView.setAdapter(mSubredditAdapter);
+        mSubredditAdapter.notifyDataSetChanged();
+    }
+
+    private void showBuilder(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
+
+        alert.setTitle(getString(R.string.search_subreddits));
+        final EditText input = new EditText(mActivity);
+        alert.setView(input);
+        alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                mSubredditsTask = new SubredditSearchTask(input.getText().toString(),SubredditFragment.this).execute();
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+    }
 }
