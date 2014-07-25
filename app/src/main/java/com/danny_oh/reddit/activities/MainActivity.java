@@ -33,7 +33,7 @@ public class MainActivity
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
 
-    private User mUser;
+    private SessionManager mSessionManager;
 
     /**
      * OnSubmissionListFragmentInteractionListener interface implementation
@@ -62,8 +62,20 @@ public class MainActivity
         mSlidingMenu.setSlidingEnabled(false);
     }
 
-    /**
+    /*
      * OnDrawerMenuInteractionListener interface implementation
+     */
+
+    /**
+     * Click handler for user login button at top of drawer menu
+     */
+    @Override
+    public void onLoginClick() {
+        new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
+    }
+
+    /**
+     * Click handler for items in the list view of the drawer menu
      * @param position
      */
     @Override
@@ -89,7 +101,7 @@ public class MainActivity
      */
     @Override
     public void onLoginClick(String username, String password) {
-        SessionManager.getInstance().userLogIn(username, password, new SessionManager.SessionListener<User>() {
+        mSessionManager.userLogIn(username, password, new SessionManager.SessionListener<User>() {
             @Override
             public void onResponse(User object) {
                 Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
@@ -134,8 +146,11 @@ public class MainActivity
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         mSlidingMenu.setFadeDegree(0.35f);
-        mSlidingMenu.setMenu(R.layout.activity_main_drawer);
+        mSlidingMenu.setMenu(R.layout.menu_frame);
         mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
+
+
+        mSessionManager = SessionManager.getInstance(this);
 
 
 //        mSlidingMenu.setSelectorEnabled(true);

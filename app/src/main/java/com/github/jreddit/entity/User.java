@@ -40,6 +40,13 @@ public class User {
         this.password = password;
     }
 
+    public User(String username, String cookie, String modhash) {
+        this.restClient = null;
+        this.username = username;
+        this.cookie = cookie;
+        this.modhash = modhash;
+    }
+
     /**
      * Get the user name of the user.
      * @return User name

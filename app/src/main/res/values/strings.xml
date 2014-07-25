@@ -11,7 +11,7 @@
         <item>Subreddits</item>
     </array>
 
-    <string name="button_login">Login</string>
+    <string name="button_login">Log In</string>
     <string name="button_cancel">Cancel</string>
 
 
@@ -26,6 +26,8 @@
     <string name="ok">Ok</string>
 
     <!-- Image contentDescription Strings -->
+    <string name="content_description_drawer_icon">drawer icon</string>
+
     <string name="content_description_submission_thumbnail">link thumbnail</string>
     <string name="content_description_submission_up_vote">up vote link</string>
     <string name="content_description_submission_down_vote">down vote link</string>

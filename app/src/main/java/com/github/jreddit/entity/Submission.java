@@ -59,6 +59,7 @@ public class Submission extends Thing {
     private Boolean nsfw;
     private Boolean hidden;
     private Boolean clicked;
+    private Boolean liked;
     
     // 
     //private String likes;
@@ -108,6 +109,30 @@ public class Submission extends Thing {
 		this.clicked = clicked;
 	}
 
+
+    public void setLiked(Boolean liked) { this.liked = liked; }
+
+    // the Reddit API represents the 3 liked states (upvote, downvote, none) using boolean.
+    // this parses the string encoded boolean to the correct boolean value.
+    public void setLiked(String liked) {
+         if (liked == null) {
+             this.liked = null;
+         } else {
+             this.liked = Boolean.parseBoolean(liked);
+         }
+    }
+
+    public void setLiked(int liked) {
+        if (liked == 0) {
+            this.liked = null;
+        } else {
+            this.liked = (liked == 1);
+        }
+    }
+
+    public Boolean isLiked() { return this.liked; }
+
+
     public Submission(String name) {
         super(name);
     }
@@ -155,6 +180,7 @@ public class Submission extends Thing {
             setNSFW(safeJsonToBoolean(obj.get("over_18")));
             setHidden(safeJsonToBoolean(obj.get("hidden")));
             setClicked(safeJsonToBoolean(obj.get("clicked")));
+            setLiked(safeJsonToString(obj.get("likes")));
 
         } catch (Exception e) {
             System.err.println("Error creating Submission");

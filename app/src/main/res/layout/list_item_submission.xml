@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent" android:layout_height="wrap_content">
 
 
@@ -13,16 +14,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/submission_score_container"
-            android:layout_marginLeft="5dp">
+            android:layout_marginLeft="5dp" >
 
-            <ImageView
+            <com.danny_oh.reddit.util.ImageViewWithVoteState
                 android:id="@+id/submission_up_vote"
-                android:src="@drawable/ic_action_collapse"
+                android:src="@drawable/selector_up_vote"
+                android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="@string/content_description_submission_up_vote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerHorizontal="true"
+                app:submission_vote_state="false"
+                />
 
             <TextView
                 android:id="@+id/submission_score"
@@ -33,14 +37,18 @@
                 android:gravity="center_horizontal"
                 android:layout_centerHorizontal="true" />
 
-            <ImageView
+            <com.danny_oh.reddit.util.ImageViewWithVoteState
                 android:id="@+id/submission_down_vote"
-                android:src="@drawable/ic_action_expand"
+                android:src="@drawable/selector_down_vote"
+                android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="@string/content_description_submission_down_vote"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/submission_score"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerHorizontal="true"
+                android:clickable="true"
+                app:submission_vote_state="false"
+                />
         </RelativeLayout>
 
         <ImageView

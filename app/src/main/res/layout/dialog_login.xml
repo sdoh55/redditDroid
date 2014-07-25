@@ -6,7 +6,7 @@
     <ImageView
         android:src="@drawable/reddit_red"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="64dp"
         android:scaleType="center"
         android:contentDescription="@string/app_name" />
     <EditText
@@ -30,11 +30,4 @@
         android:fontFamily="sans-serif"
         android:hint="@string/placeholder_password"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_login"
-        android:id="@+id/button_login"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="12dp" />
 </LinearLayout>

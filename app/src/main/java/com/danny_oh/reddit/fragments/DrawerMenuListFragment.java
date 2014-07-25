@@ -3,12 +3,14 @@ package com.danny_oh.reddit.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.danny_oh.reddit.R;
@@ -16,21 +18,28 @@ import com.danny_oh.reddit.R;
 /**
  * Created by danny on 7/22/14.
  */
-public class DrawerMenuListFragment extends ListFragment {
+public class DrawerMenuListFragment extends Fragment implements AdapterView.OnItemClickListener {
     private OnDrawerMenuInteractionListener mListener;
+
+    private ListView mListView;
 
 
     public interface OnDrawerMenuInteractionListener {
+        public void onLoginClick();
         public void onDrawerItemClick(int position);
     }
 
+    /* used if ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         mListener.onDrawerItemClick(position);
-        super.onListItemClick(l, v, position, id);
     }
+    */
 
-
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        mListener.onDrawerItemClick(position);
+    }
 
     public static DrawerMenuListFragment newInstance() {
         DrawerMenuListFragment listFragment = new DrawerMenuListFragment();
@@ -66,14 +75,28 @@ public class DrawerMenuListFragment extends ListFragment {
 //            throw new InstantiationException("Use factory method newInstance to instantiate fragment.", new Exception());
 //        }
 
-        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
-        setListAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        ((ListView)view.findViewById(android.R.id.list)).setSelector(R.drawable.drawer_item);
+        View view = inflater.inflate(R.layout.activity_main_drawer, null);
+
+        mListView = (ListView)view.findViewById(android.R.id.list);
+        mListView.setOnItemClickListener(this);
+        mListView.setSelector(R.drawable.selector_drawer_list_item);
+
+        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
+        mListView.setAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
+
+        RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.login_button_view);
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onLoginClick();
+            }
+        });
+
+
         return view;
     }
 
