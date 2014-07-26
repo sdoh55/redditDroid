@@ -12,7 +12,7 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.SessionManager;
-import com.danny_oh.reddit.fragments.DrawerMenuListFragment;
+import com.danny_oh.reddit.fragments.DrawerMenuFragment;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
@@ -28,7 +28,7 @@ public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,
         SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-        DrawerMenuListFragment.OnDrawerMenuInteractionListener,
+        DrawerMenuFragment.OnDrawerMenuInteractionListener,
         LoginDialogFragment.LoginDialogListener {
 
     private SlidingMenu mSlidingMenu;
@@ -75,6 +75,14 @@ public class MainActivity
         new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
     }
 
+    @Override
+    public void onLogoutClick() {
+        mSessionManager.userLogout();
+
+        finish();
+        startActivity(getIntent());
+    }
+
     /**
      * Click handler for items in the list view of the drawer menu
      * @param position
@@ -84,9 +92,6 @@ public class MainActivity
         switch (position) {
             // login
             case 0:
-                new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
-                break;
-            case 1:
                 // subreddits_menu
                 showFragment(new SubredditFragment(), true);
                 break;
@@ -106,6 +111,10 @@ public class MainActivity
             @Override
             public void onResponse(User object) {
                 Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
+
+                finish();
+                startActivity(getIntent());
+
                 Toast.makeText(getApplicationContext(), "Logged in as " + object.getUsername(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -153,7 +162,6 @@ public class MainActivity
 
         mSessionManager = SessionManager.getInstance(this);
 
-
 //        mSlidingMenu.setSelectorEnabled(true);
 //        mSlidingMenu.setSelectorDrawable(R.drawable.ic_drawer);
 //        mSlidingMenu.setSelectedView(mSlidingMenu.getContent());
@@ -161,7 +169,7 @@ public class MainActivity
 
         mFragmentManager
                 .beginTransaction()
-                .replace(R.id.menu_frame, new DrawerMenuListFragment())
+                .replace(R.id.menu_frame, new DrawerMenuFragment())
                 .commit();
 
         getSupportActionBar().setHomeButtonEnabled(true);

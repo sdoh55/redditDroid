@@ -6,13 +6,19 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Drawer Menu Items -->
+    <array name="drawer_menu_logged_in_user_items">
+        <item>View Profile</item>
+        <item>Log Out</item>
+    </array>
+
     <array name="drawer_menu_items">
-        <item>Login</item>
         <item>Subreddits</item>
     </array>
 
     <string name="button_login">Log In</string>
     <string name="button_cancel">Cancel</string>
+
+    <string name="placeholder_logged_in">LOGGED IN AS</string>
 
 
     <!-- Options Menu Strings -->
@@ -39,6 +45,7 @@
     <!-- Placeholder Strings -->
     <string name="placeholder_score">score</string>
     <string name="placeholder_title">Title</string>
+    <string name="placeholder_subtitle">SUBTITLE</string>
 
     <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
     <string name="placeholder_submission_num_comments">number of comments</string>
