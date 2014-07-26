@@ -37,11 +37,12 @@ import java.util.List;
  */
 public class SubmissionListFragment extends Fragment implements AbsListView.OnItemClickListener, SubmissionAdapter.OnSubmissionAdapterInteractionListener {
 
+    public static final String SUBREDDIT_VALUE_KEY = "SubmissionListFragment.Subbreddit";
+
+    private String mSubredditName = "";
     private SubmissionSort mSubmissionSort = SubmissionSort.HOT;
-    // default number of submissions to load per page
-    private int mSubmissionsPerPage = 25;
-    // this threshold is equal to the number of submissions that are not yet visible at the bottom of the list view
-    private int mLoadMoreThreshold = 3;
+    private int mSubmissionsPerPage = 25;                           // default number of submissions to load per page
+    private int mLoadMoreThreshold = 3;                             // this threshold is equal to the number of submissions that are not yet visible at the bottom of the list view
     private boolean mShowAll = false;
 
     private OnSubmissionListFragmentInteractionListener mListener;
@@ -88,10 +89,6 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
 //        public void onSubmissionCommentsClick(Submission submission);
     }
-
-
-
-
 
     /**
      * AsyncTask subclass that retrieves submissions from a specified subreddit
@@ -166,6 +163,10 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (getArguments() != null) {
+            mSubredditName = getArguments().getString(SUBREDDIT_VALUE_KEY);
+        }
+
         mSubmissionsController = new Submissions(new PoliteHttpRestClient());
         mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
 
@@ -194,7 +195,7 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
                 // passing empty string requests for the reddit frontpage
                 SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-                param.subreddit = "";
+                param.subreddit = mSubredditName;
                 param.sort = mSubmissionSort;
                 param.count = 0;
                 param.limit = mSubmissionsPerPage;
@@ -221,7 +222,7 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
         // passing empty string requests for the reddit frontpage
         SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-        param.subreddit = "";
+        param.subreddit = mSubredditName;
         param.sort = mSubmissionSort;
         param.count = 0;
         param.limit = mSubmissionsPerPage;
@@ -259,6 +260,14 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
         super.onDetach();
         mListener = null;
+    }
+
+    public static SubmissionListFragment newInstance(String subreddit){
+        SubmissionListFragment fragment = new SubmissionListFragment();
+        Bundle args = new Bundle();
+        args.putString(SUBREDDIT_VALUE_KEY,subreddit);
+        fragment.setArguments(args);
+        return fragment;
     }
 
 

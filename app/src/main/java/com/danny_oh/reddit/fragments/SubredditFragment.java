@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.SubredditAdapter;
 import com.danny_oh.reddit.tasks.SubredditSearchTask;
 import com.github.jreddit.entity.Subreddit;
@@ -41,6 +43,8 @@ import java.util.List;
 public class SubredditFragment extends Fragment implements AbsListView.OnItemClickListener,
         SubredditSearchTask.SubredditSearchListener{
 
+    private static final String TAG = "Reddit - SubredditFragment";
+
     private List<Subreddit> mSubredditList;
     private SubredditAdapter mSubredditAdapter;
 
@@ -53,7 +57,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     private String mParam1;
     private String mParam2;
 
-    private Activity mActivity;
+    private MainActivity mActivity;
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -131,7 +135,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
+        mActivity = (MainActivity)activity;
         //TODO: what is this interface for??
 //        try {
 //            mListener = (OnFragmentInteractionListener) activity;
@@ -157,11 +161,14 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(mSubredditList.get(position).getDisplayName());
-        }
+//        if (null != mListener) {
+//            // Notify the active callbacks interface (the activity, if the
+//            // fragment is attached to one) that an item has been selected.
+//            mListener.onFragmentInteraction(mSubredditList.get(position).getDisplayName());
+//        }
+        SubmissionListFragment fragment = SubmissionListFragment.newInstance(mSubredditAdapter.getItem(position).getDisplayName());
+        Log.d(TAG,mSubredditList.get(position).getDisplayName());
+        mActivity.showFragment(fragment,true);
     }
 
     /**

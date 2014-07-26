@@ -235,7 +235,7 @@ public class MainActivity
     }
 
     // Added backstack transaction option (allows back button to work go back to previous fragment)
-    private void showFragment(Fragment fragment, boolean addToBackStack){
+    public void showFragment(Fragment fragment, boolean addToBackStack){
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
 
         if (addToBackStack)
