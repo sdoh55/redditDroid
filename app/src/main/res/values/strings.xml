@@ -5,6 +5,15 @@
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- MainActivity Action Bar Navigation Items -->
+    <array name="submission_sort_array">
+        <item>hot</item>
+        <item>new</item>
+        <item>rising</item>
+        <item>controversial</item>
+        <item>top</item>
+    </array>
+
     <!-- Drawer Menu Items -->
     <array name="drawer_menu_logged_in_user_items">
         <item>View Profile</item>

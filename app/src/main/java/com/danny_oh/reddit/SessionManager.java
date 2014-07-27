@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.util.Constants;
 import com.github.jreddit.action.MarkActions;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
@@ -52,9 +53,9 @@ public class SessionManager {
             String username = strings[0];
             String password = strings[1];
 
-            mUser = new User(mRestClient, username, password);
+            mUser = new User(mRestClient, username);
             try {
-                mUser.connect();
+                mUser.connect(password);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 Log.e("SessionManager","IO Exception while attempting to connect user.");
@@ -152,6 +153,7 @@ public class SessionManager {
     public SessionManager(Context context, RestClient restClient) {
         mContext = context;
         mRestClient = restClient;
+        mRestClient.setUserAgent(Constants.USER_AGENT);
         mMarkActions = new MarkActions(mRestClient);
         mSubmissionsController = new Submissions(mRestClient);
 
@@ -176,6 +178,11 @@ public class SessionManager {
 
     public void userLogout() {
         mUser = null;
+        mMarkActions.switchActor(null);
+        mSubmissionsController.switchActor(null);
+
+        mRestClient = new HttpRestClient();
+        mRestClient.setUserAgent(Constants.USER_AGENT);
 
         // clear saved cookie and modhash
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);

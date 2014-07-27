@@ -41,6 +41,7 @@
         android:layout_toEndOf="@id/icon"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@color/drawer_font_color" />
+        android:textColor="@color/drawer_font_color"
+        android:layout_toRightOf="@+id/icon" />
 
 </RelativeLayout>

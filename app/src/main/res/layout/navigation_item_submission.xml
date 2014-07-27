@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:text="@string/placeholder_title"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/action_bar_navigation_item_font_size"
+        android:paddingTop="@dimen/action_bar_navigation_item_vertical_padding"
+        android:paddingBottom="@dimen/action_bar_navigation_item_vertical_padding"
+        android:paddingLeft="@dimen/action_bar_navigation_item_horizontal_padding"
+        android:paddingRight="@dimen/action_bar_navigation_item_horizontal_padding" />

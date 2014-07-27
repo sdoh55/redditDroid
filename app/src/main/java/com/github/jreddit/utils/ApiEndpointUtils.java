@@ -9,6 +9,7 @@ package com.github.jreddit.utils;
 public class ApiEndpointUtils {
 
     public static final String REDDIT_BASE_URL = "http://www.reddit.com";
+    public static final String REDDIT_SSL_URL = "https://ssl.reddit.com";
 
     public static final String REDDIT_BASE_API_ENDPOINT = "/api";
 

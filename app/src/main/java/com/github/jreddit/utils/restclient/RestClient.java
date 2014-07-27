@@ -23,6 +23,7 @@ public interface RestClient {
      */
     public Response post(String apiParams, String urlPath, String cookie);
 
+    public Response postSecure(String apiParams, String urlPath, String cookie);
 
     /**
      * Set the userAgent to be used when making http requests
