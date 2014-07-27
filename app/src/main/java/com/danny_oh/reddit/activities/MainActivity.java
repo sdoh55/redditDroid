@@ -1,6 +1,8 @@
 package com.danny_oh.reddit.activities;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +12,12 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.SessionManager;
-import com.danny_oh.reddit.fragments.DrawerMenuListFragment;
+import com.danny_oh.reddit.fragments.DrawerMenuFragment;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionListFragment;
+import com.danny_oh.reddit.fragments.SubredditFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
@@ -25,7 +28,7 @@ public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,
         SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-        DrawerMenuListFragment.OnDrawerMenuInteractionListener,
+        DrawerMenuFragment.OnDrawerMenuInteractionListener,
         LoginDialogFragment.LoginDialogListener {
 
     private SlidingMenu mSlidingMenu;
@@ -72,6 +75,14 @@ public class MainActivity
         new LoginDialogFragment().show(getSupportFragmentManager(), "LoginDialogFragment");
     }
 
+    @Override
+    public void onLogoutClick() {
+        mSessionManager.userLogout();
+
+        finish();
+        startActivity(getIntent());
+    }
+
     /**
      * Click handler for items in the list view of the drawer menu
      * @param position
@@ -81,7 +92,9 @@ public class MainActivity
         switch (position) {
             // login
             case 0:
-                // do something
+                // subreddits_menu
+                showFragment(new SubredditFragment(), true);
+                break;
         }
 
         mSlidingMenu.showContent();
@@ -98,6 +111,10 @@ public class MainActivity
             @Override
             public void onResponse(User object) {
                 Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
+
+                finish();
+                startActivity(getIntent());
+
                 Toast.makeText(getApplicationContext(), "Logged in as " + object.getUsername(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -145,7 +162,6 @@ public class MainActivity
 
         mSessionManager = SessionManager.getInstance(this);
 
-
 //        mSlidingMenu.setSelectorEnabled(true);
 //        mSlidingMenu.setSelectorDrawable(R.drawable.ic_drawer);
 //        mSlidingMenu.setSelectedView(mSlidingMenu.getContent());
@@ -153,7 +169,7 @@ public class MainActivity
 
         mFragmentManager
                 .beginTransaction()
-                .replace(R.id.menu_frame, new DrawerMenuListFragment())
+                .replace(R.id.menu_frame, new DrawerMenuFragment())
                 .commit();
 
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -216,5 +232,16 @@ public class MainActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    // Added backstack transaction option (allows back button to work go back to previous fragment)
+    private void showFragment(Fragment fragment, boolean addToBackStack){
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+
+        if (addToBackStack)
+            transaction.addToBackStack(null);
+
+        transaction.replace(R.id.content_frame, fragment)
+                .commit();
     }
 }

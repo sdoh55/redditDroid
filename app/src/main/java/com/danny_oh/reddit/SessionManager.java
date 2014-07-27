@@ -174,6 +174,15 @@ public class SessionManager {
         new LoginAsyncTask(listener).execute(username, password);
     }
 
+    public void userLogout() {
+        mUser = null;
+
+        // clear saved cookie and modhash
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear().commit();
+    }
+
     public User getUser() { return mUser; }
 
     public boolean isUserLoggedIn() { return (mUser != null); }
