@@ -141,6 +141,15 @@ public class SessionManager {
         }
     }
 
+
+
+
+
+
+
+
+
+
     private static SessionManager mManager;
 
     public static SessionManager getInstance(Context context) {

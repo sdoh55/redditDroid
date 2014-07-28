@@ -27,8 +27,8 @@
     <string name="button_login">Log In</string>
     <string name="button_cancel">Cancel</string>
 
-    <string name="placeholder_logged_in">LOGGED IN AS</string>
-
+    <string name="drawer_user_menu_subtitle">LOGGED IN AS</string>
+    <string name="drawer_subreddit_list_header_title">SUBREDDITS</string>
 
     <!-- Options Menu Strings -->
     <string name="option_menu_submission_comments">Show Comments</string>

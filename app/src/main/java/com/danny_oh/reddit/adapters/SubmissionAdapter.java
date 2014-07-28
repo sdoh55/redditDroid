@@ -168,6 +168,7 @@ public class SubmissionAdapter extends BaseAdapter {
                         public void onResponse(Boolean object) {
                             // if vote was successful
                             if (object) {
+                                submission.setScore(submission.getScore() + (direction == 1 ? 1 : -1));
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
                             }
@@ -193,6 +194,7 @@ public class SubmissionAdapter extends BaseAdapter {
                         public void onResponse(Boolean object) {
                             // if vote was successful
                             if (object) {
+                                submission.setScore(submission.getScore() + (direction == -1 ? -1 : 1));
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
                             }

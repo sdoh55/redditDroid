@@ -35,7 +35,7 @@
                 android:id="@+id/logged_in_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/placeholder_logged_in"
+                android:text="@string/drawer_user_menu_subtitle"
                 android:textColor="@color/drawer_font_color"
                 android:layout_toEndOf="@id/user_menu_group_icon"
                 android:layout_toRightOf="@+id/user_menu_group_icon"
@@ -61,14 +61,34 @@
 
     <ExpandableListView
         android:id="@+id/user_menu_list_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
-
-    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/subreddit_menu_list_view"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/drawer_subreddit_title_background">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/drawer_subreddit_list_header_title"
+            android:id="@android:id/text1"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:singleLine="false"
+            android:layout_margin="@dimen/drawer_subreddit_title_margin"
+            android:textSize="@dimen/drawer_subreddit_title_font_size"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/subreddit_list_view"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

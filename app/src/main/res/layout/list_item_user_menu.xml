@@ -3,13 +3,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/drawer_user_menu_list_item_background"
+    >
 
     <TextView
         android:id="@+id/user_menu_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/placeholder_title"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         android:layout_margin="8dp" />
 </RelativeLayout>
