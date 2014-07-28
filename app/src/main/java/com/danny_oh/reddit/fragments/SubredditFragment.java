@@ -104,8 +104,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        // disabling due to side menu integration
-//        setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
     }
 
     @Override

@@ -31,6 +31,12 @@ public class PagedSubmissionsList extends ArrayList<List<Submission>> {
         return super.add(object);
     }
 
+    @Override
+    public void clear() {
+        mCount = 0;
+        super.clear();
+    }
+
     public int count() {
         return mCount;
     }

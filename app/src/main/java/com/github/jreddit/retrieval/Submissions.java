@@ -160,7 +160,6 @@ public class Submissions implements ActorDriven {
     	// Format parameters
     	String params = "";
     	
-    	params = ParamFormatter.addParameter(params, "sort", sort);
     	params = ParamFormatter.addParameter(params, "count", count);
     	params = ParamFormatter.addParameter(params, "limit", limit);
     	params = ParamFormatter.addParameter(params, "after", after);
@@ -170,10 +169,13 @@ public class Submissions implements ActorDriven {
         String parsedUrl;
 
         // if no subreddit is specified, fetch front page
-        if (subreddit.isEmpty())
-            parsedUrl = String.format("/.json?%s", params);
-        else
+        if (subreddit.isEmpty()) {
+            // for frontpage items, sort is dependent on the url (e.g. for RISING: www.reddit.com/rising)
+            parsedUrl = String.format("/%s/.json?%s", sort, params);
+        } else {
+            params = ParamFormatter.addParameter(params, "sort", sort);
             parsedUrl = String.format(ApiEndpointUtils.SUBMISSIONS_GET, subreddit, params);
+        }
 
         // Retrieve submissions from the given URL
         return parse(parsedUrl);

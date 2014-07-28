@@ -24,6 +24,7 @@ import com.danny_oh.reddit.fragments.SubredditFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
+import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 
@@ -180,19 +181,13 @@ public class MainActivity
 
         getSupportActionBar().setHomeButtonEnabled(true);
 
-
-        // spinner for dropdown menu
-        SpinnerAdapter adapter = ArrayAdapter.createFromResource(this, R.array.submission_sort_array, R.layout.navigation_item_submission);
-
         // enables dropdown menu of action bar
-        getSupportActionBar().setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_LIST);
-        getSupportActionBar().setListNavigationCallbacks(adapter, this);
-
         getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
 
         if (savedInstanceState == null) {
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, new SubmissionListFragment())
+                    .add(R.id.content_frame, SubmissionListFragment.newInstance(SubmissionSort.NEW))  // null defaults to SubmissionSort.HOT
                     .commit();
         }
 

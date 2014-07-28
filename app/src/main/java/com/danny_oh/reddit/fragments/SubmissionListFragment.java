@@ -1,17 +1,21 @@
 package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SpinnerAdapter;
 
 
 import com.danny_oh.reddit.SessionManager;
@@ -27,17 +31,18 @@ import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import java.util.List;
 
 /**
- * A fragment representing a list of Items.
- * <p />
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * A fragment that displays a list of jReddit Submissions
  */
-public class SubmissionListFragment extends Fragment implements AbsListView.OnItemClickListener, SubmissionAdapter.OnSubmissionAdapterInteractionListener {
+public class SubmissionListFragment extends Fragment implements
+        AbsListView.OnItemClickListener,
+        SubmissionAdapter.OnSubmissionAdapterInteractionListener,
+        ActionBar.OnNavigationListener
+{
+    private static final String ARG_SORT = "submission_sort";
 
-    private SubmissionSort mSubmissionSort = SubmissionSort.HOT;
+    private Context mContext;
+
+    private SubmissionSort mSubmissionSort;
     // default number of submissions to load per page
     private int mSubmissionsPerPage = 25;
     // this threshold is equal to the number of submissions that are not yet visible at the bottom of the list view
@@ -64,7 +69,6 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
     private EndlessScrollListener mEndlessListener;
 
-
     private static class SubmissionFetchParam {
         private String subreddit;
         private SubmissionSort sort;
@@ -87,30 +91,6 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
         public void onSubmissionClick(Submission submission);
 
 //        public void onSubmissionCommentsClick(Submission submission);
-    }
-
-
-
-
-
-    /**
-     * AsyncTask subclass that retrieves submissions from a specified subreddit
-     */
-    private class GetSubmissionsAsyncTask extends AsyncTask<SubmissionFetchParam, Integer, Void> {
-
-        public GetSubmissionsAsyncTask() {
-        }
-
-        protected Void doInBackground(SubmissionFetchParam... params) {
-            SubmissionFetchParam param = params[0];
-            loadMore(param);
-
-            return null;
-        }
-
-        protected void onPostExecute(Void v) {
-            mAdapter.notifyDataSetChanged();
-        }
     }
 
 
@@ -162,9 +142,61 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
 
     }
 
+    public static SubmissionListFragment newInstance(SubmissionSort sort) {
+        SubmissionListFragment fragment = new SubmissionListFragment();
+
+        if (sort != null) {
+            Bundle args = new Bundle();
+            args.putString(ARG_SORT, sort.toString());
+            fragment.setArguments(args);
+        }
+        return fragment;
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(int position, long id) {
+        SubmissionSort choice;
+
+        switch (position) {
+            case 0:
+                choice = SubmissionSort.HOT;
+                break;
+            case 1:
+                choice = SubmissionSort.NEW;
+                break;
+            case 2:
+                choice = SubmissionSort.RISING;
+                break;
+            case 3:
+                choice = SubmissionSort.CONTROVERSIAL;
+                break;
+            case 4:
+                choice = SubmissionSort.TOP;
+                break;
+            default:
+                choice = null;
+        }
+
+        if (mSubmissionSort != choice) {
+            mSubmissionSort = choice;
+            initList();
+        }
+
+        return true;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+
+        if (args != null) {
+            mSubmissionSort = SubmissionSort.valueOf(args.getString(ARG_SORT));
+        } else {
+            mSubmissionSort = SubmissionSort.HOT;
+        }
 
         mSubmissionsController = new Submissions(new PoliteHttpRestClient());
         mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
@@ -218,24 +250,14 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
             }
         });
 
+        // spinner for dropdown menu
+        SpinnerAdapter adapter = ArrayAdapter.createFromResource(mContext, R.array.submission_sort_array, R.layout.navigation_item_submission);
+        ((ActionBarActivity)mContext).getSupportActionBar().setListNavigationCallbacks(adapter, this);
+        ((ActionBarActivity)mContext).getSupportActionBar().setSelectedNavigationItem(sortToIndex(mSubmissionSort));
 
-        // passing empty string requests for the reddit frontpage
-        SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-        param.subreddit = "";
-        param.sort = mSubmissionSort;
-        param.count = 0;
-        param.limit = mSubmissionsPerPage;
-        param.after = null;
-        param.before = null;
-        param.show = mShowAll;
 
-        SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
-            @Override
-            public void onResponse(List<Submission> list) {
-                mPagedSubmissionsList.add(list);
-                mAdapter.notifyDataSetChanged();
-            }
-        });
+
+        initList();
 
         return view;
     }
@@ -243,6 +265,8 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
     @Override
     public void onAttach(Activity activity) {
         Log.d("SubmissionListFragment", "onAttach()");
+
+        mContext = (Context)activity;
 
         super.onAttach(activity);
         try {
@@ -261,5 +285,46 @@ public class SubmissionListFragment extends Fragment implements AbsListView.OnIt
         mListener = null;
     }
 
+
+    private void initList() {
+        mPagedSubmissionsList.clear();
+        mAdapter.notifyDataSetChanged();
+
+        // passing empty string requests for the reddit frontpage
+        SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
+        param.subreddit = "";
+        param.sort = mSubmissionSort;
+        param.count = 0;
+        param.limit = mSubmissionsPerPage;
+        param.after = null;
+        param.before = null;
+        param.show = mShowAll;
+
+        SessionManager.getInstance(mContext).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+            @Override
+            public void onResponse(List<Submission> list) {
+                mPagedSubmissionsList.add(list);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    private int sortToIndex(SubmissionSort sort) {
+        switch (sort) {
+            case HOT:
+                return 0;
+            case NEW:
+                return 1;
+            case RISING:
+                return 2;
+            case CONTROVERSIAL:
+                return 3;
+            case TOP:
+                return 4;
+            default:
+                return -1;
+        }
+    }
 
 }
