@@ -26,7 +26,7 @@ public class User {
 
     private final String username;
     private final RestClient restClient;
-    private String modhash, cookie, password;
+    private String modhash, cookie;
 
     /**
      * Create a user.
@@ -34,10 +34,10 @@ public class User {
      * @param username User name
      * @param password Password
      */
-    public User(RestClient restClient, String username, String password) {
+    public User(RestClient restClient, String username) {
         this.restClient = restClient;
         this.username = username;
-        this.password = password;
+//        this.password = password;
     }
 
     public User(String username, String cookie, String modhash) {
@@ -58,10 +58,11 @@ public class User {
     /**
      * Set the password of the user.
      * @param password Password
-     */
+
     public void setPassword(String password) {
         this.password = password;
     }
+     */
 
     /**
      * Retrieve the modulo hash of the cookie.
@@ -87,7 +88,7 @@ public class User {
      * @throws IOException If connection fails.
      * @throws ParseException If parsing JSON fails.
      */
-    public void connect() throws IOException, ParseException {
+    public void connect(String password) throws IOException, ParseException {
         ArrayList<String> hashCookiePair = hashCookiePair(username, password);
         this.modhash = hashCookiePair.get(0);
         this.cookie = hashCookiePair.get(1);

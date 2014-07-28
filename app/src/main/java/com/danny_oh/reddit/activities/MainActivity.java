@@ -3,12 +3,15 @@ package com.danny_oh.reddit.activities;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.SessionManager;
@@ -21,15 +24,19 @@ import com.danny_oh.reddit.fragments.SubredditFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
+import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 
 public class MainActivity
         extends ActionBarActivity
-        implements FragmentManager.OnBackStackChangedListener,
-        SubmissionListFragment.OnSubmissionListFragmentInteractionListener,
-        DrawerMenuFragment.OnDrawerMenuInteractionListener,
-        LoginDialogFragment.LoginDialogListener {
+        implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
+        SubmissionListFragment.OnSubmissionListFragmentInteractionListener, // handles individual submission item clicks
+        DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
+        LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
+        ActionBar.OnNavigationListener                                      // handles action bar navigation interaction
+
+{
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
@@ -97,6 +104,13 @@ public class MainActivity
                 break;
         }
 
+        mSlidingMenu.showContent();
+    }
+
+    @Override
+    public void onSubredditClick(String subredditName) {
+        SubmissionListFragment fragment = (SubmissionListFragment)mFragmentManager.findFragmentById(R.id.content_frame);
+        fragment.refresh(subredditName);
         mSlidingMenu.showContent();
     }
 
@@ -174,9 +188,13 @@ public class MainActivity
 
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        // enables dropdown menu of action bar
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+
         if (savedInstanceState == null) {
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, new SubmissionListFragment())
+                    .add(R.id.content_frame, SubmissionListFragment.newInstance(null, null))  // null defaults to SubmissionSort.HOT and frontpage
                     .commit();
         }
 
@@ -187,8 +205,18 @@ public class MainActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+//        getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int position, long id) {
+        switch (position) {
+            case 0:
+                return true;
+        }
+
+        return false;
     }
 
     @Override

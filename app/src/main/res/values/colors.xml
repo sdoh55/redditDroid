@@ -4,16 +4,24 @@
 
     <color name="drawer_background_light">#ffe8e1db</color>
     <color name="drawer_background_dark">#ff77474b</color>
+
     <color name="drawer_user_background">#ff93adc5</color>
     <color name="drawer_user_background_selected">#ffd7dee5</color>
     <color name="drawer_item_background">#ffd7dee5</color>
     <color name="drawer_item_background_selected">#ff93adc5</color>
 
+
+    <color name="drawer_user_menu_list_item_background">#ffa7a7a7</color>
+
     <color name="drawer_user_font_color">#fff2f2f2</color>
     <color name="drawer_font_color">#ffc6c6c6</color>
     <color name="drawer_font_color_dark">#ffefefef</color>
 
+    <color name="drawer_subreddit_title_background">#ffd7dee5</color>
+
     <color name="action_bar_background">#ffe37c29</color>
+    <color name="action_bar_home_background_selected">#ffe3620f</color>
+
 
     <color name="comment_username_font_color">#ff6287d0</color>
 

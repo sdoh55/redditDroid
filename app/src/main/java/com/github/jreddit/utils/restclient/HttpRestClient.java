@@ -175,7 +175,30 @@ public class HttpRestClient implements RestClient {
 		
 	}
 
-	/**
+    @Override
+    public Response postSecure(String apiParams, String urlPath, String cookie) {
+        try {
+            Response result = post(
+                    httpPostMethod()
+                            .withUrl(ApiEndpointUtils.REDDIT_SSL_URL + urlPath)
+                            .withCookie(cookie),
+                    convertRequestStringToList(apiParams)
+            );
+            if (result == null) {
+                throw new ActionFailedException("Due to unknown reasons, the response was undefined for URI path: " + urlPath);
+            } else {
+                return result;
+            }
+        } catch (URISyntaxException e) {
+            throw new ActionFailedException("The syntax of the URI path was incorrect: " + urlPath);
+        } catch (IOException e) {
+            throw new ActionFailedException("Input/output failed when retrieving from URI path: " + urlPath);
+        } catch (ParseException e) {
+            throw new ActionFailedException("Failed to parse the response from GET request to URI path: "+ urlPath);
+        }
+    }
+
+    /**
 	 * Convert a API parameters to a appropriate list.
 	 * 
 	 * @param apiParams Input string, for example 'a=2894&b=194'

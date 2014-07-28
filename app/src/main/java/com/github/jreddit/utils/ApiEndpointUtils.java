@@ -9,6 +9,7 @@ package com.github.jreddit.utils;
 public class ApiEndpointUtils {
 
     public static final String REDDIT_BASE_URL = "http://www.reddit.com";
+    public static final String REDDIT_SSL_URL = "https://ssl.reddit.com";
 
     public static final String REDDIT_BASE_API_ENDPOINT = "/api";
 
@@ -52,7 +53,7 @@ public class ApiEndpointUtils {
     
     public static final String SUBMISSIONS_SEARCH = "/search.json?%s";
     
-    public static final String SUBMISSIONS_GET = "/r/%s.json?%s";
+    public static final String SUBMISSIONS_GET = "/r/%s/%s.json?%s";
     
     /* User specific constants */
     

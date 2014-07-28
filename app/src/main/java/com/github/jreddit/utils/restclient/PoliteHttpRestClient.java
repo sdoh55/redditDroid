@@ -46,6 +46,14 @@ public class PoliteHttpRestClient extends HttpRestClient
         return resp;
     }
 
+    @Override
+    public Response postSecure(String apiParams, String urlPath, String cookie) {
+        waitIfNeeded();
+        Response resp = super.postSecure(apiParams, urlPath, cookie);
+        noteTime();
+        return resp;
+    }
+
     private void noteTime()
     {
         lastReqTime = System.currentTimeMillis();

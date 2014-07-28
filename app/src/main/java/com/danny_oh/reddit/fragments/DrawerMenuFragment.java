@@ -44,7 +44,8 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
     public interface OnDrawerMenuInteractionListener {
         public void onLoginClick();
         public void onLogoutClick();
-        public void onDrawerItemClick(int position);
+        public void onDrawerItemClick(int position); // not used
+        public void onSubredditClick(String subredditName);
     }
 
     /* used if ListFragment
@@ -135,17 +136,9 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_main_drawer, container, false);
 
-
-        mListView = (ListView)view.findViewById(R.id.subreddit_menu_list_view);
-        mListView.setOnItemClickListener(this);
-        mListView.setSelector(R.drawable.selector_drawer_list_item);
-
-        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
-        mListView.setAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
-
-
+        // the RelativeLayout that contains the "Log In" button
         RelativeLayout loginLayout = (RelativeLayout)view.findViewById(R.id.login_button_view);
-
+        // the logged in user's expandable menu
         mUserListView = (ExpandableListView)view.findViewById(R.id.user_menu_list_view);
 
         // if user is logged in
@@ -186,6 +179,18 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
             });
         }
 
+        getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, new SubredditFragment()).commit();
+
+//        mListView = (ListView)view.findViewById(R.id.subreddit_list_view);
+//
+//        mListView.setOnItemClickListener(this);
+//        mListView.setSelector(R.drawable.selector_drawer_list_item);
+//
+//        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
+//        mListView.setAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
+
+
+
         return view;
     }
 
@@ -200,7 +205,7 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
     private void prepareUserMenuData() {
         // the group header titles for the user menu (expandable list view)
         mUserHeaderList = new ArrayList<Pair<String, String>>();
-        mUserHeaderList.add(new Pair<String, String>(mSessionManager.getUser().getUsername(), getResources().getString(R.string.placeholder_logged_in)));
+        mUserHeaderList.add(new Pair<String, String>(mSessionManager.getUser().getUsername(), getResources().getString(R.string.drawer_user_menu_subtitle)));
 
         // the item header titles for the logged in user menu
         List<String> loggedInUserItems = Arrays.asList(getResources().getStringArray(R.array.drawer_menu_logged_in_user_items));

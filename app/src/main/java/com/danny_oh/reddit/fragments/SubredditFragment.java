@@ -58,7 +58,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     private String mParam2;
 
     private MainActivity mActivity;
-    private OnFragmentInteractionListener mListener;
+    private DrawerMenuFragment.OnDrawerMenuInteractionListener mListener;
 
     /**
      * The fragment's ListView/GridView.
@@ -136,13 +136,16 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = (MainActivity)activity;
-        //TODO: what is this interface for??
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                + " must implement OnFragmentInteractionListener");
-//        }
+
+        // TODO: may want to specify listener for subreddit fragment, maybe the subreddit list will be displayed somewhere else too?
+        try {
+            mListener = (DrawerMenuFragment.OnDrawerMenuInteractionListener)activity;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            throw new ClassCastException("The activity containing SubredditFragment must implement OnDrawerMenuInteractionListener");
+        }
+
+
     }
 
     @Override
@@ -161,14 +164,11 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        if (null != mListener) {
-//            // Notify the active callbacks interface (the activity, if the
-//            // fragment is attached to one) that an item has been selected.
-//            mListener.onFragmentInteraction(mSubredditList.get(position).getDisplayName());
-//        }
-        SubmissionListFragment fragment = SubmissionListFragment.newInstance(mSubredditAdapter.getItem(position).getDisplayName());
-        Log.d(TAG,mSubredditList.get(position).getDisplayName());
-        mActivity.showFragment(fragment,true);
+        mListener.onSubredditClick(mSubredditAdapter.getItem(position).getDisplayName());
+
+//        SubmissionListFragment fragment = SubmissionListFragment.newInstance(mSubredditAdapter.getItem(position).getDisplayName());
+//        Log.d(TAG,mSubredditList.get(position).getDisplayName());
+//        mActivity.showFragment(fragment,true);
     }
 
     /**
