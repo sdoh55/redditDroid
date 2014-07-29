@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/baconit_icon"
+        android:icon="@drawable/redditandroid_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity

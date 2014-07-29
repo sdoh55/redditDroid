@@ -43,6 +43,12 @@
     <string name="search_subreddits_hint">search subreddits</string>
     <string name="list_header_subreddit">front page</string>
 
+    <!-- Log In Dialog Strings -->
+    <string name="dialog_login_hint_username">username</string>
+    <string name="dialog_login_hint_password">password</string>
+    <string name="dialog_login_text">Log In to Reddit</string>
+
+
     <!-- General -->
     <string name="ok">Ok</string>
 
@@ -65,8 +71,6 @@
     <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
     <string name="placeholder_submission_num_comments">number of comments</string>
 
-    <string name="placeholder_username">username</string>
-    <string name="placeholder_password">password</string>
 
     <string name="placeholder_comment_time_created">time created</string>
     <string name="placeholder_comment_body">comment body</string>

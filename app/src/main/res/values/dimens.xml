@@ -25,6 +25,8 @@
 
 
     <!-- Login Dialog Dimensions -->
+    <dimen name="dialog_login_text_font_size">20sp</dimen>
+    <dimen name="dialog_login_text_vertical_margin">8dp</dimen>
     <dimen name="dialog_input_horizontal_margin">8dp</dimen>
     <dimen name="dialog_input_vertical_margin">16dp</dimen>
 

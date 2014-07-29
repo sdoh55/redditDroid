@@ -94,6 +94,14 @@ public class User {
         this.cookie = hashCookiePair.get(1);
     }
 
+    public void connect(String password, boolean rem) throws IOException, ParseException {
+        ArrayList<String> hashCookiePair = hashCookiePairRem(username, password, rem);
+        this.modhash = hashCookiePair.get(0);
+        this.cookie = hashCookiePair.get(1);
+    }
+
+
+
     /**
      * This function logs in to reddit and returns an ArrayList containing a
      * modhash and cookie.
@@ -106,13 +114,29 @@ public class User {
      */
     private ArrayList<String> hashCookiePair(String username, String password) throws IOException, ParseException {
         ArrayList<String> values = new ArrayList<String>();
-        JSONObject jsonObject = (JSONObject) restClient.post("api_type=json&user=" + username + "&passwd=" + password, String.format(ApiEndpointUtils.USER_LOGIN, username), getCookie()).getResponseObject();
+        JSONObject jsonObject = (JSONObject) restClient.postSecure("api_type=json&user=" + username + "&passwd=" + password, String.format(ApiEndpointUtils.USER_LOGIN, username), getCookie()).getResponseObject();
         JSONObject valuePair = (JSONObject) ((JSONObject) jsonObject.get("json")).get("data");
 
         values.add(valuePair.get("modhash").toString());
         values.add(valuePair.get("cookie").toString());
 
         return values;
+    }
+
+    private ArrayList<String> hashCookiePairRem(String username, String password, boolean rem) throws IOException, ParseException {
+        ArrayList<String> values = new ArrayList<String>();
+        JSONObject jsonObject = (JSONObject) restClient.postSecure("api_type=json&user=" + username + "&passwd=" + password + "&rem=" + String.valueOf(rem), String.format(ApiEndpointUtils.USER_LOGIN, username), getCookie()).getResponseObject();
+        JSONObject valuePair = (JSONObject) ((JSONObject) jsonObject.get("json")).get("data");
+
+        values.add(valuePair.get("modhash").toString());
+        values.add(valuePair.get("cookie").toString());
+
+        return values;
+    }
+
+
+    private void getUserJson() {
+
     }
 
 }

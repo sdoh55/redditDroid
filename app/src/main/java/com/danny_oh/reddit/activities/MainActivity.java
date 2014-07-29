@@ -113,14 +113,17 @@ public class MainActivity
         mSessionManager.userLogIn(username, password, new SessionManager.SessionListener<User>() {
             @Override
             public void onResponse(User object) {
-                Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
+                if (object != null) {
+                    Log.d("MainActivity", String.format("User %s logged in.", object.getUsername()));
 
-                finish();
-                startActivity(getIntent());
+                    finish();
+                    startActivity(getIntent());
 
-                Toast.makeText(getApplicationContext(), "Logged in as " + object.getUsername(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Logged in as " + object.getUsername(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
     }
 
 /*

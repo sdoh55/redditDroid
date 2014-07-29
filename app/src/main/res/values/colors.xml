@@ -2,8 +2,8 @@
 <resources>
     <color name="white">#fff</color>
 
-    <color name="drawer_background_light">#ffe8e1db</color>
-    <color name="drawer_background_dark">#ff77474b</color>
+    <color name="drawer_background_light">#ffececec</color>
+    <color name="drawer_background_dark">#767c8d</color>
 
     <color name="drawer_user_background">#ff93adc5</color>
     <color name="drawer_user_background_selected">#ffd7dee5</color>
@@ -17,10 +17,14 @@
     <color name="drawer_font_color">#ffc6c6c6</color>
     <color name="drawer_font_color_dark">#ffefefef</color>
 
-    <color name="drawer_subreddit_title_background">#ffd7dee5</color>
+    <color name="drawer_subreddit_title_font_color">#ffe1e1e4</color>
+    <color name="drawer_subreddit_title_background">#3b4344</color>
+    <color name="drawer_subreddit_search_background">#f3f4f4</color>
+    <color name="drawer_subreddit_search_hint_font_color">#ffc2c2c2</color>
 
-    <color name="action_bar_background">#ffe37c29</color>
+    <color name="action_bar_background">#8f87a7</color>
     <color name="action_bar_home_background_selected">#ffe3620f</color>
+    <color name="action_bar_search_hint_font_color">#ffe1e1e1</color>
 
 
     <color name="comment_username_font_color">#ff6287d0</color>

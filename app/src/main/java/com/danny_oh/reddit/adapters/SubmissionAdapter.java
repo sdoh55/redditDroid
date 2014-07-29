@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
@@ -107,10 +108,13 @@ public class SubmissionAdapter extends BaseAdapter {
 
             Time time = new Time("UTC");
             long timeNow = System.currentTimeMillis() / 1000;
-            long created = submission.getCreatedUTC();
-            int hoursSinceCreation = (int)((timeNow - created) / 60 / 60);
+            long timePosted = submission.getCreatedUTC();
+            int hoursElapsed = (int)((timeNow - timePosted) / 60 / 60);
 
-            viewHolder.subtitle.setText(hoursSinceCreation + " hrs ago" + " | " + submission.getAuthor() + " | " + submission.getSubreddit() + " | " + submission.getDomain());
+            String timeElapsed = (hoursElapsed > 0) ? hoursElapsed + " hrs ago" : ((timeNow - timePosted) / 60) + " mins ago";
+
+            viewHolder.subtitle.setText(timeElapsed + " | " + submission.getAuthor() + " | " + submission.getSubreddit() + " | " + submission.getDomain());
+
 
             if (!submission.getThumbnail().equals("") && !submission.getThumbnail().equals("self")) {
                 viewHolder.thumbnail.setVisibility(View.VISIBLE);
@@ -171,6 +175,8 @@ public class SubmissionAdapter extends BaseAdapter {
                                 submission.setScore(submission.getScore() + (direction == 1 ? 1 : -1));
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(mContext, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -197,6 +203,8 @@ public class SubmissionAdapter extends BaseAdapter {
                                 submission.setScore(submission.getScore() + (direction == -1 ? -1 : 1));
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(mContext, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

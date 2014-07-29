@@ -62,6 +62,9 @@ public class SessionManager {
             } catch (ParseException pe) {
                 pe.printStackTrace();
                 Log.e("SessionManager","Parse Exception while attempting to connect user.");
+            } catch (NullPointerException npe) {
+                Log.e("SessionManager", "Failed to log in. Likely due to wrong password.");
+                return null;
             }
 
             return mUser;
@@ -69,17 +72,22 @@ public class SessionManager {
 
         @Override
         protected void onPostExecute(User user) {
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (user != null) {
 
-            editor.putString(SHARED_PREFERENCES_USERNAME, user.getUsername());
-            editor.putString(SHARED_PREFERENCES_USER_COOKIE, user.getCookie());
-            editor.putString(SHARED_PREFERENCES_USER_MODHASH, user.getModhash());
-            editor.commit();
+                SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            mMarkActions.switchActor(user);
-            mSubmissionsController.switchActor(mUser);
-            mListener.onResponse(user);
+                editor.putString(SHARED_PREFERENCES_USERNAME, user.getUsername());
+                editor.putString(SHARED_PREFERENCES_USER_COOKIE, user.getCookie());
+                editor.putString(SHARED_PREFERENCES_USER_MODHASH, user.getModhash());
+                editor.commit();
+
+                mMarkActions.switchActor(user);
+                mSubmissionsController.switchActor(mUser);
+                mListener.onResponse(user);
+            } else {
+                Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -98,6 +106,7 @@ public class SessionManager {
                 return mMarkActions.vote(fullname, dir);
             } else {
                 Log.d("SessionManager", "User is not logged in. Returning.");
+                Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
@@ -175,6 +184,9 @@ public class SessionManager {
 
         if (username != null && cookie != null & modhash != null) {
             mUser = new User(username, cookie, modhash);
+
+
+
             mMarkActions.switchActor(mUser);
             mSubmissionsController.switchActor(mUser);
             Toast.makeText(mContext, "Logged in as " + mUser.getUsername(), Toast.LENGTH_SHORT).show();

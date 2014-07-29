@@ -8,13 +8,19 @@
     android:focusableInTouchMode="true"
     >
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/drawer_subreddit_search_background">
     <EditText
         android:id="@+id/search_subreddits"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:imeOptions="actionSearch"
         android:hint="@string/search_subreddits_hint"
+        android:textColorHint="@color/drawer_subreddit_search_hint_font_color"
         android:padding="14dp" />
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/subreddit_list_listview"

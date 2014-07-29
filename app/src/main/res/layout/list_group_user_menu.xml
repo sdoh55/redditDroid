@@ -9,7 +9,7 @@
 
     <ImageView
         android:id="@+id/user_menu_group_icon"
-        android:src="@drawable/reddit_red"
+        android:src="@drawable/redditandroid_head"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_centerVertical="true"
@@ -30,23 +30,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/placeholder_subtitle"
-            android:textColor="@color/drawer_font_color"
-            android:layout_toEndOf="@id/user_menu_group_icon"
-            android:layout_toRightOf="@id/user_menu_group_icon"
+            android:textColor="@color/drawer_user_font_color"
             android:textSize="12sp"
-            android:layout_above="@+id/login_text"
             android:visibility="visible" />
 
         <TextView
             android:id="@+id/user_menu_group_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/drawer_font_color"
+            android:textColor="@color/drawer_user_font_color"
             android:text="@string/placeholder_title"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/user_menu_group_icon"
-            android:layout_toRightOf="@id/user_menu_group_icon"
-            android:textStyle="bold"
-            android:layout_alignParentBottom="true" />
+            android:textStyle="bold"/>
     </LinearLayout>
 </RelativeLayout>

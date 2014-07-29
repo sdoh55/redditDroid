@@ -42,6 +42,7 @@ public class CommentListFragment extends ListFragment {
     private String mSubmissionId;
     private CommentSort mCommentSort = CommentSort.CONFIDENCE;
 
+    private GetCommentsAsyncTask mCommentTask;
 
     private List<Comment> mCommentsList;
 
@@ -75,7 +76,7 @@ public class CommentListFragment extends ListFragment {
             Comments comments = new Comments(new PoliteHttpRestClient(), null);
 
             // params: submissionId, commentId, parentsShown, depth, limit, CommentSort
-            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort);
+            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, 150, mCommentSort);
             mCommentMap = CommentsListHelper.listToMap(mCommentsList);
 
             Log.d("CommentListFragment", "mCommentList count: " + mCommentsList.size());
@@ -122,7 +123,8 @@ public class CommentListFragment extends ListFragment {
             throw new InstantiationException("Use factory method newInstance to instantiate fragment.", new Exception());
         }
 
-        new GetCommentsAsyncTask().execute(mSubmissionId);
+        mCommentTask = new GetCommentsAsyncTask();
+        mCommentTask.execute(mSubmissionId);
 
         setHasOptionsMenu(true);
     }
@@ -149,6 +151,13 @@ public class CommentListFragment extends ListFragment {
 //            throw new ClassCastException(activity.toString()
 //                    + " must implement OnFragmentInteractionListener");
 //        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("CommentListFragment", "onDestroyView called.");
+        super.onDestroyView();
+        mCommentTask.cancel(true);
     }
 
     @Override
