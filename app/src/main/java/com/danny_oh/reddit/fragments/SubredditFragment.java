@@ -134,8 +134,8 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 // if 'return' key was pressed
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    mSearchSubredditEditText.clearFocus();
                     mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
+                    mSearchSubredditEditText.clearFocus();
 
                     return true;
                 }
