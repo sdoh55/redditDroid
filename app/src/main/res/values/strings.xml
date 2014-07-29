@@ -41,6 +41,7 @@
 
     <!-- Subreddit Fragment Strings -->
     <string name="search_subreddits_hint">search subreddits</string>
+    <string name="list_header_subreddit">front page</string>
 
     <!-- General -->
     <string name="ok">Ok</string>

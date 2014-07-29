@@ -154,6 +154,8 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             }
         });
 
+        mListView.addHeaderView(inflater.inflate(R.layout.list_header_subreddit, mListView, false));
+
         return view;
     }
 
@@ -196,7 +198,14 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onSubredditClick(mSubredditAdapter.getItem(position).getDisplayName());
+        if (position == 0) {
+            // front page was selected
+            mListener.onSubredditClick("");
+        } else {
+            // changed getting Subreddit from adapter because the "front page" header shifts the position of the list items
+            // down by one. By calling getItemAtPosition on the list view, the correct Subreddit is retrieved from the list.
+            mListener.onSubredditClick(((Subreddit) mListView.getItemAtPosition(position)).getDisplayName());
+        }
 
 //        SubmissionListFragment fragment = SubmissionListFragment.newInstance(mSubredditAdapter.getItem(position).getDisplayName());
 //        Log.d(TAG,mSubredditList.get(position).getDisplayName());

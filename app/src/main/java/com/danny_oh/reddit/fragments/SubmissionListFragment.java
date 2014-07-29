@@ -416,11 +416,9 @@ public class SubmissionListFragment extends Fragment implements
 
 
 
-
-
-/*
- * public methods
- */
+    /*
+         * public methods
+         */
     public void refresh(String subredditName) {
         if (!mSubredditName.equals(subredditName)) {
             mSubredditName = subredditName;
@@ -450,6 +448,13 @@ public class SubmissionListFragment extends Fragment implements
     private void initList() {
         mPagedSubmissionsList.clear();
         mAdapter.notifyDataSetChanged();
+
+        if (mSubredditName.isEmpty()) {
+            // default to front page
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+        } else {
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+        }
 
         // passing empty string requests for the reddit frontpage
         SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();

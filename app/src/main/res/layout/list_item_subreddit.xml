@@ -2,17 +2,17 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="@dimen/subreddit_fragment_list_item_height">
 
     <TextView
         android:id="@+id/subreddit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Subreddit"
-        android:textSize="20sp"
+        android:textSize="@dimen/subreddit_fragment_list_item_font_size"
         android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="false"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="@dimen/subreddit_fragment_list_item_margin" />
 </RelativeLayout>

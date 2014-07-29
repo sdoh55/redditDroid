@@ -210,8 +210,6 @@ public class MainActivity
             mFragmentManager.beginTransaction()
                     .add(R.id.content_frame, SubmissionListFragment.newInstance(null, null))  // null defaults to SubmissionSort.HOT and frontpage
                     .commit();
-
-            getSupportActionBar().setTitle("front page");
         }
 
 
