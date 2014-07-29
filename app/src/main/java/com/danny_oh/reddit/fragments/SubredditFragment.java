@@ -2,17 +2,20 @@ package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -59,6 +62,8 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
     private MainActivity mActivity;
     private DrawerMenuFragment.OnDrawerMenuInteractionListener mListener;
+
+    private EditText mSearchSubredditEditText;
 
     /**
      * The fragment's ListView/GridView.
@@ -108,7 +113,8 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        setHasOptionsMenu(true);
+        // disabled for side drawer integration
+//        setHasOptionsMenu(true);
     }
 
     @Override
@@ -121,6 +127,32 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
+
+        mSearchSubredditEditText = (EditText)view.findViewById(R.id.search_subreddits);
+        mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                // if 'return' key was pressed
+                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    mSearchSubredditEditText.clearFocus();
+                    mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+        mSearchSubredditEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    mSearchSubredditEditText.setText("");
+                } else {
+                    hideKeyboard();
+                }
+            }
+        });
 
         return view;
     }
@@ -184,21 +216,6 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         }
     }
 
-    /**
-    * This interface must be implemented by activities that contain this
-    * fragment to allow an interaction in this fragment to be communicated
-    * to the activity and potentially other fragments contained in that
-    * activity.
-    * <p>
-    * See the Android Training lesson <a href=
-    * "http://developer.android.com/training/basics/fragments/communicating.html"
-    * >Communicating with Other Fragments</a> for more information.
-    */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.subreddits_menu,menu);
@@ -251,5 +268,10 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         });
 
         alert.show();
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager manager = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow(mSearchSubredditEditText.getWindowToken(), 0);
     }
 }

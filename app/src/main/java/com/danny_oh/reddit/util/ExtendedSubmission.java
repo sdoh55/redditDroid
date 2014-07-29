@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 
 /**
  * Created by danny on 7/23/14.
+ *
+ * A Parcelable Submission
  */
 public class ExtendedSubmission extends Submission implements Parcelable {
 

@@ -6,8 +6,5 @@
     <item android:id="@+id/show_comments"
         android:title="@string/option_menu_submission_comments"
         app:showAsAction="never"/>
-    <item android:id="@+id/option1"
-        android:title="@string/option_menu_submission_option1"
-        app:showAsAction="never"/>
 
 </menu>

@@ -5,20 +5,23 @@
     android:layout_height="match_parent"
     tools:context="com.danny_oh.reddit.fragments.SubmissionListFragment">
 
-    <com.danny_oh.reddit.SubmissionListView
+    <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false" />
-    <!--Apply padding when using ActionBar overlay mode-->
-        <!--android:paddingTop="?attr/actionBarSize"-->
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        />
+    <!--Apply padding when using ActionBar overlay mode
+        android:clipToPadding="false"
+        android:paddingTop="?attr/actionBarSize"-->
 
 
-    <TextView
+    <ProgressBar
         android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"

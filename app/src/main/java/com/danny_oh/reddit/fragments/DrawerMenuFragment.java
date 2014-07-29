@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by danny on 7/22/14.
  */
-public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemClickListener,
+public class DrawerMenuFragment extends Fragment implements
         ExpandableListView.OnChildClickListener {
     private OnDrawerMenuInteractionListener mListener;
 
@@ -44,7 +44,6 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
     public interface OnDrawerMenuInteractionListener {
         public void onLoginClick();
         public void onLogoutClick();
-        public void onDrawerItemClick(int position); // not used
         public void onSubredditClick(String subredditName);
     }
 
@@ -80,18 +79,6 @@ public class DrawerMenuFragment extends Fragment implements AdapterView.OnItemCl
         }
 
         return false;
-    }
-
-    /**
-     * OnItemClick handler for the menu list view
-     * @param adapterView
-     * @param view
-     * @param position
-     * @param id
-     */
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        mListener.onDrawerItemClick(position);
     }
 
     public static DrawerMenuFragment newInstance() {

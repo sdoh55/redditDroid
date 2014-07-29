@@ -31,11 +31,16 @@
     <string name="drawer_subreddit_list_header_title">SUBREDDITS</string>
 
     <!-- Options Menu Strings -->
+    <string name="option_menu_submission_search">Search</string>
+    <string name="option_menu_submission_search_action_hint">submissions</string>
     <string name="option_menu_submission_comments">Show Comments</string>
-    <string name="option_menu_submission_option1">Another Option</string>
     <string name="new_subreddits">New</string>
     <string name="popular_subreddits">Popular</string>
     <string name="search_subreddits">Search Subreddits</string>
+
+
+    <!-- Subreddit Fragment Strings -->
+    <string name="search_subreddits_hint">search subreddits</string>
 
     <!-- General -->
     <string name="ok">Ok</string>

@@ -1,5 +1,6 @@
 package com.danny_oh.reddit.activities;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,8 +10,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
@@ -33,8 +38,7 @@ public class MainActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
         SubmissionListFragment.OnSubmissionListFragmentInteractionListener, // handles individual submission item clicks
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
-        LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
-        ActionBar.OnNavigationListener                                      // handles action bar navigation interaction
+        LoginDialogFragment.LoginDialogListener                             // handles user login dialog interaction
 
 {
 
@@ -68,11 +72,13 @@ public class MainActivity
         */
 
         mSlidingMenu.setSlidingEnabled(false);
+
+
     }
 
-    /*
-     * OnDrawerMenuInteractionListener interface implementation
-     */
+/*
+ * OnDrawerMenuInteractionListener interface implementation
+ */
 
     /**
      * Click handler for user login button at top of drawer menu
@@ -88,23 +94,6 @@ public class MainActivity
 
         finish();
         startActivity(getIntent());
-    }
-
-    /**
-     * Click handler for items in the list view of the drawer menu
-     * @param position
-     */
-    @Override
-    public void onDrawerItemClick(int position) {
-        switch (position) {
-            // login
-            case 0:
-                // subreddits_menu
-                showFragment(new SubredditFragment(), true);
-                break;
-        }
-
-        mSlidingMenu.showContent();
     }
 
     @Override
@@ -134,6 +123,9 @@ public class MainActivity
         });
     }
 
+/*
+ * Other interface implementations
+ */
     /**
      * Listener for FragmentManager back stack changes to handle action bar home icon and side menu sliding options
      */
@@ -142,6 +134,28 @@ public class MainActivity
         boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
         mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        View view = getCurrentFocus();
+
+        if (view instanceof EditText) {
+            int editTextCoordinates[] = new int[2];
+            view.getLocationOnScreen(editTextCoordinates);
+
+            float x = ev.getRawX() + view.getLeft() - editTextCoordinates[0];
+            float y = ev.getRawY() + view.getTop() - editTextCoordinates[1];
+
+            if (ev.getAction() == MotionEvent.ACTION_UP && (x < view.getLeft() || x >= view.getRight() || y < view.getTop() || y >= view.getBottom())) {
+                // touch was outside the currently focused EditText view
+                view.clearFocus();
+
+                return true;
+            }
+        }
+
+        return super.dispatchTouchEvent(ev);
     }
 
     /*
@@ -196,6 +210,8 @@ public class MainActivity
             mFragmentManager.beginTransaction()
                     .add(R.id.content_frame, SubmissionListFragment.newInstance(null, null))  // null defaults to SubmissionSort.HOT and frontpage
                     .commit();
+
+            getSupportActionBar().setTitle("front page");
         }
 
 
@@ -209,15 +225,6 @@ public class MainActivity
         return true;
     }
 
-    @Override
-    public boolean onNavigationItemSelected(int position, long id) {
-        switch (position) {
-            case 0:
-                return true;
-        }
-
-        return false;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -237,6 +244,7 @@ public class MainActivity
                 if (mSlidingMenu.isMenuShowing()) {
                     mSlidingMenu.showContent();
                 } else {
+
                     mSlidingMenu.showMenu();
                 }
 
