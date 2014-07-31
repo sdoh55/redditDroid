@@ -1,13 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.danny_oh.reddit.fragments.CommentListFragment"
+    tools:context="com.danny_oh.reddit.fragments.SubmissionListFragment"
     android:background="@android:color/white">
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        />
+    <!--Apply padding when using ActionBar overlay mode
+        android:clipToPadding="false"
+        android:paddingTop="?attr/actionBarSize"-->
+
+
+    <ProgressBar
+        android:id="@android:id/empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center_horizontal|bottom"
+        android:indeterminate="true"
+        android:visibility="gone"/>
 
 </FrameLayout>

@@ -25,9 +25,13 @@
     <color name="action_bar_background">#8f87a7</color>
     <color name="action_bar_home_background_selected">#ffe3620f</color>
     <color name="action_bar_search_hint_font_color">#ffe1e1e1</color>
+    <color name="action_bar_menu_item_selected">#ffccd4e8</color>
 
 
     <color name="comment_username_font_color">#ff6287d0</color>
+    <color name="comment_author_font_color">#ffdc8200</color>
+
+    <color name="self_submission_background_light">#fff</color>
 
     <color name="selected_state">#ccc</color>
     <color name="unselected_state">#0000</color>

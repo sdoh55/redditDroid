@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/subreddit_fragment_list_item_height">
 
@@ -13,5 +12,5 @@
         android:textSize="@dimen/subreddit_fragment_list_item_font_size"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/subreddit_fragment_list_item_margin"
-        />
-</LinearLayout>
+        android:layout_centerVertical="true" />
+</RelativeLayout>

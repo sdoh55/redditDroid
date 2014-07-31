@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.SubredditAdapter;
 import com.danny_oh.reddit.tasks.SubredditSearchTask;
@@ -51,14 +52,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     private List<Subreddit> mSubredditList;
     private SubredditAdapter mSubredditAdapter;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private MainActivity mActivity;
     private DrawerMenuFragment.OnDrawerMenuInteractionListener mListener;
@@ -81,8 +75,17 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             view = subredditsView;
         }
         protected Void doInBackground(Void... voids) {
-            Subreddits subreddits = new Subreddits(new PoliteHttpRestClient());
-            mSubredditList = subreddits.get(view, 0, 25, null, null);
+            Subreddits subreddits;
+
+            SessionManager manager = SessionManager.getInstance(getActivity());
+
+            if (manager.isUserLoggedIn()) {
+                subreddits = new Subreddits(manager.getRestClient(), manager.getUser());
+            } else {
+                subreddits = new Subreddits(new PoliteHttpRestClient());
+            }
+
+            mSubredditList = subreddits.get(view, 0, 30, null, null);
 
             return null;
         }
@@ -98,8 +101,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     public static SubredditFragment newInstance(String param1, String param2) {
         SubredditFragment fragment = new SubredditFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,8 +111,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
 
         // disabled for side drawer integration

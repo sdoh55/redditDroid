@@ -173,7 +173,7 @@ public class Submission extends Thing {
             setCreatedUTC(safeJsonToDouble(obj.get("created_utc")).longValue());
             
             setVisited(safeJsonToBoolean(obj.get("visited")));
-            setSelf(safeJsonToBoolean(obj.get("self")));
+            setSelf(safeJsonToBoolean(obj.get("is_self")));
             setSaved(safeJsonToBoolean(obj.get("saved")));
             setEdited(safeJsonToBoolean(obj.get("edited")));
             setStickied(safeJsonToBoolean(obj.get("stickied")));

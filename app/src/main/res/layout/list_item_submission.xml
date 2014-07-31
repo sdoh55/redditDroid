@@ -94,8 +94,8 @@
             android:textSize="@dimen/submission_num_comments_font_size"
             android:textStyle="bold"
             android:layout_weight="1"
-            android:paddingBottom="6dp"
-            android:paddingTop="6dp" />
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp" />
 
     </LinearLayout>
 </LinearLayout>

@@ -1,6 +1,5 @@
 package com.danny_oh.reddit;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -8,15 +7,22 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.util.Constants;
+import com.danny_oh.reddit.util.RedditRestClient;
 import com.github.jreddit.action.MarkActions;
+import com.github.jreddit.action.ProfileActions;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
+import com.github.jreddit.entity.UserInfo;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.utils.restclient.HttpRestClient;
-import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
+import com.github.jreddit.utils.restclient.RestResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClients;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -40,6 +46,8 @@ public class SessionManager {
     private User mUser;
     private MarkActions mMarkActions;
     private Submissions mSubmissionsController;
+    private ProfileActions mProfileActions;
+
 
     private class LoginAsyncTask extends AsyncTask<String, Void, User> {
         SessionListener<User> mListener;
@@ -55,7 +63,7 @@ public class SessionManager {
 
             mUser = new User(mRestClient, username);
             try {
-                mUser.connect(password);
+                mUser.connect(password, true);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 Log.e("SessionManager","IO Exception while attempting to connect user.");
@@ -83,7 +91,8 @@ public class SessionManager {
                 editor.commit();
 
                 mMarkActions.switchActor(user);
-                mSubmissionsController.switchActor(mUser);
+                mSubmissionsController.switchActor(user);
+                mProfileActions.switchActor(user);
                 mListener.onResponse(user);
             } else {
                 Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
@@ -93,6 +102,7 @@ public class SessionManager {
 
     private class MarkAsyncTask extends AsyncTask<String, Void, Boolean> {
         private SessionListener<Boolean> mListener;
+
         public MarkAsyncTask(SessionListener<Boolean> listener) {
             this.mListener = listener;
         }
@@ -150,7 +160,25 @@ public class SessionManager {
         }
     }
 
+    private class ProfileActionsAsynsTask extends AsyncTask<Void, Void, UserInfo> {
+        private SessionListener<UserInfo> mListener;
 
+        ProfileActionsAsynsTask(SessionListener<UserInfo> listener) {
+            mListener = listener;
+        }
+
+        @Override
+        protected UserInfo doInBackground(Void... voids) {
+            UserInfo info = mProfileActions.getUserInformation();
+
+            return info;
+        }
+
+        @Override
+        protected void onPostExecute(UserInfo userInfo) {
+            mListener.onResponse(userInfo);
+        }
+    }
 
 
 
@@ -163,8 +191,9 @@ public class SessionManager {
 
     public static SessionManager getInstance(Context context) {
         if (mManager == null) {// if vote was successful
-            mManager = new SessionManager(context, new HttpRestClient());
+            mManager = new SessionManager(context, RedditRestClient.getInstance(context));
         }
+
         return mManager;
     }
 
@@ -174,6 +203,8 @@ public class SessionManager {
         mRestClient.setUserAgent(Constants.USER_AGENT);
         mMarkActions = new MarkActions(mRestClient);
         mSubmissionsController = new Submissions(mRestClient);
+        mProfileActions = new ProfileActions(mRestClient);
+
 
 
         // restore user info if available
@@ -183,13 +214,23 @@ public class SessionManager {
         String modhash = preferences.getString(SHARED_PREFERENCES_USER_MODHASH, null);
 
         if (username != null && cookie != null & modhash != null) {
-            mUser = new User(username, cookie, modhash);
-
-
-
+            mUser = new User(restClient, username, cookie, modhash);
+            mProfileActions.switchActor(mUser);
             mMarkActions.switchActor(mUser);
             mSubmissionsController.switchActor(mUser);
-            Toast.makeText(mContext, "Logged in as " + mUser.getUsername(), Toast.LENGTH_SHORT).show();
+
+            new ProfileActionsAsynsTask(new SessionListener<UserInfo>() {
+                @Override
+                public void onResponse(UserInfo object) {
+                    if (object != null) {
+                        Toast.makeText(mContext, "Logged in as " + mUser.getUsername(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        // TODO: handle failure to get user info on startup (cookie & modhash no longer works)
+                        // TODO: need to show logged out screen on main activity drawer. restart activity?
+//                        userLogout();
+                    }
+                }
+            }).execute();
         }
     }
 
@@ -201,6 +242,7 @@ public class SessionManager {
         mUser = null;
         mMarkActions.switchActor(null);
         mSubmissionsController.switchActor(null);
+        mProfileActions.switchActor(null);
 
         mRestClient = new HttpRestClient();
         mRestClient.setUserAgent(Constants.USER_AGENT);
@@ -215,6 +257,9 @@ public class SessionManager {
 
     public boolean isUserLoggedIn() { return (mUser != null); }
 
+    public RestClient getRestClient() {
+        return mRestClient;
+    }
 
     public void vote(String fullname, int dir, SessionListener<Boolean> listener) {
         new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));

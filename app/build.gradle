@@ -17,6 +17,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+//    productFlavors {
+//        x86 {
+//            ndk {
+//                abiFilter "x86"
+//            }
+//        }
+//        arm {
+//            ndk {
+//                abiFilters "armeabi-v7a", "armeabi"
+//            }
+//        }
+//
+//    }
 }
 
 dependencies {
@@ -35,6 +49,10 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'com.squareup.picasso:picasso:2.3.2'
     compile project(':libraries:slidingmenu')
+
+    compile 'com.loopj.android:android-async-http:1.4.5'
+
+//    compile 'in.uncod.android.bypass:bypass:1.1'
 }
 
 

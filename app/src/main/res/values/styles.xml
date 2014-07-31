@@ -1,21 +1,25 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <!--<item name="homeAsUpIndicator">@drawable/ic_drawer</item>-->
+        <!--<item name="android:homeAsUpIndicator">@drawable/ic_drawer</item>-->
         <item name="actionBarStyle">@style/MainActionBarStyle</item>
+        <item name="android:actionBarStyle" tools:targetApi="11">@style/MainActionBarStyle</item>
         <item name="actionBarItemBackground">@drawable/selector_action_bar_home_button</item>
-        <item name="dropDownListViewStyle">@style/DropDownListViewStyle</item>
+        <item name="android:actionBarItemBackground" tools:targetApi="14">@drawable/selector_action_bar_home_button</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListViewStyle</item>
     </style>
 
-    <style name="MainActionBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="background">@color/action_bar_background</item>
+    <style name="MainActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/action_bar_background</item>
         <item name="titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:titleTextStyle" tools:targetApi="11">@style/TitleTextStyle</item>
         <item name="android:progressBarStyle">@style/MainProgressBarStyle</item>
         <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
 
-    <style name="MainProgressBarStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
+    <style name="MainProgressBarStyle" parent="android:Widget.ProgressBar.Horizontal">
         <item name="android:minHeight">@dimen/action_bar_progress_bar_height</item>
         <item name="android:progressDrawable">@drawable/horizontal_progress_bar</item>
     </style>
@@ -25,7 +29,10 @@
     </style>
 
     <style name="DropDownListViewStyle" parent="android:Widget.ListView.DropDown">
-        <item name="android:background">@android:color/darker_gray</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:textColor">@color/comment_username_font_color</item>
+        <item name="android:colorPressedHighlight" tools:targetApi="14">@color/action_bar_background</item>
     </style>
 
 </resources>
+

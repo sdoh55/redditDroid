@@ -56,6 +56,7 @@ public class ExtendedSubmission extends Submission implements Parcelable {
         setNSFW(submission.isNSFW());
         setHidden(submission.isHidden());
         setClicked(submission.isClicked());
+        setLiked(submission.isLiked());
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ExtendedSubmission extends Submission implements Parcelable {
 
         parcel.writeLong(getCreated());
         parcel.writeLong(getCreatedUTC());
-        parcel.writeBooleanArray(new boolean[]{isVisited(), isSelf(), isSaved(), isEdited(), isStickied(), isNSFW(), isHidden(), isClicked()});
+        parcel.writeBooleanArray(new boolean[]{isVisited(), isSelf(), isSaved(), isEdited(), isStickied(), isNSFW(), isHidden(), isClicked(), isLiked()});
 
     }
 
@@ -134,6 +135,7 @@ public class ExtendedSubmission extends Submission implements Parcelable {
                 submission.setNSFW(boolArray[5]);
                 submission.setHidden(boolArray[6]);
                 submission.setClicked(boolArray[7]);
+                submission.setLiked(boolArray[8]);
             }
 
             return submission;

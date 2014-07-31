@@ -70,12 +70,10 @@ public class DrawerMenuFragment extends Fragment implements
 
         switch (childPosition) {
             case 0:
-                // profile
-                return true;
-            case 1:
-                // log out
                 mListener.onLogoutClick();
                 return true;
+//            case 1:
+//                return true;
         }
 
         return false;

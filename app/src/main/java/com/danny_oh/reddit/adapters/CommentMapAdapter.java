@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.github.jreddit.entity.Comment;
+import com.github.jreddit.entity.Submission;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,11 +39,14 @@ public class CommentMapAdapter extends BaseAdapter {
     private Context mContext;
     private HashMap<Integer, CommentsListHelper.CommentContainer> mComments;
 
+    private Submission mSubmission;
+
     private List<Integer> mDepthColors;
 
-    public CommentMapAdapter(Context context, HashMap<Integer, CommentsListHelper.CommentContainer> comments) {
+    public CommentMapAdapter(Context context, HashMap<Integer, CommentsListHelper.CommentContainer> comments, Submission submission) {
         mContext = context;
         mComments = comments;
+        mSubmission = submission;
 
         mDepthColors = new ArrayList<Integer>();
     }
@@ -96,6 +100,11 @@ public class CommentMapAdapter extends BaseAdapter {
             viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
             layoutParams.setMargins(depth * 10, layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
+
+            if (comment.getAuthor().equals(mSubmission.getAuthor())) {
+                viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_author_font_color));
+            }
+
             // TODO: onClickListener for upvote and downvote
         }
 

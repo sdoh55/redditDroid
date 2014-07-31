@@ -2,9 +2,25 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/sort_submissions"
+        android:title="@string/option_menu_sort"
+        android:icon="@drawable/ic_action_sort_by_size"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/sort_hot" android:title="@string/option_sort_title_hot"/>
+            <item android:id="@+id/sort_new" android:title="@string/option_sort_title_new"/>
+            <item android:id="@+id/sort_rising" android:title="@string/option_sort_title_rising"/>
+            <item android:id="@+id/sort_controversial" android:title="@string/option_sort_title_controversial"/>
+            <item android:id="@+id/sort_top" android:title="@string/option_sort_title_top"/>
+        </menu>
+    </item>
+    <item android:id="@+id/refresh_submissions"
+        android:title="@string/option_menu_submission_refresh"
+        android:icon="@drawable/ic_action_refresh"
+        app:showAsAction="ifRoom"/>
     <item android:id="@+id/search_submissions"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_action_search"
         android:title="@string/option_menu_submission_search"
-        app:showAsAction="always|collapseActionView"
+        app:showAsAction="ifRoom|collapseActionView"
         app:actionLayout="@layout/action_search" />
 </menu>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/comments_sort"
+        android:title="@string/option_menu_sort"
+        android:icon="@drawable/ic_action_sort_by_size"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/comments_sort_new" android:title="@string/option_comment_sort_title_new"/>
+            <item android:id="@+id/comments_sort_hot" android:title="@string/option_comment_sort_title_hot"/>
+            <item android:id="@+id/comments_sort_top" android:title="@string/option_comment_sort_title_top"/>
+            <item android:id="@+id/comments_sort_controversial" android:title="@string/option_comment_sort_title_controversial"/>
+            <item android:id="@+id/comments_sort_old" android:title="@string/option_comment_sort_title_old"/>
+            <item android:id="@+id/comments_sort_random" android:title="@string/option_comment_sort_title_random"/>
+            <item android:id="@+id/comments_sort_confidence" android:title="@string/option_comment_sort_title_confidence"/>
+        </menu>
+
+    </item>
+</menu>

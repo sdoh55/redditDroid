@@ -40,7 +40,7 @@ public class User {
 //        this.password = password;
     }
 
-    public User(String username, String cookie, String modhash) {
+    public User(RestClient restClient, String username, String cookie, String modhash) {
         this.restClient = null;
         this.username = username;
         this.cookie = cookie;
@@ -95,7 +95,7 @@ public class User {
     }
 
     public void connect(String password, boolean rem) throws IOException, ParseException {
-        ArrayList<String> hashCookiePair = hashCookiePairRem(username, password, rem);
+        ArrayList<String> hashCookiePair = hashCookiePair(username, password, rem);
         this.modhash = hashCookiePair.get(0);
         this.cookie = hashCookiePair.get(1);
     }
@@ -123,7 +123,7 @@ public class User {
         return values;
     }
 
-    private ArrayList<String> hashCookiePairRem(String username, String password, boolean rem) throws IOException, ParseException {
+    private ArrayList<String> hashCookiePair(String username, String password, boolean rem) throws IOException, ParseException {
         ArrayList<String> values = new ArrayList<String>();
         JSONObject jsonObject = (JSONObject) restClient.postSecure("api_type=json&user=" + username + "&passwd=" + password + "&rem=" + String.valueOf(rem), String.format(ApiEndpointUtils.USER_LOGIN, username), getCookie()).getResponseObject();
         JSONObject valuePair = (JSONObject) ((JSONObject) jsonObject.get("json")).get("data");

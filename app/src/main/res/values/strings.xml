@@ -3,7 +3,6 @@
 
     <string name="app_name">Reddit</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- MainActivity Action Bar Navigation Items -->
     <array name="submission_sort_array">
@@ -16,7 +15,7 @@
 
     <!-- Drawer Menu Items -->
     <array name="drawer_menu_logged_in_user_items">
-        <item>View Profile</item>
+        <!--<item>View Profile</item>-->
         <item>Log Out</item>
     </array>
 
@@ -31,6 +30,20 @@
     <string name="drawer_subreddit_list_header_title">SUBREDDITS</string>
 
     <!-- Options Menu Strings -->
+    <string name="option_menu_sort">Sort</string>
+        <string name="option_sort_title_hot">hot</string>
+        <string name="option_sort_title_new">new</string>
+        <string name="option_sort_title_rising">rising</string>
+        <string name="option_sort_title_controversial">controversial</string>
+        <string name="option_sort_title_top">top</string>
+        <string name="option_comment_sort_title_new">new</string>
+        <string name="option_comment_sort_title_hot">hot</string>
+        <string name="option_comment_sort_title_top">top</string>
+        <string name="option_comment_sort_title_controversial">controversial</string>
+        <string name="option_comment_sort_title_old">old</string>
+        <string name="option_comment_sort_title_random">random</string>
+        <string name="option_comment_sort_title_confidence">confidence</string>
+    <string name="option_menu_submission_refresh">Refresh</string>
     <string name="option_menu_submission_search">Search</string>
     <string name="option_menu_submission_search_action_hint">submissions</string>
     <string name="option_menu_submission_comments">Show Comments</string>
@@ -51,6 +64,7 @@
 
     <!-- General -->
     <string name="ok">Ok</string>
+    <string name="by">by</string>
 
     <!-- Image contentDescription Strings -->
     <string name="content_description_drawer_icon">drawer icon</string>
@@ -64,15 +78,16 @@
     <string name="content_description_comment_down_vote">down vote comment</string>
 
     <!-- Placeholder Strings -->
+    <string name="placeholder_author">author</string>
     <string name="placeholder_score">score</string>
     <string name="placeholder_title">Title</string>
     <string name="placeholder_subtitle">SUBTITLE</string>
+    <string name="placeholder_self_text_html">SELFTEXT_HTML</string>
 
     <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
     <string name="placeholder_submission_num_comments">number of comments</string>
 
-
-    <string name="placeholder_comment_time_created">time created</string>
+    <string name="placeholder_comment_time_elapsed">time elapsed</string>
     <string name="placeholder_comment_body">comment body</string>
 
 

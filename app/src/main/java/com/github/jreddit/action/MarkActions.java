@@ -198,7 +198,7 @@ public class MarkActions implements ActorDriven {
                 "id=" 		+ fullName + 
                 "&dir=" 	+ dir + 
                 "&uh=" 		+ user.getModhash(),
-                ApiEndpointUtils.VOTE, 
+                ApiEndpointUtils.VOTE,
                 user.getCookie()
          ).getResponseObject();
     	

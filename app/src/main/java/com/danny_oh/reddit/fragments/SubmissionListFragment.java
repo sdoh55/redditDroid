@@ -34,6 +34,7 @@ import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.util.EndlessScrollListener;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
+import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.params.SubmissionSort;
@@ -48,8 +49,6 @@ public class SubmissionListFragment extends Fragment implements
         AbsListView.OnItemClickListener,
         // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
         SubmissionAdapter.OnSubmissionAdapterInteractionListener,
-        // listener for action bar navigation clicks
-        ActionBar.OnNavigationListener,
         // listener for action bar search box
         TextView.OnEditorActionListener
 {
@@ -120,45 +119,6 @@ public class SubmissionListFragment extends Fragment implements
 /*
  * Interface implementations
  */
-
-    /**
-     * ActionBar navigation listener
-     * @param position
-     * @param id
-     * @return
-     */
-    @Override
-    public boolean onNavigationItemSelected(int position, long id) {
-        SubmissionSort choice;
-
-        switch (position) {
-            case 0:
-                choice = SubmissionSort.HOT;
-                break;
-            case 1:
-                choice = SubmissionSort.NEW;
-                break;
-            case 2:
-                choice = SubmissionSort.RISING;
-                break;
-            case 3:
-                choice = SubmissionSort.CONTROVERSIAL;
-                break;
-            case 4:
-                choice = SubmissionSort.TOP;
-                break;
-            default:
-                choice = null;
-        }
-
-        if (mSubmissionSort != choice) {
-            mSubmissionSort = choice;
-            initList();
-        }
-
-        return true;
-    }
-
     /**
      * listener for ActionBar search menu interactions
      * @param textView
@@ -218,14 +178,55 @@ public class SubmissionListFragment extends Fragment implements
         getFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .add(R.id.content_frame, CommentListFragment.newInstance(submission.getIdentifier()))
+                .add(R.id.content_frame, CommentListFragment.newInstance(new ExtendedSubmission(submission)))
                 .commit();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("SubmissionListFragment", "onOptionsItemSelected called.");
 
+        int id = item.getItemId();
+        SubmissionSort sort;
 
+        switch (id) {
+            case R.id.sort_hot:
+                sort = SubmissionSort.HOT;
+                break;
 
-/*
+            case R.id.sort_new:
+                sort = SubmissionSort.NEW;
+                break;
+
+            case R.id.sort_rising:
+                sort = SubmissionSort.RISING;
+                break;
+
+            case R.id.sort_controversial:
+                sort = SubmissionSort.CONTROVERSIAL;
+                break;
+
+            case R.id.sort_top:
+                sort = SubmissionSort.TOP;
+                break;
+
+            case R.id.refresh_submissions:
+                initList();
+                return true;
+
+            default:
+                return false;
+        }
+
+        if (mSubmissionSort != sort) {
+            mSubmissionSort = sort;
+            initList();
+        }
+
+        return true;
+    }
+
+    /*
  * Constructors
  */
 
@@ -380,9 +381,9 @@ public class SubmissionListFragment extends Fragment implements
 
 
         // spinner for dropdown menu
-        SpinnerAdapter adapter = ArrayAdapter.createFromResource(mContext, R.array.submission_sort_array, R.layout.navigation_item_submission);
-        ((ActionBarActivity)mContext).getSupportActionBar().setListNavigationCallbacks(adapter, this);
-        ((ActionBarActivity)mContext).getSupportActionBar().setSelectedNavigationItem(sortToIndex(mSubmissionSort));
+//        SpinnerAdapter adapter = ArrayAdapter.createFromResource(mContext, R.array.submission_sort_array, R.layout.navigation_item_submission);
+//        ((ActionBarActivity)mContext).getSupportActionBar().setListNavigationCallbacks(adapter, this);
+//        ((ActionBarActivity)mContext).getSupportActionBar().setSelectedNavigationItem(sortToIndex(mSubmissionSort));
 
 
 

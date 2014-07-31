@@ -116,11 +116,18 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.subtitle.setText(timeElapsed + " | " + submission.getAuthor() + " | " + submission.getSubreddit() + " | " + submission.getDomain());
 
 
-            if (!submission.getThumbnail().equals("") && !submission.getThumbnail().equals("self")) {
+            // TODO: thumbnail types/strings to consider
+            // - "nsfw"
+            // - "default"
+            // - sometimes thumbnails are embeded in { media } (extend Submission to save media)
+
+
+
+            if (!submission.getThumbnail().equals("") && !submission.isSelf()) {
                 viewHolder.thumbnail.setVisibility(View.VISIBLE);
                 Picasso.with(mContext)
                         .load(submission.getThumbnail())
-                        .placeholder(R.drawable.reddit_red)
+                        .placeholder(R.drawable.redditandroid_head)
                         .into(viewHolder.thumbnail);
             } else {
                 viewHolder.thumbnail.setVisibility(View.GONE);
@@ -137,8 +144,7 @@ public class SubmissionAdapter extends BaseAdapter {
                 });
             }
 
-
-//            /*
+//            if (submission.is)
 
             if (submission.isLiked() == null) {
 
@@ -153,7 +159,6 @@ public class SubmissionAdapter extends BaseAdapter {
                     viewHolder.downvote.setStateVoted(true);
                 }
             }
-//            */
 
 
             viewHolder.upvote.setOnClickListener(new View.OnClickListener() {
@@ -172,7 +177,11 @@ public class SubmissionAdapter extends BaseAdapter {
                         public void onResponse(Boolean object) {
                             // if vote was successful
                             if (object) {
-                                submission.setScore(submission.getScore() + (direction == 1 ? 1 : -1));
+                                if (submission.isLiked() == null) {
+                                    submission.setScore(submission.getScore() + 1);
+                                } else {
+                                    submission.setScore(submission.getScore() + (submission.isLiked() ? -1 : 2));
+                                }
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
                             } else {
@@ -200,7 +209,11 @@ public class SubmissionAdapter extends BaseAdapter {
                         public void onResponse(Boolean object) {
                             // if vote was successful
                             if (object) {
-                                submission.setScore(submission.getScore() + (direction == -1 ? -1 : 1));
+                                if (submission.isLiked() == null) {
+                                    submission.setScore(submission.getScore() - 1);
+                                } else {
+                                    submission.setScore(submission.getScore() - (submission.isLiked() ? 2 : -1));
+                                }
                                 submission.setLiked(direction);
                                 notifyDataSetChanged();
                             } else {

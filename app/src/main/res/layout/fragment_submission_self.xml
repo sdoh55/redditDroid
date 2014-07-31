@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/self_submission_background_light">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <ScrollView
+        android:id="@+id/submission_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/placeholder_title"
+                    android:id="@+id/submission_title"
+                    android:textSize="@dimen/submission_self_title_font_size"
+                    android:layout_margin="@dimen/submission_self_title_margin" />
+
+
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/submission_info_container">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_comment_time_elapsed"
+                        android:id="@+id/hours_ago_label"
+                        android:layout_alignParentBottom="false"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/submission_self_title_margin"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginRight="@dimen/submission_self_score_margin" />
+
+                    <TextView
+                        android:id="@android:id/text1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/by"
+                        android:layout_marginRight="@dimen/submission_self_score_margin"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/hours_ago_label"
+                        android:layout_toEndOf="@id/hours_ago_label" />
+
+                    <TextView
+                        android:id="@+id/author_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_author"
+                        android:layout_toRightOf="@android:id/text1"
+                        android:layout_toEndOf="@id/author_label"
+                        android:textColor="@color/comment_author_font_color"
+                        android:textStyle="bold"/>
+
+
+                </RelativeLayout>
+
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/submission_score_container"
+                    android:layout_marginLeft="5dp">
+
+                    <com.danny_oh.reddit.util.ImageViewWithVoteState
+                        android:id="@+id/submission_up_vote"
+                        android:src="@drawable/selector_up_vote"
+                        android:contentDescription="@string/content_description_submission_up_vote"
+                        android:layout_width="@dimen/submission_self_vote_button_size"
+                        android:layout_height="@dimen/submission_self_vote_button_size"
+                        app:submission_vote_state="false"
+                        android:layout_alignParentLeft="true" />
+
+                    <com.danny_oh.reddit.util.ImageViewWithVoteState
+                        android:id="@+id/submission_down_vote"
+                        android:src="@drawable/selector_down_vote"
+                        android:contentDescription="@string/content_description_submission_down_vote"
+                        android:layout_width="@dimen/submission_self_vote_button_size"
+                        android:layout_height="@dimen/submission_self_vote_button_size"
+                        android:layout_centerHorizontal="true"
+                        android:clickable="true"
+                        app:submission_vote_state="false"
+                        android:layout_toRightOf="@+id/submission_up_vote" />
+
+                    <TextView
+                        android:id="@+id/submission_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/placeholder_score"
+                        android:gravity="center_horizontal"
+                        android:layout_centerVertical="true"
+                        android:textSize="@dimen/submission_self_score_font_size"
+                        android:layout_toRightOf="@+id/submission_down_vote"
+                        android:layout_marginLeft="@dimen/submission_self_score_margin"
+                        android:textStyle="bold"
+                        android:layout_marginRight="@dimen/submission_self_score_margin" />
+
+                </RelativeLayout>
+
+            <TextView
+                android:id="@+id/submission_self_text_html"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder_self_text_html"
+                android:textSize="@dimen/submission_self_text_font_size"
+                android:layout_margin="@dimen/submission_self_text_margin"
+                />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout
+            android:id="@+id/comments_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:minHeight="100dp" />
+
+</LinearLayout>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center" />
+</FrameLayout>

@@ -23,6 +23,7 @@ import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.fragments.DrawerMenuFragment;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
+import com.danny_oh.reddit.fragments.SelfSubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionListFragment;
 import com.danny_oh.reddit.fragments.SubredditFragment;
@@ -54,22 +55,24 @@ public class MainActivity
     public void onSubmissionClick(Submission submission) {
         Log.d("MainActivity", "Received fragment interaction. Selection: " + submission.getFullName());
 
+        if (submission.isSelf()) {
+            SelfSubmissionFragment selfSubmissionFragment = SelfSubmissionFragment.newInstance(new ExtendedSubmission(submission));
+            mFragmentManager
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.content_frame, selfSubmissionFragment)
+                    .commit();
 
-        SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(submission));
-        mFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.content_frame, submissionFragment)
-                .commit();
+        } else {
 
-        /*
-        CommentListFragment commentListFragment = CommentListFragment.newInstance(submission.getIdentifier());
-        mFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.content_frame, commentListFragment)
-                .commit();
-        */
+            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(submission));
+            mFragmentManager
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.content_frame, submissionFragment)
+                    .commit();
+
+        }
 
         mSlidingMenu.setSlidingEnabled(false);
 
@@ -206,12 +209,12 @@ public class MainActivity
         getSupportActionBar().setHomeButtonEnabled(true);
 
         // enables dropdown menu of action bar
-        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+//        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
 
         if (savedInstanceState == null) {
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, SubmissionListFragment.newInstance(null, null))  // null defaults to SubmissionSort.HOT and frontpage
+                    .add(R.id.content_frame, SubmissionListFragment.newInstance("nosleep", null))  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 
@@ -223,7 +226,7 @@ public class MainActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
 //        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
 
@@ -232,6 +235,8 @@ public class MainActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        Log.d("MainActivity", "onOptionsItemSelected called.");
+
         int id = item.getItemId();
 
         switch (id) {
@@ -251,11 +256,6 @@ public class MainActivity
 
                 return true;
             }
-
-            case R.id.action_settings: {
-                return true;
-            }
-
         }
 
         return super.onOptionsItemSelected(item);

@@ -76,6 +76,10 @@ public class HttpRestClient implements RestClient {
 		this.httpClient = httpClient;
 		this.responseHandler = responseHandler;
 	}
+
+    public ResponseHandler<Response> getResponseHandler() {
+        return this.responseHandler;
+    }
 	
 	/**
 	 * Set the user agent.

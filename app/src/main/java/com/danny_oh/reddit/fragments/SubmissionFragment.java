@@ -30,10 +30,8 @@ import com.github.jreddit.entity.Submission;
  */
 public class SubmissionFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_URL = "url";
     private static final String ARG_SUBMISSION = "submission";
 
-    private String mUrl;
     private WebView mWebView;
 
     private Submission mSubmission;
@@ -43,15 +41,12 @@ public class SubmissionFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param url URL of submission link.
      * @return A new instance of fragment SubmissionFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SubmissionFragment newInstance(ExtendedSubmission submission) {
         SubmissionFragment fragment = new SubmissionFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_SUBMISSION, submission);
-        args.putString(ARG_URL, submission.getURL());
         fragment.setArguments(args);
         return fragment;
     }
@@ -77,7 +72,6 @@ public class SubmissionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mUrl = getArguments().getString(ARG_URL);
             mSubmission = (ExtendedSubmission)getArguments().getParcelable(ARG_SUBMISSION);
         } else {
             throw new InstantiationException("Fragments must be instantiated using factory method newInstance.", new Exception());
@@ -128,11 +122,11 @@ public class SubmissionFragment extends Fragment {
                 activity.setProgress(10000);
                 Log.e("SubmissionFragment", "WebView received error.");
 
-                Toast.makeText(getActivity(), "Network error. Please check you internet connection and try again.", Toast.LENGTH_SHORT);
+                Toast.makeText(getActivity(), "Network error. Please check you internet connection and try again.", Toast.LENGTH_SHORT).show();
             }
         });
 
-        mWebView.loadUrl(mUrl);
+        mWebView.loadUrl(mSubmission.getUrl());
 
         return view;
     }
@@ -160,10 +154,13 @@ public class SubmissionFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.submission_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("SubmissionFragment", "onOptionsItemSelected called.");
+
         int id = item.getItemId();
 
         switch (id) {
@@ -171,7 +168,7 @@ public class SubmissionFragment extends Fragment {
                 getFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
-                        .add(R.id.content_frame, CommentListFragment.newInstance(mSubmission.getIdentifier()))
+                        .add(R.id.content_frame, CommentListFragment.newInstance((ExtendedSubmission)mSubmission))
                         .commit();
                 return true;
         }

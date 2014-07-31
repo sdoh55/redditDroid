@@ -127,7 +127,10 @@ public class ProfileActions implements ActorDriven {
         JSONObject jsonObject = (JSONObject) restClient.get(ApiEndpointUtils.USER_INFO, user.getCookie()).getResponseObject();
         JSONObject info = (JSONObject) jsonObject.get("data");
 
-        return new UserInfo(info);
+        if (info != null)
+            return new UserInfo(info);
+        else
+            return null;
     }
 
     /**

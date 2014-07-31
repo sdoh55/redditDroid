@@ -71,7 +71,7 @@
 
             <TextView
                 android:id="@+id/comment_time_created"
-                android:text="@string/placeholder_comment_time_created"
+                android:text="@string/placeholder_comment_time_elapsed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/comment_margin"
@@ -88,7 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/comment_title_container"
             android:layout_alignParentStart="false"
-            android:layout_alignLeft="@+id/comment_title_container" />
+            android:layout_alignLeft="@+id/comment_title_container"
+            android:autoLink="web" />
     </RelativeLayout>
 
     <LinearLayout
