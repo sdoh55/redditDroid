@@ -83,14 +83,15 @@ public class ExtendedSubmission extends Submission implements Parcelable {
 
         parcel.writeLong(getGilded());
         parcel.writeLong(getCommentCount());
-        parcel.writeLong(getReportCount());
+        parcel.writeValue(getReportCount());    // use writeValue because getReportCount() can return null (num_reports from reddit)
         parcel.writeLong(getScore());
         parcel.writeLong(getUpVotes());
         parcel.writeLong(getDownVotes());
 
         parcel.writeLong(getCreated());
         parcel.writeLong(getCreatedUTC());
-        parcel.writeBooleanArray(new boolean[]{isVisited(), isSelf(), isSaved(), isEdited(), isStickied(), isNSFW(), isHidden(), isClicked(), isLiked()});
+        parcel.writeBooleanArray(new boolean[]{isVisited(), isSelf(), isSaved(), isEdited(), isStickied(), isNSFW(), isHidden(), isClicked()});
+        parcel.writeValue(isLiked());
 
     }
 
@@ -115,7 +116,7 @@ public class ExtendedSubmission extends Submission implements Parcelable {
 
             submission.setGilded(parcel.readLong());
             submission.setCommentCount(parcel.readLong());
-            submission.setReportCount(parcel.readLong());
+            submission.setReportCount((Long)parcel.readValue(Long.class.getClassLoader()));
             submission.setScore(parcel.readLong());
             submission.setUpVotes(parcel.readLong());
             submission.setDownVotes(parcel.readLong());
@@ -137,6 +138,8 @@ public class ExtendedSubmission extends Submission implements Parcelable {
                 submission.setClicked(boolArray[7]);
                 submission.setLiked(boolArray[8]);
             }
+
+            submission.setLiked((Boolean)parcel.readValue(Boolean.class.getClassLoader()));
 
             return submission;
         }

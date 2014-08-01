@@ -1,10 +1,8 @@
 package com.danny_oh.reddit.activities;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,59 +11,67 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.adapters.SubmissionAdapter;
+import com.danny_oh.reddit.fragments.CommentsListFragment;
 import com.danny_oh.reddit.fragments.DrawerMenuFragment;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
-import com.danny_oh.reddit.fragments.SelfSubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
-import com.danny_oh.reddit.fragments.SubmissionListFragment;
-import com.danny_oh.reddit.fragments.SubredditFragment;
+import com.danny_oh.reddit.fragments.SubmissionsListFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
+import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
-import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 
 public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
-        SubmissionListFragment.OnSubmissionListFragmentInteractionListener, // handles individual submission item clicks
+        SubmissionsListFragment.OnSubmissionListFragmentInteractionListener, // handles individual submission item clicks
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
-        LoginDialogFragment.LoginDialogListener                             // handles user login dialog interaction
+        LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
+        CommentsListFragment.OnSelfSubmissionFragmentDetachListener
 
 {
+
+    public static final String SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG = "self_submission_fragment_transaction";
+    private static final String LAST_SUBMISSION_CLICKED_SAVE_INSTANCE_KEY = "last_submission_clicked";
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
 
     private SessionManager mSessionManager;
 
+    private Submission mLastSubmissionClicked;
+    private View mSubmissionListItem;
+
     /**
      * OnSubmissionListFragmentInteractionListener interface implementation
-     * @param submission the submission that was clicked by the user
+     * @param submissionsList the list of submissions that are currently visible
+     * @param position index of the submission that was clicked inside the submissionsList
      */
-    public void onSubmissionClick(Submission submission) {
-        Log.d("MainActivity", "Received fragment interaction. Selection: " + submission.getFullName());
+    public void onSubmissionClick(PagedSubmissionsList submissionsList, int position, View listItem) {
+        mSubmissionListItem = listItem;
+        mLastSubmissionClicked = submissionsList.getSubmissionAtIndex(position);
 
-        if (submission.isSelf()) {
-            SelfSubmissionFragment selfSubmissionFragment = SelfSubmissionFragment.newInstance(new ExtendedSubmission(submission));
+        Log.d("MainActivity", "Received fragment interaction. Selection: " + mLastSubmissionClicked.getFullName());
+
+        if (mLastSubmissionClicked.isSelf()) {
+            CommentsListFragment selfSubmissionFragment = CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
-                    .add(R.id.content_frame, selfSubmissionFragment)
+                    .add(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
                     .commit();
 
         } else {
 
-            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(submission));
+            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
@@ -75,11 +81,19 @@ public class MainActivity
         }
 
         mSlidingMenu.setSlidingEnabled(false);
-
-
     }
 
-/*
+    @Override
+    public void onSelfSubmissionFragmentDetach(Submission submission) {
+        // TODO: update the submission's score and voted status within the SubmissionListFragment
+        if (mLastSubmissionClicked != null) {
+            mLastSubmissionClicked.setLiked(submission.isLiked());
+            mLastSubmissionClicked.setScore(submission.getScore());
+            mSubmissionListItem.invalidate();
+        }
+    }
+
+    /*
  * OnDrawerMenuInteractionListener interface implementation
  */
 
@@ -101,7 +115,7 @@ public class MainActivity
 
     @Override
     public void onSubredditClick(String subredditName) {
-        SubmissionListFragment fragment = (SubmissionListFragment)mFragmentManager.findFragmentById(R.id.content_frame);
+        SubmissionsListFragment fragment = (SubmissionsListFragment)mFragmentManager.findFragmentById(R.id.content_frame);
         fragment.refresh(subredditName);
         mSlidingMenu.showContent();
     }
@@ -214,7 +228,7 @@ public class MainActivity
 
         if (savedInstanceState == null) {
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, SubmissionListFragment.newInstance("nosleep", null))  // null defaults to frontpage and SubmissionSort.HOT
+                    .add(R.id.content_frame, SubmissionsListFragment.newInstance(null, null))  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 

@@ -103,6 +103,8 @@ public class CommentMapAdapter extends BaseAdapter {
 
             if (comment.getAuthor().equals(mSubmission.getAuthor())) {
                 viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_author_font_color));
+            } else {
+                viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_username_font_color));
             }
 
             // TODO: onClickListener for upvote and downvote

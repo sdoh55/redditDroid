@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.danny_oh.reddit.fragments.SubmissionsListFragment">
+    tools:context="com.danny_oh.reddit.fragments.SubmissionsListFragment"
+    android:background="@android:color/white">
 
     <ListView
         android:id="@android:id/list"
@@ -29,6 +30,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/progressBar"
         android:layout_gravity="center_horizontal|bottom"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        android:visibility="gone"/>
 
 </FrameLayout>

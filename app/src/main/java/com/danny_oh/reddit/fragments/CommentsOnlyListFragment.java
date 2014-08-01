@@ -1,11 +1,10 @@
 package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,31 +13,30 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.CommentMapAdapter;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
-import com.danny_oh.reddit.util.RedditRestClient;
 import com.github.jreddit.entity.Comment;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Comments;
 import com.github.jreddit.retrieval.params.CommentSort;
-import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
 import java.util.HashMap;
 import java.util.List;
 
 
-public class CommentListFragment extends ListFragment {
+public class CommentsOnlyListFragment extends ListFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_SUBMISSION = "submission";
 
     // the fullname of a reddit 'Thing'
     private String mSubmissionId;
+
     private CommentSort mCommentSort = CommentSort.CONFIDENCE;
 
     private GetCommentsAsyncTask mCommentTask;
@@ -74,7 +72,6 @@ public class CommentListFragment extends ListFragment {
             ((CommentMapAdapter)getListAdapter()).notifyDataSetChanged();
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -124,14 +121,14 @@ public class CommentListFragment extends ListFragment {
      * @param submission Parcelable Submission of a reddit link.
      * @return A new instance of fragment CommentListFragment.
      */
-    public static CommentListFragment newInstance(ExtendedSubmission submission) {
-        CommentListFragment fragment = new CommentListFragment();
+    public static CommentsOnlyListFragment newInstance(ExtendedSubmission submission) {
+        CommentsOnlyListFragment fragment = new CommentsOnlyListFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_SUBMISSION, submission);
         fragment.setArguments(args);
         return fragment;
     }
-    public CommentListFragment() {
+    public CommentsOnlyListFragment() {
         // Required empty public constructor
         mCommentMap = new HashMap<Integer, CommentsListHelper.CommentContainer>();
     }
@@ -156,7 +153,7 @@ public class CommentListFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_comment_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_comments_only_list, container, false);
 
         ListView listView = (ListView)view.findViewById(android.R.id.list);
         listView.setEmptyView(view.findViewById(android.R.id.empty));
@@ -187,6 +184,15 @@ public class CommentListFragment extends ListFragment {
     @Override
     public void onDetach() {
         super.onDetach();
+
+        // if SelfSubmissionFragment is in the back stack, pop it.
+        FragmentManager fragmentManager = getFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag(MainActivity.SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG);
+
+        if (fragment != null) {
+            boolean status = fragmentManager.popBackStackImmediate(MainActivity.SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            Log.d("CommentListFragment", "Found SelfSubmissionFragment and popped with status: " + status);
+        }
     }
 
     private void initList() {

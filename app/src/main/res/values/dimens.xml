@@ -40,7 +40,7 @@
     <dimen name="submission_self_title_margin">8dp</dimen>
     <dimen name="submission_self_text_font_size">16sp</dimen>
     <dimen name="submission_self_text_margin">6dp</dimen>
-    <dimen name="submission_self_score_margin">6dp</dimen>
+    <dimen name="submission_self_score_margin">4dp</dimen>
     <dimen name="submission_self_score_font_size">20sp</dimen>
     <dimen name="submission_self_vote_button_size">42dp</dimen>
 

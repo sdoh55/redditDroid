@@ -65,6 +65,7 @@
     <!-- General -->
     <string name="ok">Ok</string>
     <string name="by">by</string>
+    <string name="pts">pts</string>
 
     <!-- Image contentDescription Strings -->
     <string name="content_description_drawer_icon">drawer icon</string>

@@ -11,12 +11,13 @@ import java.util.List;
 public class PagedSubmissionsList extends ArrayList<List<Submission>> {
     int mSubmissionsPerPage;
     int mCount;
-
+    int mFirstPageItemCount;    // sometimes there are sticky posts at the top of the returned list
 
     public PagedSubmissionsList() {
         super();
         mCount = 0;
         mSubmissionsPerPage = 25;
+        mFirstPageItemCount = -1;
     }
 
     public PagedSubmissionsList(int submissionsPerPage) {
@@ -27,6 +28,9 @@ public class PagedSubmissionsList extends ArrayList<List<Submission>> {
 
     @Override
     public boolean add(List<Submission> object) {
+        if (size() == 0) {
+            mFirstPageItemCount = object.size();
+        }
         mCount += object.size();
         return super.add(object);
     }
@@ -42,9 +46,14 @@ public class PagedSubmissionsList extends ArrayList<List<Submission>> {
     }
 
     public Submission getSubmissionAtIndex(int index) {
-        int page = index / mSubmissionsPerPage;
-        int indexOnPage = index - (page * mSubmissionsPerPage);
+        if (index < mFirstPageItemCount) {
+            return get(0).get(index);
+        } else {
+            int page = ((index - mFirstPageItemCount) / mSubmissionsPerPage) + 1;
+            int indexOnPage = (index - mFirstPageItemCount) - ((page - 1) * mSubmissionsPerPage);
 
-        return get(page).get(indexOnPage);
+            return get(page).get(indexOnPage);
+        }
+
     }
 }

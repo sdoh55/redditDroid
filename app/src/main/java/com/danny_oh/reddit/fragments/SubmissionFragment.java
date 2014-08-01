@@ -132,6 +132,13 @@ public class SubmissionFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+//        mWebView.pau
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
 
@@ -168,7 +175,7 @@ public class SubmissionFragment extends Fragment {
                 getFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
-                        .add(R.id.content_frame, CommentListFragment.newInstance((ExtendedSubmission)mSubmission))
+                        .add(R.id.content_frame, CommentsOnlyListFragment.newInstance((ExtendedSubmission) mSubmission))
                         .commit();
                 return true;
         }

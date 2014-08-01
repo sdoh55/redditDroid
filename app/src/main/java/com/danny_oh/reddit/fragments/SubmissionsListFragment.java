@@ -2,12 +2,9 @@ package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.hardware.input.InputManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -15,17 +12,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +38,7 @@ import java.util.List;
 /**
  * A fragment that displays a list of jReddit Submissions
  */
-public class SubmissionListFragment extends Fragment implements
+public class SubmissionsListFragment extends Fragment implements
         // listener for submissions list view clicks (displays the selected submission)
         AbsListView.OnItemClickListener,
         // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
@@ -108,12 +102,8 @@ public class SubmissionListFragment extends Fragment implements
      * <p>
      */
     public interface OnSubmissionListFragmentInteractionListener {
-        public void onSubmissionClick(Submission submission);
-
-//        public void onSubmissionCommentsClick(Submission submission);
+        public void onSubmissionClick(PagedSubmissionsList submissionsList, int position, View listItem);
     }
-
-
 
 
 /*
@@ -161,8 +151,7 @@ public class SubmissionListFragment extends Fragment implements
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
 
-            Submission submission = (Submission)mAdapter.getItem(position);
-            mListener.onSubmissionClick(submission);
+            mListener.onSubmissionClick(mPagedSubmissionsList, position, mListView.getChildAt(position));
         }
     }
 
@@ -178,7 +167,7 @@ public class SubmissionListFragment extends Fragment implements
         getFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .add(R.id.content_frame, CommentListFragment.newInstance(new ExtendedSubmission(submission)))
+                .add(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
                 .commit();
     }
 
@@ -234,14 +223,14 @@ public class SubmissionListFragment extends Fragment implements
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SubmissionListFragment() {
+    public SubmissionsListFragment() {
 
     }
 
 
 
-    public static SubmissionListFragment newInstance(String subredditName, SubmissionSort sort) {
-        SubmissionListFragment fragment = new SubmissionListFragment();
+    public static SubmissionsListFragment newInstance(String subredditName, SubmissionSort sort) {
+        SubmissionsListFragment fragment = new SubmissionsListFragment();
 
         Bundle args = new Bundle();
 
@@ -277,14 +266,107 @@ public class SubmissionListFragment extends Fragment implements
         mSubredditName = args.getString(SUBREDDIT_VALUE_KEY);
         mSubmissionSort = SubmissionSort.valueOf(args.getString(ARG_SORT));
 
-        mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
-
-        mAdapter = new SubmissionAdapter(getActivity(), mPagedSubmissionsList);
-        mAdapter.setOnSubmissionAdapterInteractionListener(this);
-
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_submission_list, container, false);
+
+        mProgressBar = (ProgressBar)view.findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.GONE);
+
+        mListView = (ListView)view.findViewById(android.R.id.list);
+
+        ProgressBar progressBar = (ProgressBar)view.findViewById(android.R.id.empty);
+        mListView.setEmptyView(progressBar);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (mPagedSubmissionsList != null) {
+            // fragment was retained and restored
+            Log.d("SubmissionListFragment", "Fragment was restored from instance.");
+        } else {
+            mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
+            mAdapter = new SubmissionAdapter(getActivity(), mPagedSubmissionsList);
+
+            initList();
+        }
+
+        mAdapter.setOnSubmissionAdapterInteractionListener(this);
+
+        // Set OnItemClickListener so we can be notified on item clicks
+        mListView.setOnItemClickListener(this);
+        mListView.setAdapter(mAdapter);
+
+        // add EndlessScrollListener that loads more submissions when the scroll position reaches close to the end
+        mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
+
+                // passing empty string requests for the reddit frontpage
+                SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
+                param.subreddit = mSubredditName;
+                param.sort = mSubmissionSort;
+                param.count = 0;
+                param.limit = mSubmissionsPerPage;
+                param.after = lastSubmission;
+                param.before = null;
+                param.show = mShowAll;
+
+                SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+                    @Override
+                    public void onResponse(List<Submission> list) {
+                        mPagedSubmissionsList.add(list);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onLoadComplete() {
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        Log.d("SubmissionListFragment", "onAttach()");
+
+        mContext = (Context)activity;
+
+        super.onAttach(activity);
+        try {
+            mListener = (OnSubmissionListFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        Log.d("SubmissionListFragment", "onDetach()");
+
+        super.onDetach();
+        mListener = null;
+    }
+
+/*
+ * Options Menu
+ */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.submission_list_menu, menu);
@@ -329,97 +411,9 @@ public class SubmissionListFragment extends Fragment implements
 
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_submission_list, container, false);
-
-        mProgressBar = (ProgressBar)view.findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(View.GONE);
-
-        mListView = (ListView)view.findViewById(android.R.id.list);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
-        mListView.setAdapter(mAdapter);
-
-        // add EndlessScrollListener that loads more submissions when the scroll position reaches close to the end
-        mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
-
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                Submission lastSubmission = (Submission)mAdapter.getItem(totalItemsCount-1);
-
-                // passing empty string requests for the reddit frontpage
-                SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-                param.subreddit = mSubredditName;
-                param.sort = mSubmissionSort;
-                param.count = 0;
-                param.limit = mSubmissionsPerPage;
-                param.after = lastSubmission;
-                param.before = null;
-                param.show = mShowAll;
-
-                SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
-                    @Override
-                    public void onResponse(List<Submission> list) {
-                        mPagedSubmissionsList.add(list);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
-                mProgressBar.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onLoadComplete() {
-                mProgressBar.setVisibility(View.GONE);
-            }
-        });
-
-        ProgressBar progressBar = (ProgressBar)view.findViewById(android.R.id.empty);
-        mListView.setEmptyView(progressBar);
-
-
-        // spinner for dropdown menu
-//        SpinnerAdapter adapter = ArrayAdapter.createFromResource(mContext, R.array.submission_sort_array, R.layout.navigation_item_submission);
-//        ((ActionBarActivity)mContext).getSupportActionBar().setListNavigationCallbacks(adapter, this);
-//        ((ActionBarActivity)mContext).getSupportActionBar().setSelectedNavigationItem(sortToIndex(mSubmissionSort));
-
-
-
-        initList();
-
-        return view;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        Log.d("SubmissionListFragment", "onAttach()");
-
-        mContext = (Context)activity;
-
-        super.onAttach(activity);
-        try {
-            mListener = (OnSubmissionListFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        Log.d("SubmissionListFragment", "onDetach()");
-
-        super.onDetach();
-        mListener = null;
-    }
-
-
-
-    /*
-         * public methods
-         */
+/*
+ * public methods
+ */
     public void refresh(String subredditName) {
         if (!mSubredditName.equals(subredditName)) {
             mSubredditName = subredditName;
@@ -477,22 +471,6 @@ public class SubmissionListFragment extends Fragment implements
 
     }
 
-    private int sortToIndex(SubmissionSort sort) {
-        switch (sort) {
-            case HOT:
-                return 0;
-            case NEW:
-                return 1;
-            case RISING:
-                return 2;
-            case CONTROVERSIAL:
-                return 3;
-            case TOP:
-                return 4;
-            default:
-                return -1;
-        }
-    }
 
     /**
      * hides the soft keyboard (the only ui element that can bring up the keyboard in this fragment is mSearchMenuEditText)

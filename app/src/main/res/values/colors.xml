@@ -32,6 +32,7 @@
     <color name="comment_author_font_color">#ffdc8200</color>
 
     <color name="self_submission_background_light">#fff</color>
+    <color name="self_submission_time_elapsed_font_color">#ff8e8e8e</color>
 
     <color name="selected_state">#ccc</color>
     <color name="unselected_state">#0000</color>

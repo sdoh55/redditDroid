@@ -1,5 +1,7 @@
 package com.danny_oh.reddit.util;
 
+import android.util.SparseArray;
+
 import com.github.jreddit.entity.Comment;
 import com.github.jreddit.entity.Kind;
 import com.github.jreddit.exception.RedditError;
@@ -24,11 +26,20 @@ public class CommentsListHelper {
 
     static int index = 0;
 
-    public static HashMap<Integer, CommentContainer> listToMap(List<Comment> commentList) {
+    public static HashMap<Integer, CommentContainer> listToMap(List<Comment> commentsList) {
         HashMap<Integer, CommentContainer> comments = new HashMap<Integer, CommentContainer>();
 
         index = 0;
-        parseRecursiveMap(comments, commentList, 0);
+        parseRecursiveMap(comments, commentsList, 0);
+
+        return comments;
+    }
+
+    public static SparseArray<CommentContainer> listToSparseArray(List<Comment> commentsList) {
+        SparseArray<CommentContainer> comments = new SparseArray<CommentContainer>();
+
+        index = 0;
+        parseRecursiveArray(comments, commentsList, index);
 
         return comments;
     }
@@ -45,6 +56,23 @@ public class CommentsListHelper {
 
             if (comment.hasRepliesSomewhere()) {
                 parseRecursiveMap(comments, comment.getReplies(), ++depth);
+            }
+        }
+
+    }
+
+    protected static void parseRecursiveArray(SparseArray<CommentContainer> comments, List<Comment> commentList, int depth) throws RetrievalFailedException, RedditError {
+        assert comments != null : "List of comments must be instantiated.";
+        assert commentList != null : "JSON Object must be instantiated.";
+
+        for (Comment comment : commentList) {
+            CommentContainer container = new CommentContainer();
+            container.comment = comment;
+            container.depth = depth;
+            comments.put(index++, container);
+
+            if (comment.hasRepliesSomewhere()) {
+                parseRecursiveArray(comments, comment.getReplies(), ++depth);
             }
         }
 

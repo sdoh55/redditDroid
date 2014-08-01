@@ -1,7 +1,9 @@
 package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +12,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.util.CommentsListHelper;
 import com.github.jreddit.entity.Comment;
+import com.github.jreddit.entity.Submission;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by danny on 7/21/14.
+ * Created by danny on 7/31/14.
  */
-public class CommentAdapter extends BaseAdapter {
+public class CommentSparseArrayAdapter extends BaseAdapter {
 
     static class ViewHolder {
         private TextView username;
@@ -32,11 +38,18 @@ public class CommentAdapter extends BaseAdapter {
     }
 
     private Context mContext;
-    private List<Comment> mComments;
+    private SparseArray<CommentsListHelper.CommentContainer> mComments;
 
-    public CommentAdapter(Context context, List<Comment> comments) {
+    private Submission mSubmission;
+
+    private List<Integer> mDepthColors;
+
+    public CommentSparseArrayAdapter(Context context, SparseArray<CommentsListHelper.CommentContainer> comments, Submission submission) {
         mContext = context;
         mComments = comments;
+        mSubmission = submission;
+
+        mDepthColors = new ArrayList<Integer>();
     }
 
     @Override
@@ -64,22 +77,36 @@ public class CommentAdapter extends BaseAdapter {
         }
 
         // get comment at position
-        Comment comment = mComments.get(position);
+        Comment comment = mComments.get(position).comment;
+        int depth = mComments.get(position).depth;
+
+        if (mDepthColors.size() < depth + 1) {
+            mDepthColors.add(Color.argb(255, (int)(255 * Math.random()), (int)(255 * Math.random()), (int)(255 * Math.random())));
+        }
 
         if (comment != null) {
             // time since comment posted calculation
             long timeNow = System.currentTimeMillis() / 1000;
             long timePosted = comment.getCreatedUTC();
             int hoursElapsed = (int)((timeNow - timePosted) / 60 / 60);
+            String timeElapsed = (hoursElapsed > 0) ? hoursElapsed + " hrs ago" : ((timeNow - timePosted) / 60) + " mins ago";
 
             ViewHolder viewHolder = (ViewHolder)view.getTag();
 
             viewHolder.username.setText(comment.getAuthor());
-            viewHolder.score.setText(comment.getScore().toString());
-            viewHolder.timeCreated.setText(hoursElapsed + " hrs ago");
+            viewHolder.score.setText(comment.getScore().toString() + " points");
+            viewHolder.timeCreated.setText(timeElapsed);
             viewHolder.body.setText(comment.getBody());
 
-            viewHolder.depthIndicator.setBackgroundColor(Color.argb(255, (int)(255 * Math.random()), (int)(255 * Math.random()), (int)(255 * Math.random())));
+            viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
+            layoutParams.setMargins(depth * 10, layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
+
+            if (comment.getAuthor().equals(mSubmission.getAuthor())) {
+                viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_author_font_color));
+            } else {
+                viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_username_font_color));
+            }
 
             // TODO: onClickListener for upvote and downvote
         }
@@ -89,11 +116,11 @@ public class CommentAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int i) {
-        return mComments.get(i);
+        return mComments.get(i).comment;
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return i;
     }
 }
