@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -139,6 +140,7 @@ public class SubmissionFragment extends Fragment {
         Log.d("SubmissionFragment", "onResume");
 
         super.onResume();
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(mSubmission.getTitle());
     }
 
     @Override
@@ -194,7 +196,7 @@ public class SubmissionFragment extends Fragment {
                 getFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
-                        .add(R.id.content_frame, CommentsOnlyListFragment.newInstance((ExtendedSubmission) mSubmission))
+                        .replace(R.id.content_frame, CommentsOnlyListFragment.newInstance((ExtendedSubmission) mSubmission))
                         .commit();
                 return true;
         }

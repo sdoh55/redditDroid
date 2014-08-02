@@ -81,8 +81,6 @@ public class SubmissionsListFragment extends Fragment implements
     private SubmissionAdapter mAdapter;
 
 
-    private EndlessScrollListener mEndlessListener;
-
     private static class SubmissionFetchParam {
         private String subreddit;
         private SubmissionSort sort;
@@ -91,6 +89,13 @@ public class SubmissionsListFragment extends Fragment implements
         private Submission before;
         private Submission after;
         private boolean show;
+    }
+
+
+    private OnSubmissionsListInteractionListener mListener;
+
+    public interface OnSubmissionsListInteractionListener {
+        public void onSearchSubmissions(String queryString);
     }
 
 
@@ -111,30 +116,14 @@ public class SubmissionsListFragment extends Fragment implements
             // if the 'return' key is pressed, get the text inside the search box (edit text) and collapse action view
             if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                 // get user input
-                CharSequence search = textView.getText();
+                String search = textView.getText().toString();
 
                 // clear focus (also hides keyboard)
                 mSearchMenuEditText.clearFocus();
                 // collapse the action view
                 MenuItemCompat.collapseActionView(mSearchMenuItem);
 
-                // TODO: search submissions
-                Toast.makeText(mContext, search, Toast.LENGTH_SHORT).show();
-
-                String query = mSearchMenuEditText.getText().toString();
-
-                SessionManager manager = SessionManager.getInstance(mContext);
-                manager.searchSubmissions(query, QuerySyntax.PLAIN, SearchSort.RELEVANCE,
-                        TimeSpan.ALL, 0, 25, null, null, true,
-                        new AsyncSubmissions.SubmissionsResponseHandler(){
-                            @Override
-                            public void onParseFinished(List<Submission> submissions) {
-                                Log.d("SubmissionsListFragment", "Submissions search successful.");
-                                mPagedSubmissionsList.clear();
-                                mPagedSubmissionsList.add(submissions);
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
+                mListener.onSearchSubmissions(search);
 
                 return true;
             }
@@ -313,18 +302,31 @@ public class SubmissionsListFragment extends Fragment implements
     }
 
     @Override
+    public void onResume() {
+        Log.d("SubmissionListFragment", "onResume()");
+
+        super.onResume();
+        if (mSubredditName.isEmpty()) {
+            // default to front page
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+        } else {
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+        }
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         Log.d("SubmissionListFragment", "onAttach()");
 
         mContext = activity;
 
         super.onAttach(activity);
-//        try {
-//            mListener = (OnSubmissionListFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                + " must implement OnFragmentInteractionListener");
-//        }
+        try {
+            mListener = (OnSubmissionsListInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -427,13 +429,6 @@ public class SubmissionsListFragment extends Fragment implements
     private void initList() {
         mPagedSubmissionsList.clear();
         mAdapter.notifyDataSetChanged();
-
-        if (mSubredditName.isEmpty()) {
-            // default to front page
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
-        } else {
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
-        }
 
         // passing empty string requests for the reddit frontpage
         SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
@@ -284,6 +285,14 @@ public class CommentsListFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        Log.d("CommentsListFragment", "onResume()");
+
+        super.onResume();
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(mSubmission.getTitle());
     }
 
     @Override

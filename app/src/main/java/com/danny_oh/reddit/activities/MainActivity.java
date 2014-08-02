@@ -20,6 +20,7 @@ import com.danny_oh.reddit.fragments.CommentsListFragment;
 import com.danny_oh.reddit.fragments.DrawerMenuFragment;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.fragments.LoginDialogFragment;
+import com.danny_oh.reddit.fragments.SearchSubmissionsFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionsListFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
@@ -32,7 +33,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
-
+        SubmissionsListFragment.OnSubmissionsListInteractionListener,
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
         LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
         CommentsListFragment.OnSelfSubmissionFragmentDetachListener,
@@ -68,7 +69,7 @@ public class MainActivity
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
-                    .add(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
+                    .replace(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
                     .commit();
 
         } else {
@@ -77,7 +78,7 @@ public class MainActivity
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
-                    .add(R.id.content_frame, submissionFragment)
+                    .replace(R.id.content_frame, submissionFragment)
                     .commit();
 
         }
@@ -97,7 +98,7 @@ public class MainActivity
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .add(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
+                .replace(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
                 .commit();
     }
 
@@ -117,7 +118,17 @@ public class MainActivity
         }
     }
 
-/*
+    @Override
+    public void onSearchSubmissions(String queryString) {
+        SearchSubmissionsFragment submissionsFragment = SearchSubmissionsFragment.newInstance(queryString);
+        mFragmentManager
+                .beginTransaction()
+                .addToBackStack(null)
+                .replace(R.id.content_frame, submissionsFragment)
+                .commit();
+    }
+
+    /*
  * OnDrawerMenuInteractionListener interface implementation
  */
 

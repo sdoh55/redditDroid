@@ -80,7 +80,7 @@ public class AsyncSubmissions extends Submissions {
      * @param response
      * @return 		Listing of submissions
      */
-    public static List<Submission> parseJson(Object response) {
+    private static List<Submission> parseJson(Object response) {
 
         // List of submissions
         List<Submission> submissions = new LinkedList<Submission>();

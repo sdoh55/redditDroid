@@ -31,11 +31,13 @@
 
     <!-- Options Menu Strings -->
     <string name="option_menu_sort">Sort</string>
+        <string name="option_sort_title_relevance">relevance</string>
         <string name="option_sort_title_hot">hot</string>
         <string name="option_sort_title_new">new</string>
         <string name="option_sort_title_rising">rising</string>
         <string name="option_sort_title_controversial">controversial</string>
         <string name="option_sort_title_top">top</string>
+        <string name="option_sort_title_comments">comments</string>
         <string name="option_comment_sort_title_new">new</string>
         <string name="option_comment_sort_title_hot">hot</string>
         <string name="option_comment_sort_title_top">top</string>
