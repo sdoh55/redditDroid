@@ -3,9 +3,11 @@ package com.danny_oh.reddit;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.Constants;
 import com.danny_oh.reddit.util.RedditRestClient;
 import com.github.jreddit.action.MarkActions;
@@ -14,7 +16,10 @@ import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.github.jreddit.entity.UserInfo;
 import com.github.jreddit.retrieval.Submissions;
+import com.github.jreddit.retrieval.params.QuerySyntax;
+import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
+import com.github.jreddit.retrieval.params.TimeSpan;
 import com.github.jreddit.utils.restclient.HttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 import com.github.jreddit.utils.restclient.RestResponseHandler;
@@ -45,7 +50,7 @@ public class SessionManager {
     private RestClient mRestClient;
     private User mUser;
     private MarkActions mMarkActions;
-    private Submissions mSubmissionsController;
+    private AsyncSubmissions mSubmissionsController;
     private ProfileActions mProfileActions;
 
 
@@ -95,7 +100,12 @@ public class SessionManager {
                 mProfileActions.switchActor(user);
                 mListener.onResponse(user);
             } else {
-                Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
+                ((FragmentActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     }
@@ -116,7 +126,13 @@ public class SessionManager {
                 return mMarkActions.vote(fullname, dir);
             } else {
                 Log.d("SessionManager", "User is not logged in. Returning.");
-                Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
+                ((FragmentActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 return false;
             }
         }
@@ -202,7 +218,7 @@ public class SessionManager {
         mRestClient = restClient;
         mRestClient.setUserAgent(Constants.USER_AGENT);
         mMarkActions = new MarkActions(mRestClient);
-        mSubmissionsController = new Submissions(mRestClient);
+        mSubmissionsController = new AsyncSubmissions((RedditRestClient)mRestClient);
         mProfileActions = new ProfileActions(mRestClient);
 
 
@@ -244,13 +260,13 @@ public class SessionManager {
         mSubmissionsController.switchActor(null);
         mProfileActions.switchActor(null);
 
-        mRestClient = new HttpRestClient();
-        mRestClient.setUserAgent(Constants.USER_AGENT);
-
         // clear saved cookie and modhash
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear().commit();
+        editor.clear().apply();
+
+        PersistentCookieStore cookieStore = ((RedditRestClient)mRestClient).getCookieStore();
+        cookieStore.clear();
     }
 
     public User getUser() { return mUser; }
@@ -269,4 +285,21 @@ public class SessionManager {
     public void fetchMoreSubmissions(SubmissionFetchParam param, SessionListener<List<Submission>> listener) {
         new SubmissionsAsyncTask(listener).execute(param);
     }
+
+
+    public void searchSubmissions(String query,
+                                  QuerySyntax syntax,
+                                  SearchSort sort,
+                                  TimeSpan time,
+                                  int count,
+                                  int limit,
+                                  Submission after,
+                                  Submission before,
+                                  boolean show_all,
+                                  AsyncSubmissions.SubmissionsResponseHandler responseHandler) {
+
+        mSubmissionsController.searchAsync(query, syntax, sort, time, count, limit, after, before, show_all, responseHandler);
+
+    }
+
 }

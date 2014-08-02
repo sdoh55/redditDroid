@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -25,13 +26,17 @@ import android.widget.Toast;
 
 
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.EndlessScrollListener;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
+import com.github.jreddit.retrieval.params.QuerySyntax;
+import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
+import com.github.jreddit.retrieval.params.TimeSpan;
 
 import java.util.List;
 
@@ -116,6 +121,21 @@ public class SubmissionsListFragment extends Fragment implements
                 // TODO: search submissions
                 Toast.makeText(mContext, search, Toast.LENGTH_SHORT).show();
 
+                String query = mSearchMenuEditText.getText().toString();
+
+                SessionManager manager = SessionManager.getInstance(mContext);
+                manager.searchSubmissions(query, QuerySyntax.PLAIN, SearchSort.RELEVANCE,
+                        TimeSpan.ALL, 0, 25, null, null, true,
+                        new AsyncSubmissions.SubmissionsResponseHandler(){
+                            @Override
+                            public void onParseFinished(List<Submission> submissions) {
+                                Log.d("SubmissionsListFragment", "Submissions search successful.");
+                                mPagedSubmissionsList.clear();
+                                mPagedSubmissionsList.add(submissions);
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+
                 return true;
             }
         }
@@ -179,7 +199,6 @@ public class SubmissionsListFragment extends Fragment implements
     public SubmissionsListFragment() {
 
     }
-
 
 
     public static SubmissionsListFragment newInstance(String subredditName, SubmissionSort sort) {
@@ -336,6 +355,7 @@ public class SubmissionsListFragment extends Fragment implements
                     public void onFocusChange(View view, boolean hasFocus) {
                         if (!hasFocus) {
                             hideKeyboard();
+                            MenuItemCompat.collapseActionView(mSearchMenuItem);
                         }
                     }
                 });
@@ -348,8 +368,18 @@ public class SubmissionsListFragment extends Fragment implements
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 // reset the search box (EditText)
-                if (mSearchMenuEditText != null)
+                if (mSearchMenuEditText != null) {
                     mSearchMenuEditText.setText("");
+
+                    mSearchMenuEditText.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSearchMenuEditText.requestFocus();
+                            InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            manager.showSoftInput(mSearchMenuEditText, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+                }
 
                 return true;
             }

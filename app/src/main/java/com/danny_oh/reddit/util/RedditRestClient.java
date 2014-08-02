@@ -53,6 +53,9 @@ public class RedditRestClient implements RestClient {
 
 
 
+    public AsyncHttpClient getAsyncClient() {
+        return mClient;
+    }
 
 
 
@@ -92,7 +95,9 @@ public class RedditRestClient implements RestClient {
     }
 
 
-
+    public PersistentCookieStore getCookieStore(){
+        return mCookieStore;
+    }
 
 /**
  * RestClient interface override

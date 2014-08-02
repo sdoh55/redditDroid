@@ -102,41 +102,10 @@ public class MainActivity
     }
 
 
-
-
     /**
-     * OnSubmissionListFragmentInteractionListener interface implementation
-     * @param submissionsList the list of submissions that are currently visible
-     * @param position index of the submission that was clicked inside the submissionsList
+     * Listener that listens to onDetach of CommentsListFragment to update the underlying submission object
+      * @param submission
      */
-    public void onSubmissionClick(PagedSubmissionsList submissionsList, int position) {
-        mLastSubmissionClicked = submissionsList.getSubmissionAtIndex(position);
-        mLastSubmissionClicked.setVisited(true);
-
-        Log.d("MainActivity", "Received fragment interaction. Selection: " + mLastSubmissionClicked.getFullName());
-
-        if (mLastSubmissionClicked.isSelf()) {
-            CommentsListFragment selfSubmissionFragment = CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
-            mFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .add(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
-                    .commit();
-
-        } else {
-
-            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
-            mFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .add(R.id.content_frame, submissionFragment)
-                    .commit();
-
-        }
-
-        mSlidingMenu.setSlidingEnabled(false);
-    }
-
     @Override
     public void onSelfSubmissionFragmentDetach(Submission submission) {
         Log.d("MainActivity", "CommentsListFragment detach listener");
@@ -207,13 +176,17 @@ public class MainActivity
     @Override
     public void onBackStackChanged() {
         boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
         mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
 
         if (backStackIsEmpty) {
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+
             Log.d("MainActivity", "Back stack is empty. Refreshing SubmissionsListFragment");
             SubmissionsListFragment submissionsListFragment = (SubmissionsListFragment) getSupportFragmentManager().findFragmentByTag(SUBMISSIONS_LIST_FRAGMENT_TAG);
             submissionsListFragment.updateList();
+        } else {
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_previous_item);
         }
     }
 
@@ -282,6 +255,9 @@ public class MainActivity
                 .commit();
 
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+
 
         // enables dropdown menu of action bar
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
