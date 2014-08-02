@@ -19,8 +19,12 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.util.Constants;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 
 /**
@@ -91,46 +95,79 @@ public class SubmissionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_submission, container, false);
 
-        mWebView = (WebView)view.findViewById(R.id.submission_webview);
-        WebSettings webSettings = mWebView.getSettings();
 
-        webSettings.setLoadWithOverviewMode(true);
-        webSettings.setUseWideViewPort(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setBuiltInZoomControls(true);
-        webSettings.setJavaScriptEnabled(true);
+        if (mSubmission.getDomain().equals("youtube.com")) {
 
-        // setDisplayZoomControls(boolean) is available since API 11
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            webSettings.setDisplayZoomControls(false);
+            // http://www.youtube.com/watch?v=LkVZhEtaQCA
+
+            int index = mSubmission.getUrl().indexOf("watch?v=");
+            index += 8;
+
+            final String videoId = mSubmission.getUrl().substring(index);
+
+            YouTubePlayerSupportFragment youtubeFragment = new YouTubePlayerSupportFragment();
+
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.submission_container, youtubeFragment)
+                    .commit();
+
+            youtubeFragment.initialize(Constants.GOOGLE_API_KEY, new YouTubePlayer.OnInitializedListener() {
+                @Override
+                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
+                    if (!wasRestored) {
+                        youTubePlayer.cueVideo(videoId);
+                    }
+                }
+
+                @Override
+                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                    Log.d("SubmissionFragment", "Failed to initialize YouTubePlayer.");
+                    Toast.makeText(getActivity(), "Failed to initialize YouTube Player. Please try again later.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+
+            mWebView = (WebView) view.findViewById(R.id.submission_webview);
+            WebSettings webSettings = mWebView.getSettings();
+
+            webSettings.setLoadWithOverviewMode(true);
+            webSettings.setUseWideViewPort(true);
+            webSettings.setSupportZoom(true);
+            webSettings.setBuiltInZoomControls(true);
+            webSettings.setJavaScriptEnabled(true);
+
+            // setDisplayZoomControls(boolean) is available since API 11
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                webSettings.setDisplayZoomControls(false);
 
 
-        final Activity activity = getActivity();
+            final Activity activity = getActivity();
 
-        mWebView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                // param 'newProgress' ranges from 0 - 100
-                // activity.setProgress has range 0 - 10000
-                activity.setProgress(newProgress * 100);
+            mWebView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    // param 'newProgress' ranges from 0 - 100
+                    // activity.setProgress has range 0 - 10000
+                    activity.setProgress(newProgress * 100);
 
 //                Log.d("SubmissionFragment", "WebView progress: " + newProgress);
-            }
+                }
 
-        });
+            });
 
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                mWebView.stopLoading();
-                activity.setProgress(10000);
-                Log.e("SubmissionFragment", "WebView received error.");
+            mWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                    mWebView.stopLoading();
+                    activity.setProgress(10000);
+                    Log.e("SubmissionFragment", "WebView received error.");
 
-                Toast.makeText(getActivity(), "Network error. Please check you internet connection and try again.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(getActivity(), "Network error. Please check you internet connection and try again.", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        mWebView.loadUrl(mSubmission.getUrl());
+            mWebView.loadUrl(mSubmission.getUrl());
+        }
 
         return view;
     }
@@ -164,7 +201,7 @@ public class SubmissionFragment extends Fragment {
         super.onDestroyView();
 
         // stop WebView loading and reset the progress bar on go back
-        mWebView.destroy();
+//        mWebView.destroy();
         getActivity().setProgress(10000);
     }
 

@@ -24,7 +24,6 @@ import com.danny_oh.reddit.fragments.SearchSubmissionsFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionsListFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
-import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -36,7 +35,7 @@ public class MainActivity
         SubmissionsListFragment.OnSubmissionsListInteractionListener,
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
         LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
-        CommentsListFragment.OnSelfSubmissionFragmentDetachListener,
+        CommentsListFragment.OnCommentsListFragmentDetachListener,
         // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
         SubmissionAdapter.OnSubmissionAdapterInteractionListener
 {
@@ -65,11 +64,11 @@ public class MainActivity
         Log.d("MainActivity", "Received fragment interaction. Selection: " + mLastSubmissionClicked.getFullName());
 
         if (mLastSubmissionClicked.isSelf()) {
-            CommentsListFragment selfSubmissionFragment = CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
+            CommentsListFragment commentsListFragment = CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
-                    .replace(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
+                    .replace(R.id.content_frame, commentsListFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
                     .commit();
 
         } else {
@@ -108,7 +107,7 @@ public class MainActivity
       * @param submission
      */
     @Override
-    public void onSelfSubmissionFragmentDetach(Submission submission) {
+    public void onCommentsListFragmentDetach(Submission submission) {
         Log.d("MainActivity", "CommentsListFragment detach listener");
 
         // TODO: update the submission's score and voted status within the SubmissionListFragment
@@ -228,18 +227,22 @@ public class MainActivity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("MainActivity", "onCreate()");
         super.onCreate(savedInstanceState);
 
         // request FEATURE_PROGRESS to show progress bar while loading links
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
 //        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
+
+        setContentView(R.layout.activity_main);
+
         mFragmentManager = getSupportFragmentManager();
 
         // register for changes to fragment manager back stack
         mFragmentManager.addOnBackStackChangedListener(this);
 
-        setContentView(R.layout.activity_main);
+        
 
         // set up the sliding side menu
         mSlidingMenu = new SlidingMenu(this);
@@ -260,11 +263,6 @@ public class MainActivity
 //        mSlidingMenu.setSelectedView(mSlidingMenu.getContent());
 
 
-        mFragmentManager
-                .beginTransaction()
-                .replace(R.id.menu_frame, new DrawerMenuFragment())
-                .commit();
-
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
@@ -273,16 +271,57 @@ public class MainActivity
         // enables dropdown menu of action bar
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-
         if (savedInstanceState == null) {
+            Log.d("MainActivity", "savedInstanceState is null. Instantiating fragments.");
+
+            mFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.menu_frame, new DrawerMenuFragment())
+                    .commit();
+
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, SubmissionsListFragment.newInstance(null, null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
+                    .replace(R.id.content_frame, SubmissionsListFragment.newInstance(null, null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 
 
     }
 
+    @Override
+    protected void onResume() {
+        Log.d("MainActivity", "onResume()");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPostResume() {
+        Log.d("MainActivity", "onPostResume()");
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("MainActivity", "onPause()");
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("MainActivity", "onDestroy()");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d("MainActivity", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d("MainActivity", "onRestoreInstanceState()");
+//        super.onRestoreInstanceState(savedInstanceState);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

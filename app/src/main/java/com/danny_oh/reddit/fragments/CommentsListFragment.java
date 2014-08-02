@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -64,10 +63,10 @@ public class CommentsListFragment extends Fragment {
     private View mHeaderView;
 
 
-    private OnSelfSubmissionFragmentDetachListener mListener;
+    private OnCommentsListFragmentDetachListener mListener;
 
-    public interface OnSelfSubmissionFragmentDetachListener {
-        public void onSelfSubmissionFragmentDetach(Submission submission);
+    public interface OnCommentsListFragmentDetachListener {
+        public void onCommentsListFragmentDetach(Submission submission);
     }
 
 
@@ -122,7 +121,7 @@ public class CommentsListFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            mListener = (OnSelfSubmissionFragmentDetachListener)activity;
+            mListener = (OnCommentsListFragmentDetachListener)activity;
         } catch (ClassCastException ce) {
             ce.printStackTrace();
             throw new ClassCastException("Parent activity of SelfSubmissionFragment must implement");
@@ -131,7 +130,7 @@ public class CommentsListFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        mListener.onSelfSubmissionFragmentDetach(mSubmission);
+        mListener.onCommentsListFragmentDetach(mSubmission);
         super.onDetach();
     }
 

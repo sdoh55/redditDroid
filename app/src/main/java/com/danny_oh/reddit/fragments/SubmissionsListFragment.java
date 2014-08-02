@@ -235,6 +235,8 @@ public class SubmissionsListFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("SubmissionListFragment", "onCreateView()");
+
         View view = inflater.inflate(R.layout.fragment_submission_list, container, false);
 
         mProgressBar = (ProgressBar)view.findViewById(R.id.progressBar);
@@ -250,15 +252,19 @@ public class SubmissionsListFragment extends Fragment implements
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("SubmissionListFragment", "onActivityCreated()");
+
         super.onActivityCreated(savedInstanceState);
 
         if (mPagedSubmissionsList != null) {
             // fragment was retained and restored
             Log.d("SubmissionListFragment", "Fragment was restored from instance.");
+
+            // the adapter needs to be recreated because it maintains a reference to the old activity
+            mAdapter = new SubmissionAdapter(getActivity(), mPagedSubmissionsList);
         } else {
             mPagedSubmissionsList = new PagedSubmissionsList(mSubmissionsPerPage);
             mAdapter = new SubmissionAdapter(getActivity(), mPagedSubmissionsList);
-
             initList();
         }
 
@@ -306,12 +312,20 @@ public class SubmissionsListFragment extends Fragment implements
         Log.d("SubmissionListFragment", "onResume()");
 
         super.onResume();
+
         if (mSubredditName.isEmpty()) {
             // default to front page
             ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
         } else {
             ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d("SubmissionListFragment", "onDestroy()");
+
+        super.onDestroy();
     }
 
     @Override
@@ -336,9 +350,18 @@ public class SubmissionsListFragment extends Fragment implements
         super.onDetach();
     }
 
-/*
- * Options Menu
- */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("SubmissionsListFragment", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+    }
+
+
+
+
+    /*
+     * Options Menu
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.submission_list_menu, menu);

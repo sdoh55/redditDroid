@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ public class DrawerMenuFragment extends Fragment implements
     private List<Pair<String, String>> mUserHeaderList;
     private HashMap<String, List<String>> mUserItemList;
 
+    private SubredditFragment mSubredditFragment;
 
     private SessionManager mSessionManager;
 
@@ -93,9 +95,8 @@ public class DrawerMenuFragment extends Fragment implements
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d("DrawerMenuFragment", "onAttach()");
         super.onAttach(activity);
-
-        mSessionManager = SessionManager.getInstance(activity);
 
         try {
             mListener = (OnDrawerMenuInteractionListener)activity;
@@ -106,32 +107,53 @@ public class DrawerMenuFragment extends Fragment implements
     }
 
     @Override
+    public void onDetach() {
+        Log.d("DrawerMenuFragment", "onDetach()");
+        super.onDetach();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onCreate()");
         super.onCreate(savedInstanceState);
 
-//        if (getArguments() != null) {
-//            // TODO: do something with arguments if needed
-//        } else {
-//            throw new InstantiationException("Use factory method newInstance to instantiate fragment.", new Exception());
-//        }
-
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onCreateView()");
         View view = inflater.inflate(R.layout.activity_main_drawer, container, false);
 
-        // the RelativeLayout that contains the "Log In" button
-        RelativeLayout loginLayout = (RelativeLayout)view.findViewById(R.id.login_button_view);
         // the logged in user's expandable menu
         mUserListView = (ExpandableListView)view.findViewById(R.id.user_menu_list_view);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onActivityCreated()");
+        super.onActivityCreated(savedInstanceState);
+
+        // the RelativeLayout that contains the "Log In" button
+        RelativeLayout loginLayout = (RelativeLayout)getView().findViewById(R.id.login_button_view);
+
+        mSessionManager = SessionManager.getInstance(getActivity());
+
+        if (mSubredditFragment == null) {
+            Log.d("DrawerMenuFragment", "mSubredditFragment is null. Instantiating SubredditFragment and user menu list headers and items.");
+            mSubredditFragment = SubredditFragment.newInstance();
+            getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, mSubredditFragment).commit();
+
+            prepareUserMenuData();
+        }
+
 
         // if user is logged in
         if (mSessionManager.isUserLoggedIn()) {
             // hide the "Log In" portion of the drawer menu
             loginLayout.setVisibility(View.GONE);
-
-            prepareUserMenuData();
 
             mUserListView.setAdapter(new UserMenuExpandableListAdapter(getActivity(), mUserHeaderList, mUserItemList));
 
@@ -163,20 +185,18 @@ public class DrawerMenuFragment extends Fragment implements
                 }
             });
         }
+    }
 
-        getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, new SubredditFragment()).commit();
+    @Override
+    public void onResume() {
+        Log.d("DrawerMenuFragment", "onResume");
+        super.onResume();
+    }
 
-//        mListView = (ListView)view.findViewById(R.id.subreddit_list_view);
-//
-//        mListView.setOnItemClickListener(this);
-//        mListView.setSelector(R.drawable.selector_drawer_list_item);
-//
-//        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
-//        mListView.setAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
-
-
-
-        return view;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("DrawerMenuFragment", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
     }
 
     private int GetPixelFromDips(float pixels) {

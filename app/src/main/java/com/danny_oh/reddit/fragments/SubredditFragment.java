@@ -99,7 +99,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     }
 
     // TODO: Rename and change types of parameters
-    public static SubredditFragment newInstance(String param1, String param2) {
+    public static SubredditFragment newInstance() {
         SubredditFragment fragment = new SubredditFragment();
         Bundle args = new Bundle();
 
@@ -109,11 +109,14 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onCreate()");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
 
         }
+
+        setRetainInstance(true);
 
         // disabled for side drawer integration
 //        setHasOptionsMenu(true);
@@ -122,15 +125,36 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onCreateView()");
+
         View view = inflater.inflate(R.layout.fragment_subreddit_list, container, false);
 
         // Set the adapter
         mListView = (ListView)view.findViewById(R.id.subreddit_list_listview);
 
+        mSearchSubredditEditText = (EditText)view.findViewById(R.id.search_subreddits);
+
+        mListView.addHeaderView(inflater.inflate(R.layout.list_header_subreddit, mListView, false));
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onActivityCreated()");
+
+        super.onActivityCreated(savedInstanceState);
+
+        if (mSubredditList != null && mSubredditAdapter != null) {
+            // fragment was restored
+            mListView.setAdapter(mSubredditAdapter);
+        } else {
+            mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
+        }
+
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
-        mSearchSubredditEditText = (EditText)view.findViewById(R.id.search_subreddits);
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -149,21 +173,17 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
                 }
             }
         });
-
-        mListView.addHeaderView(inflater.inflate(R.layout.list_header_subreddit, mListView, false));
-
-        return view;
     }
 
     @Override
     public void onResume() {
+        Log.d("SubredditFragment", "onResume()");
         super.onResume();
-
-        mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
     }
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d("SubredditFragment", "onAttach()");
         super.onAttach(activity);
         mActivity = (MainActivity)activity;
 
@@ -180,9 +200,18 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onDetach() {
+        Log.d("SubredditFragment", "onDetach()");
         super.onDetach();
-        mListener = null;
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("SubredditFragment", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+    }
+
+
 
 
     /**
