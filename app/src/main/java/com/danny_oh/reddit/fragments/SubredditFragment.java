@@ -134,8 +134,10 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
-                mSearchSubredditEditText.clearFocus();
+                if (mSearchSubredditEditText.getText().length() > 0) {
+                    mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(), SubredditFragment.this).execute();
+                    mSearchSubredditEditText.clearFocus();
+                }
                 return true;
             }
         });

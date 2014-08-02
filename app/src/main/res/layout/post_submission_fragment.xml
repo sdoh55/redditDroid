@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/small_dp">
+
+    <EditText
+        android:id="@+id/submission_title_ET"
+        style="@style/Base.Wrapper.FullWidth.SmallLeftRightMargin"
+        android:inputType="text"
+        android:imeOptions="actionNext"
+        android:hint="@string/placeholder_title" />
+
+    <EditText
+        android:id="@+id/submission_url_ET"
+        style="@style/Base.Wrapper.FullWidth.SmallLeftRightMargin"
+        android:inputType="textUri"
+        android:imeOptions="actionNext"
+        android:hint="@string/hint_url" />
+
+    <EditText
+        android:id="@+id/submission_content_ET"
+        style="@style/Base.Wrapper.FullWidth.SmallLeftRightMargin"
+        android:inputType="textMultiLine"
+        android:lines="5"
+        android:hint="@string/hint_text" />
+
+    <EditText
+        android:id="@+id/submission_subreddit_ET"
+        style="@style/Base.Wrapper.FullWidth.SmallLeftRightMargin"
+        android:inputType="text"
+        android:imeOptions="actionGo"
+        android:hint="@string/hint_subreddit" />
+</LinearLayout>
