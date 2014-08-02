@@ -12,25 +12,15 @@ android {
         versionName "1.0"
     }
     buildTypes {
-        release {
+        debug {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        release {
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
-
-//    productFlavors {
-//        x86 {
-//            ndk {
-//                abiFilter "x86"
-//            }
-//        }
-//        arm {
-//            ndk {
-//                abiFilters "armeabi-v7a", "armeabi"
-//            }
-//        }
-//
-//    }
 }
 
 dependencies {
@@ -54,11 +44,6 @@ dependencies {
 
 //    compile 'in.uncod.android.bypass:bypass:1.1'
 }
-
-
-
-
-
 
 configurations {
     all*.exclude module: 'junit'

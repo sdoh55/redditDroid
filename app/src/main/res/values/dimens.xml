@@ -16,7 +16,7 @@
     <dimen name="list_padding">10dp</dimen>
     <dimen name="shadow_width">5dp</dimen>
     <integer name="num_cols">1</integer>
-    <dimen name="drawer_subreddits_placeholder_font_size">16dp</dimen>
+    <dimen name="drawer_subreddits_placeholder_font_size">16sp</dimen>
 
     <!-- Drawer Subreddit List Dimensions -->
     <dimen name="subreddit_fragment_list_item_font_size">20sp</dimen>
@@ -31,17 +31,22 @@
     <dimen name="dialog_input_vertical_margin">16dp</dimen>
 
     <!-- Submission Dimensions -->
+    <dimen name="submission_icon_size">50dp</dimen>
+    <dimen name="submission_icon_margin">5dp</dimen>
     <dimen name="submission_title_font_size">14sp</dimen>
+    <dimen name="submission_title_margin">5dp</dimen>
     <dimen name="submission_subtitle_font_size">11sp</dimen>
     <dimen name="submission_num_comments_font_size">12sp</dimen>
+    <dimen name="submission_num_comments_margin">6dp</dimen>
+    <dimen name="submission_num_comments_padding">8dp</dimen>
 
     <!-- "self" Submission Dimensions -->
-    <dimen name="submission_self_title_font_size">20sp</dimen>
+    <dimen name="submission_self_title_font_size">16sp</dimen>
     <dimen name="submission_self_title_margin">8dp</dimen>
-    <dimen name="submission_self_text_font_size">16sp</dimen>
+    <dimen name="submission_self_text_font_size">14sp</dimen>
     <dimen name="submission_self_text_margin">6dp</dimen>
     <dimen name="submission_self_score_margin">4dp</dimen>
-    <dimen name="submission_self_score_font_size">20sp</dimen>
+    <dimen name="submission_self_score_font_size">16sp</dimen>
     <dimen name="submission_self_vote_button_size">42dp</dimen>
 
     <!-- Comment Dimensions -->
@@ -52,6 +57,7 @@
     <dimen name="comment_username_font_size">11sp</dimen>
     <dimen name="comment_score_font_size">13sp</dimen>
     <dimen name="comment_time_created_font_size">11sp</dimen>
+    <dimen name="comment_body_font_size">12sp</dimen>
 
 
 

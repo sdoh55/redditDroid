@@ -70,7 +70,10 @@ public class SubmissionFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("SubmissionFragment", "onCreate");
+
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mSubmission = (ExtendedSubmission)getArguments().getParcelable(ARG_SUBMISSION);
         } else {
@@ -110,7 +113,7 @@ public class SubmissionFragment extends Fragment {
                 // activity.setProgress has range 0 - 10000
                 activity.setProgress(newProgress * 100);
 
-                Log.d("SubmissionFragment", "WebView progress: " + newProgress);
+//                Log.d("SubmissionFragment", "WebView progress: " + newProgress);
             }
 
         });
@@ -132,14 +135,30 @@ public class SubmissionFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onResume() {
+        Log.d("SubmissionFragment", "onResume");
 
-//        mWebView.pau
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d("SubmissionFragment", "onPause");
+
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("SubmissionFragment", "onStop");
+
+        super.onStop();
     }
 
     @Override
     public void onDestroyView() {
+        Log.d("SubmissionFragment", "onDestroyView");
+
         super.onDestroyView();
 
         // stop WebView loading and reset the progress bar on go back
@@ -149,8 +168,8 @@ public class SubmissionFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
         Log.d("SubmissionFragment", "onDetach() called.");
+        super.onDetach();
     }
 
 

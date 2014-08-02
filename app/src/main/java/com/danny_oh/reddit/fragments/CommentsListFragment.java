@@ -203,13 +203,16 @@ public class CommentsListFragment extends Fragment {
             }
         }.execute();
 
+
         // initialize view elements
         TextView title = (TextView) mHeaderView.findViewById(R.id.submission_title);
         mScoreLabel = (TextView) mHeaderView.findViewById(R.id.submission_score);
         TextView timeElapsed = (TextView) mHeaderView.findViewById(R.id.hours_ago_label);
         TextView author = (TextView) mHeaderView.findViewById(R.id.author_label);
+        TextView subreddit = (TextView) mHeaderView.findViewById(R.id.subreddit_label);
         mUpvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_up_vote);
         mDownvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_down_vote);
+
 
         title.setText(mSubmission.getTitle());
         mScoreLabel.setText(mSubmission.getScore().toString());
@@ -223,6 +226,7 @@ public class CommentsListFragment extends Fragment {
         timeElapsed.setText(timeElapsedString);
 
         author.setText(mSubmission.getAuthor());
+        subreddit.setText(mSubmission.getSubreddit());
 
         // sets the voted states for up/down vote image views and sets score for the score label.
         updateVoteIndicator(null);

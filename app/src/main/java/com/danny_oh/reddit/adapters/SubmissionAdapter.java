@@ -1,16 +1,20 @@
 package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.format.Time;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +23,7 @@ import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
-import com.github.jreddit.entity.Subreddit;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 /**
  * Created by danny on 7/21/14.
@@ -33,8 +34,17 @@ public class SubmissionAdapter extends BaseAdapter {
     private PagedSubmissionsList mPagedSubmissions;
     private OnSubmissionAdapterInteractionListener mListener;
 
+    private int mSubmissionTitleColor;
+    private int mVisitedSubmissionTitleColor;
+
+
+    private int mTimeElapsedFontColor;
+    private int mAuthorFontColor;
+
+
     public interface OnSubmissionAdapterInteractionListener {
         public void onCommentsClick(Submission submission);
+        public void onSubmissionClick(Submission submission, int position);
     }
 
     /*
@@ -49,6 +59,7 @@ public class SubmissionAdapter extends BaseAdapter {
         private TextView title;
         private TextView subtitle;
         private TextView numComments;
+        private LinearLayout titleContainer;
     }
 
 //    public SubmissionAdapter(Context context, List<Submission> submissions) {
@@ -57,13 +68,22 @@ public class SubmissionAdapter extends BaseAdapter {
 //    }
 
     public SubmissionAdapter(Context context, PagedSubmissionsList pagedSubmissions) {
+        try {
+            mListener = (OnSubmissionAdapterInteractionListener)context;
+        } catch (ClassCastException ce) {
+            ce.printStackTrace();
+            throw new ClassCastException("Parent activity of SubmissionAdapter must implement OnSubmissionAdapterInteractionListener interface.");
+        }
+
         mContext = context;
         mPagedSubmissions = pagedSubmissions;
+
+        mSubmissionTitleColor = mContext.getResources().getColor(R.color.submission_title_font_color);
+        mVisitedSubmissionTitleColor = mContext.getResources().getColor(R.color.submission_visited_title_font_color);
+        mAuthorFontColor = mContext.getResources().getColor(R.color.submission_author_font_color);
+        mTimeElapsedFontColor = mContext.getResources().getColor(R.color.submission_time_elapsed_font_color);
     }
 
-    public void setOnSubmissionAdapterInteractionListener(OnSubmissionAdapterInteractionListener listener) {
-        mListener = listener;
-    }
 
     @Override
     public int getCount() {
@@ -94,6 +114,7 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.title = (TextView)view.findViewById(R.id.submission_title);
             viewHolder.subtitle = (TextView)view.findViewById(R.id.submission_subtitle);
             viewHolder.numComments = (TextView)view.findViewById(R.id.submission_num_comments);
+            viewHolder.titleContainer = (LinearLayout)view.findViewById(R.id.submission_title_container);
 
             view.setTag(viewHolder);
         } else {
@@ -106,6 +127,12 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.score.setText(submission.getScore().toString());
             viewHolder.title.setText(submission.getTitle().toString());
 
+            if (submission.isVisited()) {
+                viewHolder.title.setTextColor(mVisitedSubmissionTitleColor);
+            } else {
+                viewHolder.title.setTextColor(mSubmissionTitleColor);
+            }
+
             Time time = new Time("UTC");
             long timeNow = System.currentTimeMillis() / 1000;
             long timePosted = submission.getCreatedUTC();
@@ -113,7 +140,7 @@ public class SubmissionAdapter extends BaseAdapter {
 
             String timeElapsed = (hoursElapsed > 0) ? hoursElapsed + " hrs ago" : ((timeNow - timePosted) / 60) + " mins ago";
 
-            viewHolder.subtitle.setText(timeElapsed + " | " + submission.getAuthor() + " | " + submission.getSubreddit() + " | " + submission.getDomain());
+            viewHolder.subtitle.setText(buildSubtitle(timeElapsed, submission.getAuthor(), submission.getSubreddit(), submission.getDomain()));
 
 
             // TODO: thumbnail types/strings to consider
@@ -136,10 +163,16 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.numComments.setText(submission.getCommentCount().toString() + " comments");
 
             if (mListener != null) {
+                viewHolder.titleContainer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mListener.onSubmissionClick(submission, position);
+                    }
+                });
                 viewHolder.numComments.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mListener.onCommentsClick(mPagedSubmissions.getSubmissionAtIndex(position));
+                        mListener.onCommentsClick(submission);
                     }
                 });
             }
@@ -226,6 +259,42 @@ public class SubmissionAdapter extends BaseAdapter {
         }
 
         return view;
+    }
+
+    private Spannable buildSubtitle(String timeElapsed, String author, String subreddit, String domain) {
+        Spannable subtitleSpannable = new SpannableString(timeElapsed + " " + author + " " + subreddit + " " + domain);
+
+        // set time elapsed font color
+        subtitleSpannable.setSpan(new ForegroundColorSpan(mTimeElapsedFontColor),
+                0,
+                timeElapsed.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        // set time elapsed to italic
+        subtitleSpannable.setSpan(new StyleSpan(Typeface.ITALIC),
+                0,
+                timeElapsed.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        // set the author text color
+        subtitleSpannable.setSpan(new ForegroundColorSpan(mAuthorFontColor),
+                timeElapsed.length() + 1,
+                timeElapsed.length() + 1 + author.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        // set the subreddit text color
+        subtitleSpannable.setSpan(new StyleSpan(Typeface.BOLD),
+                timeElapsed.length() + 1 + author.length() + 1,
+                timeElapsed.length() + 1 + author.length() + 1 + subreddit.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        // set the domain text size
+        subtitleSpannable.setSpan(new RelativeSizeSpan(0.7f),
+                timeElapsed.length() + 1 + author.length() + 1 + subreddit.length() + 1,
+                subtitleSpannable.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+        return subtitleSpannable;
     }
 
 }

@@ -87,9 +87,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/comment_title_container"
-            android:layout_alignParentStart="false"
             android:layout_alignLeft="@+id/comment_title_container"
-            android:autoLink="web" />
+            android:textSize="@dimen/comment_body_font_size" />
     </RelativeLayout>
 
     <LinearLayout

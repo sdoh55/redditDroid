@@ -27,13 +27,18 @@
     <color name="action_bar_search_hint_font_color">#ffe1e1e1</color>
     <color name="action_bar_menu_item_selected">#ffccd4e8</color>
 
+    <color name="submission_author_font_color">#ff6287d0</color>
+    <color name="submission_subreddit_font_color">#ffbfbbcb</color>
+    <color name="submission_time_elapsed_font_color">#ff8e8e8e</color>
+
+    <color name="submission_title_font_color">#000</color>
+    <color name="submission_visited_title_font_color">#ffababab</color>
 
     <color name="comment_username_font_color">#ff6287d0</color>
     <color name="comment_author_font_color">#ffdc8200</color>
 
     <color name="self_submission_background_light">#fff</color>
-    <color name="self_submission_time_elapsed_font_color">#ff8e8e8e</color>
 
-    <color name="selected_state">#ccc</color>
+    <color name="pressed_state">#ccc</color>
     <color name="unselected_state">#0000</color>
 </resources>

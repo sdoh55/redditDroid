@@ -39,10 +39,6 @@ import java.util.List;
  * A fragment that displays a list of jReddit Submissions
  */
 public class SubmissionsListFragment extends Fragment implements
-        // listener for submissions list view clicks (displays the selected submission)
-        AbsListView.OnItemClickListener,
-        // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
-        SubmissionAdapter.OnSubmissionAdapterInteractionListener,
         // listener for action bar search box
         TextView.OnEditorActionListener
 {
@@ -64,7 +60,6 @@ public class SubmissionsListFragment extends Fragment implements
 
     private boolean mShowAll = false;
 
-    private OnSubmissionListFragmentInteractionListener mListener;
     private PagedSubmissionsList mPagedSubmissionsList;
 
     private ProgressBar mProgressBar;
@@ -93,17 +88,6 @@ public class SubmissionsListFragment extends Fragment implements
         private boolean show;
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     */
-    public interface OnSubmissionListFragmentInteractionListener {
-        public void onSubmissionClick(PagedSubmissionsList submissionsList, int position, View listItem);
-    }
 
 
 /*
@@ -138,38 +122,7 @@ public class SubmissionsListFragment extends Fragment implements
         return false;
     }
 
-    /**
-     * OnItemClick listener to handle item clicks on mListView
-     * @param parent
-     * @param view
-     * @param position
-     * @param id
-     */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (mListener != null) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
 
-            mListener.onSubmissionClick(mPagedSubmissionsList, position, mListView.getChildAt(position));
-        }
-    }
-
-    /**
-     * OnSubmissionAdapterInteractionListener interface implementation
-     * Listener for clicks on the 'number of comments' View from submissions list view.
-     * @param submission
-     */
-    @Override
-    public void onCommentsClick(Submission submission) {
-//        mSearchMenuEditText.clearFocus();
-
-        getFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
-                .commit();
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -259,6 +212,7 @@ public class SubmissionsListFragment extends Fragment implements
  */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("SubmissionsListFragment", "onCreate");
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
@@ -300,10 +254,8 @@ public class SubmissionsListFragment extends Fragment implements
             initList();
         }
 
-        mAdapter.setOnSubmissionAdapterInteractionListener(this);
-
         // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+//        mListView.setOnItemClickListener(this);
         mListView.setAdapter(mAdapter);
 
         // add EndlessScrollListener that loads more submissions when the scroll position reaches close to the end
@@ -345,15 +297,15 @@ public class SubmissionsListFragment extends Fragment implements
     public void onAttach(Activity activity) {
         Log.d("SubmissionListFragment", "onAttach()");
 
-        mContext = (Context)activity;
+        mContext = activity;
 
         super.onAttach(activity);
-        try {
-            mListener = (OnSubmissionListFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                + " must implement OnFragmentInteractionListener");
-        }
+//        try {
+//            mListener = (OnSubmissionListFragmentInteractionListener) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString()
+//                + " must implement OnFragmentInteractionListener");
+//        }
     }
 
     @Override
@@ -361,7 +313,6 @@ public class SubmissionsListFragment extends Fragment implements
         Log.d("SubmissionListFragment", "onDetach()");
 
         super.onDetach();
-        mListener = null;
     }
 
 /*
@@ -437,6 +388,9 @@ public class SubmissionsListFragment extends Fragment implements
 
     }
 
+    public void updateList() {
+        mAdapter.notifyDataSetChanged();
+    }
 /*
  * private methods
  */

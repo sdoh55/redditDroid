@@ -30,11 +30,12 @@
             android:layout_height="wrap_content"
             android:text="@string/placeholder_comment_time_elapsed"
             android:id="@+id/hours_ago_label"
-            android:textColor="@color/self_submission_time_elapsed_font_color"
+            android:textColor="@color/submission_time_elapsed_font_color"
             android:layout_alignParentBottom="false"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/submission_self_title_margin"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"
+            android:textStyle="italic" />
 
         <TextView
             android:id="@android:id/text1"
@@ -56,6 +57,23 @@
             android:layout_toEndOf="@id/author_label"
             android:textColor="@color/comment_author_font_color"
             android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/to"
+            android:id="@android:id/text2"
+            android:layout_toRightOf="@+id/author_label"
+            android:layout_marginLeft="@dimen/submission_self_score_margin"
+            android:layout_marginRight="@dimen/submission_self_score_margin" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder_subreddit"
+            android:id="@+id/subreddit_label"
+            android:layout_toRightOf="@android:id/text2"
+            android:textStyle="bold" />
 
 
     </RelativeLayout>

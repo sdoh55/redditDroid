@@ -32,15 +32,17 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class MainActivity
         extends ActionBarActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
-        SubmissionsListFragment.OnSubmissionListFragmentInteractionListener, // handles individual submission item clicks
+
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
         LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
-        CommentsListFragment.OnSelfSubmissionFragmentDetachListener
-
+        CommentsListFragment.OnSelfSubmissionFragmentDetachListener,
+        // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
+        SubmissionAdapter.OnSubmissionAdapterInteractionListener
 {
 
     public static final String SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG = "self_submission_fragment_transaction";
     private static final String LAST_SUBMISSION_CLICKED_SAVE_INSTANCE_KEY = "last_submission_clicked";
+    private static final String SUBMISSIONS_LIST_FRAGMENT_TAG = "submissions_list_fragment_key";
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
@@ -48,16 +50,68 @@ public class MainActivity
     private SessionManager mSessionManager;
 
     private Submission mLastSubmissionClicked;
-    private View mSubmissionListItem;
+
+
+
+/*
+ * OnSubmissionAdapterInteractionListener interface implementation
+ */
+    @Override
+    public void onSubmissionClick(Submission submission, int position) {
+        mLastSubmissionClicked = submission;
+        mLastSubmissionClicked.setVisited(true);
+
+        Log.d("MainActivity", "Received fragment interaction. Selection: " + mLastSubmissionClicked.getFullName());
+
+        if (mLastSubmissionClicked.isSelf()) {
+            CommentsListFragment selfSubmissionFragment = CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
+            mFragmentManager
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.content_frame, selfSubmissionFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
+                    .commit();
+
+        } else {
+
+            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
+            mFragmentManager
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.content_frame, submissionFragment)
+                    .commit();
+
+        }
+
+        mSlidingMenu.setSlidingEnabled(false);
+    }
+
+    /**
+     * Listener for clicks on the 'number of comments' View from submissions list view.
+     * @param submission
+     */
+    @Override
+    public void onCommentsClick(Submission submission) {
+        mLastSubmissionClicked = submission;
+        mLastSubmissionClicked.setVisited(true);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
+                .commit();
+    }
+
+
+
 
     /**
      * OnSubmissionListFragmentInteractionListener interface implementation
      * @param submissionsList the list of submissions that are currently visible
      * @param position index of the submission that was clicked inside the submissionsList
      */
-    public void onSubmissionClick(PagedSubmissionsList submissionsList, int position, View listItem) {
-        mSubmissionListItem = listItem;
+    public void onSubmissionClick(PagedSubmissionsList submissionsList, int position) {
         mLastSubmissionClicked = submissionsList.getSubmissionAtIndex(position);
+        mLastSubmissionClicked.setVisited(true);
 
         Log.d("MainActivity", "Received fragment interaction. Selection: " + mLastSubmissionClicked.getFullName());
 
@@ -85,15 +139,16 @@ public class MainActivity
 
     @Override
     public void onSelfSubmissionFragmentDetach(Submission submission) {
+        Log.d("MainActivity", "CommentsListFragment detach listener");
+
         // TODO: update the submission's score and voted status within the SubmissionListFragment
         if (mLastSubmissionClicked != null) {
             mLastSubmissionClicked.setLiked(submission.isLiked());
             mLastSubmissionClicked.setScore(submission.getScore());
-            mSubmissionListItem.invalidate();
         }
     }
 
-    /*
+/*
  * OnDrawerMenuInteractionListener interface implementation
  */
 
@@ -154,6 +209,12 @@ public class MainActivity
         boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
         getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
         mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+
+        if (backStackIsEmpty) {
+            Log.d("MainActivity", "Back stack is empty. Refreshing SubmissionsListFragment");
+            SubmissionsListFragment submissionsListFragment = (SubmissionsListFragment) getSupportFragmentManager().findFragmentByTag(SUBMISSIONS_LIST_FRAGMENT_TAG);
+            submissionsListFragment.updateList();
+        }
     }
 
     @Override
@@ -228,7 +289,7 @@ public class MainActivity
 
         if (savedInstanceState == null) {
             mFragmentManager.beginTransaction()
-                    .add(R.id.content_frame, SubmissionsListFragment.newInstance(null, null))  // null defaults to frontpage and SubmissionSort.HOT
+                    .add(R.id.content_frame, SubmissionsListFragment.newInstance(null, null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 

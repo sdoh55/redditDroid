@@ -65,6 +65,7 @@
     <!-- General -->
     <string name="ok">Ok</string>
     <string name="by">by</string>
+    <string name="to">to</string>
     <string name="pts">pts</string>
 
     <!-- Image contentDescription Strings -->
@@ -83,7 +84,8 @@
     <string name="placeholder_score">score</string>
     <string name="placeholder_title">Title</string>
     <string name="placeholder_subtitle">SUBTITLE</string>
-    <string name="placeholder_self_text_html">SELFTEXT_HTML</string>
+    <string name="placeholder_self_text_html">Parsing for you . . .</string>
+    <string name="placeholder_subreddit">subreddit</string>
 
     <string name="placeholder_submission_subtitle">user | hrs ago | subreddit | domain</string>
     <string name="placeholder_submission_num_comments">number of comments</string>

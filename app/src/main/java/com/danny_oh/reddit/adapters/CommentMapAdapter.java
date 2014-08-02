@@ -3,6 +3,7 @@ package com.danny_oh.reddit.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import com.github.jreddit.entity.Submission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import in.uncod.android.bypass.Bypass;
 
 /**
  * Created by danny on 7/23/14.
@@ -43,12 +46,15 @@ public class CommentMapAdapter extends BaseAdapter {
 
     private List<Integer> mDepthColors;
 
+    private Bypass mBypass;
+
     public CommentMapAdapter(Context context, HashMap<Integer, CommentsListHelper.CommentContainer> comments, Submission submission) {
         mContext = context;
         mComments = comments;
         mSubmission = submission;
 
         mDepthColors = new ArrayList<Integer>();
+        mBypass = new Bypass();
     }
 
     @Override
@@ -95,7 +101,11 @@ public class CommentMapAdapter extends BaseAdapter {
             viewHolder.username.setText(comment.getAuthor());
             viewHolder.score.setText(comment.getScore().toString() + " points");
             viewHolder.timeCreated.setText(timeElapsed);
-            viewHolder.body.setText(comment.getBody());
+
+            CharSequence spannable = mBypass.markdownToSpannable(comment.getBody());
+
+            viewHolder.body.setText(spannable);
+            viewHolder.body.setMovementMethod(LinkMovementMethod.getInstance());
 
             viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
