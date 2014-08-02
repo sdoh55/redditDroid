@@ -17,7 +17,7 @@
 
     <RelativeLayout
         android:id="@+id/comment_container"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/comment_margin"
         android:layout_marginTop="@dimen/comment_margin"
@@ -33,7 +33,7 @@
 
         <RelativeLayout
             android:id="@+id/comment_title_container"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="false"
