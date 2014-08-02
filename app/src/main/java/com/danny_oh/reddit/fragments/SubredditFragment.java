@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -133,15 +134,9 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                // if 'return' key was pressed
-                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
-                    mSearchSubredditEditText.clearFocus();
-
-                    return true;
-                }
-
-                return false;
+                mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
+                mSearchSubredditEditText.clearFocus();
+                return true;
             }
         });
         mSearchSubredditEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
