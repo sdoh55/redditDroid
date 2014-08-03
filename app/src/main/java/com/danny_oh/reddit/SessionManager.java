@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.Constants;
 import com.danny_oh.reddit.util.RedditRestClient;
@@ -49,7 +50,7 @@ public class SessionManager {
     private Context mContext;
     private RestClient mRestClient;
     private User mUser;
-    private MarkActions mMarkActions;
+    private AsyncMarkActions mMarkActions;
     private AsyncSubmissions mSubmissionsController;
     private ProfileActions mProfileActions;
 
@@ -217,7 +218,7 @@ public class SessionManager {
         mContext = context;
         mRestClient = restClient;
         mRestClient.setUserAgent(Constants.USER_AGENT);
-        mMarkActions = new MarkActions(mRestClient);
+        mMarkActions = new AsyncMarkActions((RedditRestClient)mRestClient);
         mSubmissionsController = new AsyncSubmissions((RedditRestClient)mRestClient);
         mProfileActions = new ProfileActions(mRestClient);
 
@@ -302,4 +303,11 @@ public class SessionManager {
 
     }
 
+    public void saveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
+        mMarkActions.saveAsync(fullName, responseHandler);
+    }
+
+    public void unsaveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
+        mMarkActions.unsaveAsync(fullName, responseHandler);
+    }
 }

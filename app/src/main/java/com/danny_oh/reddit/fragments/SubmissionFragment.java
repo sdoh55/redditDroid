@@ -48,7 +48,6 @@ public class SubmissionFragment extends Fragment {
     private YouTubePlayerSupportFragment mYouTubeFragment;
     private YouTubePlayer mYouTubePlayer;
 
-    private boolean mIsWebView;
     private boolean mWebViewFinishedLoading = false;
 
 
@@ -170,7 +169,7 @@ public class SubmissionFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (mIsWebView && mWebViewFinishedLoading) {
+        if (mWebViewFinishedLoading) {
             mWebView.saveState(outState);
         }
     }
@@ -203,11 +202,9 @@ public class SubmissionFragment extends Fragment {
 
         super.onDestroy();
 
-        if (mIsWebView) {
-            // stop WebView loading and reset the progress bar on go back
-            mWebView.destroy();
-            getActivity().setProgress(10000);
-        }
+        // stop WebView loading and reset the progress bar on go back
+        mWebView.destroy();
+        getActivity().setProgress(10000);
     }
 
     @Override

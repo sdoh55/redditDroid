@@ -2,14 +2,14 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:drawable="@drawable/ic_downvote_unselected"
+    <item android:drawable="@drawable/ic_favorite_disabled"
         app:submission_vote_state="false"
         />
-        <!--android:state_checked="false"-->
-    <item android:drawable="@drawable/ic_downvote_selected"
+    <!--android:state_checked="false"-->
+    <item android:drawable="@drawable/ic_favorite_enabled"
         app:submission_vote_state="true"
         />
-        <!--android:state_checked="true"-->
+    <!--android:state_checked="true"-->
 
-    <item android:drawable="@drawable/ic_downvote_unselected"/>
+    <item android:drawable="@drawable/ic_favorite_disabled"/>
 </selector>

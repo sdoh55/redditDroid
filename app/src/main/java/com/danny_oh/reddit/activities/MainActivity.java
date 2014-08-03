@@ -203,19 +203,7 @@ public class MainActivity
      */
     @Override
     public void onBackStackChanged() {
-        boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(!backStackIsEmpty);
-        mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
-
-        if (backStackIsEmpty) {
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
-
-            Log.d("MainActivity", "Back stack is empty. Refreshing SubmissionsListFragment");
-            SubmissionsListFragment submissionsListFragment = (SubmissionsListFragment) getSupportFragmentManager().findFragmentByTag(SUBMISSIONS_LIST_FRAGMENT_TAG);
-            submissionsListFragment.updateList();
-        } else {
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_previous_item);
-        }
+        refreshActionBar();
     }
 
     @Override
@@ -309,6 +297,8 @@ public class MainActivity
     protected void onResume() {
         Log.d("MainActivity", "onResume()");
         super.onResume();
+
+        refreshActionBar();
     }
 
     @Override
@@ -387,6 +377,21 @@ public class MainActivity
             mSlidingMenu.showContent();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void refreshActionBar() {
+        boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
+        mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+
+        if (backStackIsEmpty) {
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
+
+            Log.d("MainActivity", "Back stack is empty. Refreshing SubmissionsListFragment");
+            SubmissionsListFragment submissionsListFragment = (SubmissionsListFragment) getSupportFragmentManager().findFragmentByTag(SUBMISSIONS_LIST_FRAGMENT_TAG);
+            submissionsListFragment.updateList();
+        } else {
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_previous_item);
         }
     }
 
