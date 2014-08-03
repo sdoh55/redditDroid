@@ -23,6 +23,7 @@ import com.danny_oh.reddit.fragments.LoginDialogFragment;
 import com.danny_oh.reddit.fragments.SearchSubmissionsFragment;
 import com.danny_oh.reddit.fragments.SubmissionFragment;
 import com.danny_oh.reddit.fragments.SubmissionsListFragment;
+import com.danny_oh.reddit.fragments.YouTubeSubmissionFragment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
@@ -73,13 +74,30 @@ public class MainActivity
 
         } else {
 
-            SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
-            mFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .replace(R.id.content_frame, submissionFragment)
-                    .commit();
+            if (mLastSubmissionClicked.getDomain().equals("youtube.com") || mLastSubmissionClicked.getDomain().equals("youtu.be")) {
 
+                // youtube link format: http://www.youtube.com/watch?v=LkVZhEtaQCA
+                int index = mLastSubmissionClicked.getUrl().indexOf("watch?v=");
+                index += 8;
+
+                final String videoId = mLastSubmissionClicked.getUrl().substring(index);
+
+                YouTubeSubmissionFragment submissionFragment = YouTubeSubmissionFragment.newInstance(videoId);
+                mFragmentManager
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.content_frame, submissionFragment)
+                        .commit();
+
+            } else {
+
+                SubmissionFragment submissionFragment = SubmissionFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked));
+                mFragmentManager
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.content_frame, submissionFragment)
+                        .commit();
+            }
         }
 
         mSlidingMenu.setSlidingEnabled(false);
@@ -280,7 +298,7 @@ public class MainActivity
                     .commit();
 
             mFragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, SubmissionsListFragment.newInstance(null, null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
+                    .replace(R.id.content_frame, SubmissionsListFragment.newInstance("videos", null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 

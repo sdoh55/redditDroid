@@ -1,6 +1,7 @@
 package com.danny_oh.reddit.fragments;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,9 +38,18 @@ public class SubmissionFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_SUBMISSION = "submission";
 
+    // for saving instance states
+    private static final String YOUTUBE_PLAYER_MILLIS_KEY = "youtube_player_current_millis";
+
     private WebView mWebView;
 
     private Submission mSubmission;
+
+    private YouTubePlayerSupportFragment mYouTubeFragment;
+    private YouTubePlayer mYouTubePlayer;
+
+    private boolean mIsWebView;
+    private boolean mWebViewFinishedLoading = false;
 
 
     /**
@@ -95,39 +105,20 @@ public class SubmissionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_submission, container, false);
 
+        mWebView = (WebView) view.findViewById(R.id.submission_webview);
 
-        if (mSubmission.getDomain().equals("youtube.com")) {
+        return view;
+    }
 
-            // http://www.youtube.com/watch?v=LkVZhEtaQCA
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-            int index = mSubmission.getUrl().indexOf("watch?v=");
-            index += 8;
+        if (savedInstanceState != null && mWebView.restoreState(savedInstanceState) != null) {
+            Log.d("SubmissionFragment", "savedInstanceState is not null. Restoring WebView state.");
 
-            final String videoId = mSubmission.getUrl().substring(index);
-
-            YouTubePlayerSupportFragment youtubeFragment = new YouTubePlayerSupportFragment();
-
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.submission_container, youtubeFragment)
-                    .commit();
-
-            youtubeFragment.initialize(Constants.GOOGLE_API_KEY, new YouTubePlayer.OnInitializedListener() {
-                @Override
-                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
-                    if (!wasRestored) {
-                        youTubePlayer.cueVideo(videoId);
-                    }
-                }
-
-                @Override
-                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-                    Log.d("SubmissionFragment", "Failed to initialize YouTubePlayer.");
-                    Toast.makeText(getActivity(), "Failed to initialize YouTube Player. Please try again later.", Toast.LENGTH_SHORT).show();
-                }
-            });
         } else {
 
-            mWebView = (WebView) view.findViewById(R.id.submission_webview);
             WebSettings webSettings = mWebView.getSettings();
 
             webSettings.setLoadWithOverviewMode(true);
@@ -139,7 +130,6 @@ public class SubmissionFragment extends Fragment {
             // setDisplayZoomControls(boolean) is available since API 11
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
                 webSettings.setDisplayZoomControls(false);
-
 
             final Activity activity = getActivity();
 
@@ -157,6 +147,12 @@ public class SubmissionFragment extends Fragment {
 
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+                    mWebViewFinishedLoading = true;
+                }
+
+                @Override
                 public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                     mWebView.stopLoading();
                     activity.setProgress(10000);
@@ -168,8 +164,15 @@ public class SubmissionFragment extends Fragment {
 
             mWebView.loadUrl(mSubmission.getUrl());
         }
+    }
 
-        return view;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mIsWebView && mWebViewFinishedLoading) {
+            mWebView.saveState(outState);
+        }
     }
 
     @Override
@@ -195,14 +198,16 @@ public class SubmissionFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        Log.d("SubmissionFragment", "onDestroyView");
+    public void onDestroy() {
+        Log.d("SubmissionFragment", "onDestroy");
 
-        super.onDestroyView();
+        super.onDestroy();
 
-        // stop WebView loading and reset the progress bar on go back
-//        mWebView.destroy();
-        getActivity().setProgress(10000);
+        if (mIsWebView) {
+            // stop WebView loading and reset the progress bar on go back
+            mWebView.destroy();
+            getActivity().setProgress(10000);
+        }
     }
 
     @Override

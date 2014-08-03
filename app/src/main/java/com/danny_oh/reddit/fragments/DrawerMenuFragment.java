@@ -144,6 +144,7 @@ public class DrawerMenuFragment extends Fragment implements
         if (mSubredditFragment == null) {
             Log.d("DrawerMenuFragment", "mSubredditFragment is null. Instantiating SubredditFragment and user menu list headers and items.");
             mSubredditFragment = SubredditFragment.newInstance();
+
             getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, mSubredditFragment).commit();
 
             prepareUserMenuData();
