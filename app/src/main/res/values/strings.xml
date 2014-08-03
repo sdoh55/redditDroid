@@ -62,11 +62,11 @@
     <string name="dialog_login_text">Log In to Reddit</string>
 
     <!-- Submission Post Strings -->
-
     <string name="hint_url">URL</string>
     <string name="hint_text">Text(optional)</string>
     <string name="hint_subreddit">Subreddit</string>
     <string name="send_submission">Send</string>
+    <string name="comment">Comment</string>
 
     <!-- General -->
     <string name="ok">Ok</string>

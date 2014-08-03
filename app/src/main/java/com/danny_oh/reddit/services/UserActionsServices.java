@@ -7,7 +7,7 @@ import com.github.jreddit.action.SubmitActions;
  * Created by allen on 8/2/14.
  */
 public class UserActionsServices {
-
+    //TODO: Not sure how we should make this class
     private static UserActionsServices mUserActionServices = new UserActionsServices();
 
     private SubmitActions mSubmitter;
@@ -17,8 +17,8 @@ public class UserActionsServices {
     }
 
     private UserActionsServices(){
-        SessionManager manager = SessionManager.getInstance();
-        mSubmitter = new SubmitActions(manager.getRestClient());
+//        SessionManager manager = SessionManager.getInstance();
+//        mSubmitter = new SubmitActions(manager.getRestClient());
     }
 
     public void sendComment(String title, String comment) {

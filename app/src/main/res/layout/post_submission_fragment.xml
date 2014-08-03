@@ -25,6 +25,7 @@
         style="@style/Base.Wrapper.FullWidth.SmallLeftRightMargin"
         android:inputType="textMultiLine"
         android:lines="5"
+        android:gravity="bottom"
         android:hint="@string/hint_text" />
 
     <EditText

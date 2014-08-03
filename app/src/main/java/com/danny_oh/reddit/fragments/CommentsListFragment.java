@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.CommentSparseArrayAdapter;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
@@ -62,8 +63,8 @@ public class CommentsListFragment extends Fragment {
     private CommentSparseArrayAdapter mAdapter;
     private View mHeaderView;
 
-
     private OnSelfSubmissionFragmentDetachListener mListener;
+    private MainActivity mActivity;
 
     public interface OnSelfSubmissionFragmentDetachListener {
         public void onSelfSubmissionFragmentDetach(Submission submission);
@@ -122,6 +123,7 @@ public class CommentsListFragment extends Fragment {
 
         try {
             mListener = (OnSelfSubmissionFragmentDetachListener)activity;
+            mActivity = (MainActivity)activity;
         } catch (ClassCastException ce) {
             ce.printStackTrace();
             throw new ClassCastException("Parent activity of SelfSubmissionFragment must implement");
@@ -305,9 +307,12 @@ public class CommentsListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        CommentSort sort;
+        CommentSort sort = null;
 
         switch (id) {
+            case R.id.submit_comment:
+                mActivity.showFragment(SubmitPostFragment.newInstance(SubmitPostFragment.PostType.Comment, null), true);
+                break;
             case R.id.comments_sort_new:
                 sort = CommentSort.NEW;
                 break;
@@ -334,7 +339,7 @@ public class CommentsListFragment extends Fragment {
                 return false;
         }
 
-        if (mCommentSort != sort) {
+        if (mCommentSort != sort && sort != null) {
             mCommentSort = sort;
             initList();
         }
@@ -386,5 +391,4 @@ public class CommentsListFragment extends Fragment {
         mCommentTask = new GetCommentsAsyncTask();
         mCommentTask.execute(mSubmission.getIdentifier());
     }
-
 }

@@ -12,7 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.danny_oh.reddit.R;
-import com.danny_oh.reddit.services.UserActionsServices;
+import com.danny_oh.reddit.SessionManager;
+import com.github.jreddit.action.SubmitActions;
 
 /**
  * Created by allen on 8/2/14.
@@ -23,7 +24,7 @@ public class SubmitPostFragment extends Fragment {
     public static final String POST_TYPE_KEY = "Subreddit_Post_Type_Key";
 
     private PostType mPostType;
-    private String mSubredditName;
+    private String mSubredditName = "";
 
     EditText mTitleEditText;
     EditText mUrlEditText;
@@ -48,7 +49,9 @@ public class SubmitPostFragment extends Fragment {
 
         if (getArguments() != null) {
             mPostType = PostType.values()[getArguments().getInt(POST_TYPE_KEY)];
-            mSubredditName = getArguments().getString(SUBREDDIT_NAME_KEY);
+            if (getArguments().containsKey(SUBREDDIT_NAME_KEY)) {
+                mSubredditName = getArguments().getString(SUBREDDIT_NAME_KEY);
+            }
         }
     }
 
@@ -77,7 +80,9 @@ public class SubmitPostFragment extends Fragment {
         Bundle args = new Bundle();
         int type = postType.ordinal();
         args.putInt(POST_TYPE_KEY, type);
-        args.putString(SUBREDDIT_NAME_KEY, subreddit);
+        if (subreddit != null) {
+            args.putString(SUBREDDIT_NAME_KEY, subreddit);
+        }
         fragment.setArguments(args);
 
         return fragment;
@@ -111,11 +116,12 @@ public class SubmitPostFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_send:
-                //TODO
-                UserActionsServices.getInstance().submitPost();
+            //TODO
+//                UserActionsServices.getInstance().submitPost();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 }
