@@ -298,7 +298,7 @@ public class MainActivity
                     .commit();
 
             mFragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, SubmissionsListFragment.newInstance("videos", null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
+                    .replace(R.id.content_frame, SubmissionsListFragment.newInstance(null, null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
 
