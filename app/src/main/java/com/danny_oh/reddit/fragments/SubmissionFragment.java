@@ -1,5 +1,6 @@
 package com.danny_oh.reddit.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -128,7 +129,7 @@ public class SubmissionFragment extends Fragment {
 
             // setDisplayZoomControls(boolean) is available since API 11
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                webSettings.setDisplayZoomControls(false);
+                setWebViewDisplayZoomControls(webSettings, false);
 
             final Activity activity = getActivity();
 
@@ -163,6 +164,11 @@ public class SubmissionFragment extends Fragment {
 
             mWebView.loadUrl(mSubmission.getUrl());
         }
+    }
+
+    @TargetApi(11)
+    private void setWebViewDisplayZoomControls(WebSettings settings, boolean show) {
+        settings.setDisplayZoomControls(show);
     }
 
     @Override

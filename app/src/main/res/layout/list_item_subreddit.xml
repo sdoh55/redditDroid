@@ -8,7 +8,7 @@
         android:id="@+id/subreddit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Subreddit"
+        android:text="@string/placeholder_subreddit"
         android:textSize="@dimen/subreddit_fragment_list_item_font_size"
         android:layout_alignParentBottom="false"
         android:layout_alignParentLeft="true"

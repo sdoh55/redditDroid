@@ -1,5 +1,6 @@
 package com.danny_oh.reddit.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -116,8 +117,6 @@ public class DrawerMenuFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         Log.d("DrawerMenuFragment", "onCreate()");
         super.onCreate(savedInstanceState);
-
-        setRetainInstance(true);
     }
 
     @Override
@@ -146,8 +145,6 @@ public class DrawerMenuFragment extends Fragment implements
             mSubredditFragment = SubredditFragment.newInstance();
 
             getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, mSubredditFragment).commit();
-
-            prepareUserMenuData();
         }
 
 
@@ -155,6 +152,8 @@ public class DrawerMenuFragment extends Fragment implements
         if (mSessionManager.isUserLoggedIn()) {
             // hide the "Log In" portion of the drawer menu
             loginLayout.setVisibility(View.GONE);
+
+            prepareUserMenuData();
 
             mUserListView.setAdapter(new UserMenuExpandableListAdapter(getActivity(), mUserHeaderList, mUserItemList));
 
@@ -170,7 +169,7 @@ public class DrawerMenuFragment extends Fragment implements
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 mUserListView.setIndicatorBounds(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
             } else {
-                mUserListView.setIndicatorBoundsRelative(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
+                setIndicatorBounds(width);
             }
 
             mUserListView.setOnChildClickListener(this);
@@ -186,6 +185,11 @@ public class DrawerMenuFragment extends Fragment implements
                 }
             });
         }
+    }
+
+    @TargetApi(18)
+    private void setIndicatorBounds(int width) {
+        mUserListView.setIndicatorBoundsRelative(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
     }
 
     @Override

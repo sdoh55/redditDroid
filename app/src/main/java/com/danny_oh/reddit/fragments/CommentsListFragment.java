@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.adapters.CommentSparseArrayAdapter;
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
@@ -212,7 +213,7 @@ public class CommentsListFragment extends Fragment {
         TextView subreddit = (TextView) mHeaderView.findViewById(R.id.subreddit_label);
         mUpvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_up_vote);
         mDownvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_down_vote);
-
+        final ImageViewWithVoteState saved = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_saved);
 
         title.setText(mSubmission.getTitle());
         mScoreLabel.setText(mSubmission.getScore().toString());
@@ -233,6 +234,54 @@ public class CommentsListFragment extends Fragment {
 
 
         final Context context = getActivity();
+
+
+        if (mSubmission.isSaved()) {
+            saved.setStateVoted(true);
+        } else {
+            saved.setStateVoted(false);
+        }
+
+        saved.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mSubmission.isSaved()) {
+                    SessionManager.getInstance(context).saveThing(mSubmission.getFullName(),
+                            new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                @Override
+                                public void onSuccess(boolean actionSuccessful) {
+                                    if (actionSuccessful) {
+                                        mSubmission.setSaved(true);
+                                        saved.setStateVoted(true);
+                                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Failed to save. Please try again later.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                } else {
+                    SessionManager.getInstance(context).unsaveThing(mSubmission.getFullName(),
+                            new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                @Override
+                                public void onSuccess(boolean actionSuccessful) {
+                                    if (actionSuccessful) {
+                                        mSubmission.setSaved(false);
+                                        saved.setStateVoted(false);
+                                        Toast.makeText(context, "Unsaved", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Failed to unsave. Please try again later.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+
+
+
 
         mUpvoteIndicator.setOnClickListener(new View.OnClickListener() {
             @Override

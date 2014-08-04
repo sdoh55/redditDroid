@@ -199,6 +199,7 @@ public class SubmissionAdapter extends BaseAdapter {
                                     if (actionSuccessful) {
                                         submission.setSaved(true);
                                         notifyDataSetChanged();
+                                        Toast.makeText(mContext, "Saved", Toast.LENGTH_SHORT).show();
                                     } else {
                                         Toast.makeText(mContext, "Failed to save. Please try again later.", Toast.LENGTH_SHORT).show();
                                     }
@@ -214,6 +215,7 @@ public class SubmissionAdapter extends BaseAdapter {
                                         if (actionSuccessful) {
                                             submission.setSaved(false);
                                             notifyDataSetChanged();
+                                            Toast.makeText(mContext, "Unsaved", Toast.LENGTH_SHORT).show();
                                         } else {
                                             Toast.makeText(mContext, "Failed to unsave. Please try again later.", Toast.LENGTH_SHORT).show();
                                         }
@@ -249,6 +251,7 @@ public class SubmissionAdapter extends BaseAdapter {
                     } else {
                         direction = 0;
                     }
+
 
                     SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
                         @Override

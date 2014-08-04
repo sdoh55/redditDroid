@@ -83,7 +83,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             if (manager.isUserLoggedIn()) {
                 subreddits = new Subreddits(manager.getRestClient(), manager.getUser());
             } else {
-                subreddits = new Subreddits(new PoliteHttpRestClient());
+                subreddits = new Subreddits(manager.getRestClient());
             }
 
             mSubredditList = subreddits.get(view, 0, 30, null, null);
@@ -158,7 +158,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
+                mSubredditsTask = new SubredditSearchTask(getActivity(), mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
                 mSearchSubredditEditText.clearFocus();
                 return true;
             }
@@ -296,7 +296,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                mSubredditsTask = new SubredditSearchTask(input.getText().toString(),SubredditFragment.this).execute();
+                mSubredditsTask = new SubredditSearchTask(getActivity(), input.getText().toString(),SubredditFragment.this).execute();
                 dialog.dismiss();
             }
         });

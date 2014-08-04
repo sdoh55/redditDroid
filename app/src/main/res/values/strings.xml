@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Reddit</string>
+    <string name="app_name">redditDroid</string>
     <string name="action_settings">Settings</string>
 
     <!-- MainActivity Action Bar Navigation Items -->
@@ -61,7 +61,7 @@
     <!-- Log In Dialog Strings -->
     <string name="dialog_login_hint_username">username</string>
     <string name="dialog_login_hint_password">password</string>
-    <string name="dialog_login_text">Log In to Reddit</string>
+    <string name="dialog_login_text">Log in to reddit</string>
 
 
     <!-- General -->
@@ -94,6 +94,8 @@
 
     <string name="placeholder_comment_time_elapsed">time elapsed</string>
     <string name="placeholder_comment_body">comment body</string>
+
+    <string name="placeholder_menu_item">Menu Item</string>
 
 
 </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.danny_oh.reddit" >
+    package="com.danny_oh.reddit"
+    >
 
     <uses-permission android:name="android.permission.INTERNET"/>
 

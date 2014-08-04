@@ -6,7 +6,7 @@
 
     <!-- Action Bar Dimensions -->
     <dimen name="action_bar_progress_bar_height">6dp</dimen>
-    <dimen name="action_bar_navigation_item_font_size">18dp</dimen>
+    <dimen name="action_bar_navigation_item_font_size">18sp</dimen>
     <dimen name="action_bar_navigation_item_horizontal_padding">4dp</dimen>
     <dimen name="action_bar_navigation_item_vertical_padding">8dp</dimen>
 

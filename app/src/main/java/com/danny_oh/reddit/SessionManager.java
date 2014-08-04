@@ -207,7 +207,7 @@ public class SessionManager {
     private static SessionManager mManager;
 
     public static SessionManager getInstance(Context context) {
-        if (mManager == null) {// if vote was successful
+        if (mManager == null) {
             mManager = new SessionManager(context, RedditRestClient.getInstance(context));
         }
 
@@ -279,7 +279,11 @@ public class SessionManager {
     }
 
     public void vote(String fullname, int dir, SessionListener<Boolean> listener) {
-        new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));
+        if (isUserLoggedIn()) {
+            new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -304,10 +308,18 @@ public class SessionManager {
     }
 
     public void saveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
-        mMarkActions.saveAsync(fullName, responseHandler);
+        if (isUserLoggedIn()) {
+            mMarkActions.saveAsync(fullName, responseHandler);
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to save links.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void unsaveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
-        mMarkActions.unsaveAsync(fullName, responseHandler);
+        if (isUserLoggedIn()) {
+            mMarkActions.unsaveAsync(fullName, responseHandler);
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to unsave links.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

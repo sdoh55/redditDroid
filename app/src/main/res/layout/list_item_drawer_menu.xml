@@ -22,7 +22,7 @@
         android:layout_width="@dimen/drawer_icon_size"
         android:layout_height="@dimen/drawer_icon_size"
         android:id="@+id/icon"
-        android:src="@drawable/reddit_red"
+        android:src="@drawable/redditandroid_head"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dp"
@@ -33,7 +33,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Menu Item"
+        android:text="@string/placeholder_menu_item"
         android:id="@android:id/text1"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="false"

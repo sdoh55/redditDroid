@@ -187,7 +187,8 @@ public class UserInfo {
     
     public String toString() {
     	StringBuilder result = new StringBuilder();
-    	String newLine = System.lineSeparator();
+    	String newLine = "\n";
+    	//System.lineSeparator();
     	
     	result.append("id: ").append(id).append(newLine)
     		  .append("name: ").append(name).append(newLine)

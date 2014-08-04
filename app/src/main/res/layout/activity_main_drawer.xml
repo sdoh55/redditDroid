@@ -4,7 +4,16 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/drawer_background_light">
+    >
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/imageView"
+        android:src="@drawable/logo_with_droidalien"
+        android:background="@color/reddit_background"
+        android:scaleType="fitStart"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/login_button_view"

@@ -80,7 +80,16 @@ public class MainActivity
                 int index = mLastSubmissionClicked.getUrl().indexOf("watch?v=");
                 index += 8;
 
-                final String videoId = mLastSubmissionClicked.getUrl().substring(index);
+                // strip url parameters if any
+                int endIndex = mLastSubmissionClicked.getUrl().indexOf('&', index);
+
+                final String videoId;
+
+                if (endIndex < 0) {
+                    videoId = mLastSubmissionClicked.getUrl().substring(index);
+                } else {
+                    videoId = mLastSubmissionClicked.getUrl().substring(index, endIndex);
+                }
 
                 YouTubeSubmissionFragment submissionFragment = YouTubeSubmissionFragment.newInstance(videoId);
                 mFragmentManager
@@ -132,6 +141,7 @@ public class MainActivity
         if (mLastSubmissionClicked != null) {
             mLastSubmissionClicked.setLiked(submission.isLiked());
             mLastSubmissionClicked.setScore(submission.getScore());
+            mLastSubmissionClicked.setSaved(submission.isSaved());
         }
     }
 
