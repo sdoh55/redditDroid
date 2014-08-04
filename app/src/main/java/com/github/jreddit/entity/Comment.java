@@ -36,6 +36,7 @@ public class Comment extends Thing {
     private Integer score;        	// Karma score
     private Integer upvotes;        // Number of upvotes that this body received
     private Integer downvotes;      // Number of downvotes that this body received
+    private Boolean liked;
     
     // Possible fields to add as well:
 //    private String bannedBy;
@@ -75,6 +76,7 @@ public class Comment extends Thing {
             this.setLinkId(safeJsonToString(obj.get("link_id")));
             this.setBodyHTML(safeJsonToString(obj.get("body_html")));
             this.setScoreHidden(safeJsonToBoolean(obj.get("score_hidden")));
+            setLiked(safeJsonToString(obj.get("likes")));
             
         } catch (Exception e) {
         	e.printStackTrace();
@@ -82,6 +84,28 @@ public class Comment extends Thing {
         }
 
     }
+
+    public void setLiked(Boolean liked) { this.liked = liked; }
+
+    // the Reddit API represents the 3 liked states (upvote, downvote, none) using boolean.
+    // this parses the string encoded boolean to the correct boolean value.
+    public void setLiked(String liked) {
+        if (liked == null) {
+            this.liked = null;
+        } else {
+            this.liked = Boolean.parseBoolean(liked);
+        }
+    }
+
+    public void setLiked(int liked) {
+        if (liked == 0) {
+            this.liked = null;
+        } else {
+            this.liked = (liked == 1);
+        }
+    }
+
+    public Boolean isLiked() { return this.liked; }
     
     /**
      * Add a reply to this comment.

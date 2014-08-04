@@ -101,7 +101,8 @@
                 android:contentDescription="@string/content_description_submission_thumbnail"
                 android:layout_width="@dimen/submission_icon_size"
                 android:layout_height="@dimen/submission_icon_size"
-                android:layout_margin="@dimen/submission_icon_margin" />
+                android:layout_margin="@dimen/submission_icon_margin"
+                android:scaleType="centerCrop" />
 
         </LinearLayout>
 

@@ -21,6 +21,8 @@ import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.retrieval.params.TimeSpan;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 import com.github.jreddit.utils.restclient.HttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 import com.github.jreddit.utils.restclient.RestResponseHandler;
@@ -321,5 +323,10 @@ public class SessionManager {
         } else {
             Toast.makeText(mContext, "You need to be logged in to unsave links.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void getUserSubmissions(UserSubmissionsCategory category, UserOverviewSort sort, int count, int limit, Submission after, Submission before, boolean show_given, AsyncSubmissions.SubmissionsResponseHandler handler) {
+        if (isUserLoggedIn())
+            mSubmissionsController.ofUserAsync(mUser.getUsername(), category, sort, count, limit, after, before, show_given, handler);
     }
 }

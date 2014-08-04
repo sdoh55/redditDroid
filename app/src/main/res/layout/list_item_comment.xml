@@ -12,8 +12,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="#ffdaa34d"
+        android:layout_marginRight="@dimen/comment_margin"
+        android:layout_alignParentBottom="false"
         android:layout_alignBottom="@+id/comment_container"
-        android:layout_marginRight="@dimen/comment_margin" />
+        />
 
     <RelativeLayout
         android:id="@+id/comment_container"
@@ -24,10 +26,11 @@
         android:layout_alignParentStart="false"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="false"
-        android:layout_toLeftOf="@+id/comment_vote_container"
         android:layout_toStartOf="@+id/comment_vote_container"
         android:layout_toRightOf="@+id/comment_depth_indicator"
-        android:paddingBottom="@dimen/comment_bottom_padding">
+        android:paddingBottom="@dimen/comment_bottom_padding"
+        android:layout_marginRight="@dimen/comment_margin"
+        android:layout_toLeftOf="@+id/comment_vote_container">
 
 
 
@@ -95,22 +98,25 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:id="@+id/comment_vote_container"
-        android:visibility="gone">
+        android:visibility="visible"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="6dp">
 
-        <ImageView
+        <com.danny_oh.reddit.util.ImageViewWithVoteState
             android:id="@+id/comment_up_vote"
-            android:src="@drawable/ic_action_collapse"
+            android:src="@drawable/selector_up_vote"
+            android:background="@drawable/selectable_item_background"
             android:contentDescription="@string/content_description_comment_up_vote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <ImageView
+        <com.danny_oh.reddit.util.ImageViewWithVoteState
             android:id="@+id/comment_down_vote"
-            android:src="@drawable/ic_action_expand"
+            android:src="@drawable/selector_down_vote"
+            android:background="@drawable/selectable_item_background"
             android:contentDescription="@string/content_description_comment_down_vote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

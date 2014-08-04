@@ -10,6 +10,8 @@ import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.TimeSpan;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 import com.github.jreddit.utils.ApiEndpointUtils;
 import com.github.jreddit.utils.ParamFormatter;
 import com.github.jreddit.utils.RedditConstants;
@@ -245,5 +247,79 @@ public class AsyncSubmissions extends Submissions {
 
 
 
+    /**
+     * Get the submissions of a user.
+     * In this variant all parameters are Strings.
+     *
+     * @param username	 		Username of the user you want to retrieve from.
+     * @param category    		(Optional, set null/empty if not used) Category in the user overview to retrieve submissions from
+     * @param sort	    		(Optional, set null/empty if not used) Sorting method.
+     * @param time		 		(Optional, set null/empty is not used) Time window
+     * @param count        		(Optional, set null/empty if not used) Number at which the counter starts
+     * @param limit        		(Optional, set null/empty if not used) Integer representing the maximum number of comments to return
+     * @param after				(Optional, set null/empty if not used) After which comment to retrieve
+     * @param before			(Optional, set null/empty if not used) Before which comment to retrieve
+     * @param show				(Optional, set null/empty if not used) Show parameter ('given' is only acceptable value)
+     *
+     * @return Comments of a user.
+     */
+    protected void ofUserAsync(String username, String category, String sort, String count, String limit, String after, String before, String show, SubmissionsResponseHandler handler) throws RetrievalFailedException, RedditError {
+
+        // Format parameters
+        String params = "";
+        params = ParamFormatter.addParameter(params, "sort", sort);
+        params = ParamFormatter.addParameter(params, "count", count);
+        params = ParamFormatter.addParameter(params, "limit", limit);
+        params = ParamFormatter.addParameter(params, "after", after);
+        params = ParamFormatter.addParameter(params, "before", before);
+        params = ParamFormatter.addParameter(params, "show", show);
+
+        // Retrieve submissions from the given URL
+        mRestClient.getAsyncClient().get(ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.USER_SUBMISSIONS_INTERACTION, username, category, params), handler);
+
+    }
+
+    /**
+     * Get the submissions of a user.
+     * In this variant all parameters are Strings.
+     *
+     * @param username	 		Username of the user you want to retrieve from.
+     * @param category    		Category in the user overview to retrieve submissions from
+     * @param sort	    		(Optional, set null if not used) Sorting method.
+     * @param time		 		(Optional, set null is not used) Time window
+     * @param count        		(Optional, set -1 if not used) Number at which the counter starts
+     * @param limit        		(Optional, set -1 if not used) Integer representing the maximum number of comments to return
+     * @param after				(Optional, set null if not used) After which comment to retrieve
+     * @param before			(Optional, set null if not used) Before which comment to retrieve
+     * @param show				(Optional, set false if not used) Show parameter ('given' is only acceptable value)
+     *
+     * @return Submissions of a user.
+     */
+    public void ofUserAsync(String username, UserSubmissionsCategory category, UserOverviewSort sort, int count, int limit, Submission after, Submission before, boolean show_given, SubmissionsResponseHandler handler) throws RetrievalFailedException, IllegalArgumentException {
+
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("The username must be defined.");
+        }
+
+        if (category == null) {
+            throw new IllegalArgumentException("The category must be defined.");
+        }
+
+        if (limit < -1 || limit > RedditConstants.MAX_LIMIT_LISTING) {
+            throw new IllegalArgumentException("The limit needs to be between 0 and 100 (or -1 for default).");
+        }
+
+        ofUserAsync(
+                username,
+                (category != null) ? category.value() : "",
+                (sort != null) ? sort.value() : "",
+                String.valueOf(count),
+                String.valueOf(limit),
+                (after != null) ? after.getFullName() : "",
+                (before != null) ? before.getFullName() : "",
+                (show_given) ? "given" : "",
+                handler
+        );
+    }
 
 }

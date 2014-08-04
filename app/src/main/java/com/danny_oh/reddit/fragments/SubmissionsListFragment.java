@@ -37,6 +37,8 @@ import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.retrieval.params.TimeSpan;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class SubmissionsListFragment extends Fragment implements
 {
     public static final String ARG_SORT = "submission_sort";
     public static final String SUBREDDIT_VALUE_KEY = "SubmissionListFragment.Subbreddit";
+    public static final String USER_SUBMISSIONS_CATEGORY_KEY = "user_submissions_category";
 
     private MenuItem mSearchMenuItem;
     private EditText mSearchMenuEditText;
@@ -57,7 +60,9 @@ public class SubmissionsListFragment extends Fragment implements
 
     private Context mContext;
 
-    private SubmissionSort mSubmissionSort;
+    private UserSubmissionsCategory mUserSubmissionsCategory;
+
+    private String mSubmissionSort;
     // default number of submissions to load per page
     private int mSubmissionsPerPage = 25;
     // this threshold is equal to the number of submissions that are not yet visible at the bottom of the list view
@@ -169,8 +174,8 @@ public class SubmissionsListFragment extends Fragment implements
                 return false;
         }
 
-        if (mSubmissionSort != sort) {
-            mSubmissionSort = sort;
+        if (!mSubmissionSort.equals(sort.toString())) {
+            mSubmissionSort = sort.toString();
             initList();
         }
 
@@ -189,6 +194,30 @@ public class SubmissionsListFragment extends Fragment implements
 
     }
 
+
+    public static SubmissionsListFragment newInstance(UserSubmissionsCategory category, UserOverviewSort sort) {
+        SubmissionsListFragment fragment = new SubmissionsListFragment();
+
+        Bundle args = new Bundle();
+
+        if (sort != null) {
+            args.putString(ARG_SORT, sort.toString());
+        } else {
+            args.putString(ARG_SORT, UserOverviewSort.NEW.toString());
+        }
+
+        if (category != null) {
+            args.putString(USER_SUBMISSIONS_CATEGORY_KEY, category.toString());
+        } else {
+            throw new Error("User submissions category cannot be missing.");
+        }
+
+        args.putString(SUBREDDIT_VALUE_KEY, "");
+
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     public static SubmissionsListFragment newInstance(String subredditName, SubmissionSort sort) {
         SubmissionsListFragment fragment = new SubmissionsListFragment();
@@ -226,7 +255,10 @@ public class SubmissionsListFragment extends Fragment implements
         Bundle args = getArguments();
 
         mSubredditName = args.getString(SUBREDDIT_VALUE_KEY);
-        mSubmissionSort = SubmissionSort.valueOf(args.getString(ARG_SORT));
+        mSubmissionSort = args.getString(ARG_SORT);
+
+        if (args.getString(USER_SUBMISSIONS_CATEGORY_KEY) != null)
+            mUserSubmissionsCategory = UserSubmissionsCategory.valueOf(args.getString(USER_SUBMISSIONS_CATEGORY_KEY));
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -272,39 +304,70 @@ public class SubmissionsListFragment extends Fragment implements
 //        mListView.setOnItemClickListener(this);
         mListView.setAdapter(mAdapter);
 
+
         // add EndlessScrollListener that loads more submissions when the scroll position reaches close to the end
-        mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
 
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
+        if (mUserSubmissionsCategory == null) {
+            // get submissions from the currently selected subreddit
+            mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
 
-                // passing empty string requests for the reddit frontpage
-                SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-                param.subreddit = mSubredditName;
-                param.sort = mSubmissionSort;
-                param.count = 0;
-                param.limit = mSubmissionsPerPage;
-                param.after = lastSubmission;
-                param.before = null;
-                param.show = mShowAll;
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
 
-                SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
-                    @Override
-                    public void onResponse(List<Submission> list) {
-                        mPagedSubmissionsList.add(list);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
-                mProgressBar.setVisibility(View.VISIBLE);
-            }
+                    // passing empty string requests for the reddit frontpage
+                    SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
+                    param.subreddit = mSubredditName;
+                    param.sort = SubmissionSort.valueOf(mSubmissionSort);
+                    param.count = 0;
+                    param.limit = mSubmissionsPerPage;
+                    param.after = lastSubmission;
+                    param.before = null;
+                    param.show = mShowAll;
 
-            @Override
-            public void onLoadComplete() {
-                mProgressBar.setVisibility(View.GONE);
-            }
-        });
+                    SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+                        @Override
+                        public void onResponse(List<Submission> list) {
+                            mPagedSubmissionsList.add(list);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    mProgressBar.setVisibility(View.VISIBLE);
+                }
 
+                @Override
+                public void onLoadComplete() {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            // get logged in user's saved submissions
+            mListView.setOnScrollListener(new EndlessScrollListener(mLoadMoreThreshold) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
+
+                    mProgressBar.setVisibility(View.VISIBLE);
+
+                    SessionManager.getInstance(mContext).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, lastSubmission, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
+                        @Override
+                        public void onParseFinished(List<Submission> submissions) {
+                            mPagedSubmissionsList.add(submissions);
+                            mAdapter.notifyDataSetChanged();
+
+
+                        }
+                    });
+                }
+
+                ;
+
+                @Override
+                public void onLoadComplete() {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     @Override
@@ -313,11 +376,15 @@ public class SubmissionsListFragment extends Fragment implements
 
         super.onResume();
 
-        if (mSubredditName.isEmpty()) {
-            // default to front page
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+        if (mUserSubmissionsCategory != null) {
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mUserSubmissionsCategory.toString());
         } else {
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+            if (mSubredditName.isEmpty()) {
+                // default to front page
+                ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+            } else {
+                ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+            }
         }
     }
 
@@ -427,21 +494,14 @@ public class SubmissionsListFragment extends Fragment implements
         }
     }
 
-    public void refresh(SubmissionSort sort) {
+    public void refreshSort(String sort) {
         if (mSubmissionSort != sort) {
             mSubmissionSort = sort;
             initList();
         }
     }
 
-    public void refresh(String subredditName, SubmissionSort sort) {
-        if (!mSubredditName.equals(subredditName) || mSubmissionSort != sort) {
-            mSubredditName = subredditName;
-            mSubmissionSort = sort;
-            initList();
-        }
 
-    }
 
     public void updateList() {
         mAdapter.notifyDataSetChanged();
@@ -453,24 +513,38 @@ public class SubmissionsListFragment extends Fragment implements
         mPagedSubmissionsList.clear();
         mAdapter.notifyDataSetChanged();
 
-        // passing empty string requests for the reddit frontpage
-        SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-        param.subreddit = mSubredditName;
-        param.sort = mSubmissionSort;
-        param.count = 0;
-        param.limit = mSubmissionsPerPage;
-        param.after = null;
-        param.before = null;
-        param.show = mShowAll;
+        if (mUserSubmissionsCategory == null) {
+            // passing empty string requests for the reddit frontpage
+            SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
+            param.subreddit = mSubredditName;
+            param.sort = SubmissionSort.valueOf(mSubmissionSort);
+            param.count = 0;
+            param.limit = mSubmissionsPerPage;
+            param.after = null;
+            param.before = null;
+            param.show = mShowAll;
 
-        SessionManager.getInstance(mContext).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
-            @Override
-            public void onResponse(List<Submission> list) {
-                mPagedSubmissionsList.add(list);
-                mAdapter.notifyDataSetChanged();
-            }
-        });
+            SessionManager.getInstance(mContext).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+                @Override
+                public void onResponse(List<Submission> list) {
+                    mPagedSubmissionsList.add(list);
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
 
+
+        } else {
+
+            SessionManager.getInstance(mContext).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, null, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
+                @Override
+                public void onParseFinished(List<Submission> submissions) {
+                    mPagedSubmissionsList.add(submissions);
+                    mAdapter.notifyDataSetChanged();
+
+
+                }
+            });
+        }
     }
 
 

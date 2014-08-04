@@ -20,7 +20,10 @@ import android.widget.TextView;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.UserMenuExpandableListAdapter;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,10 +76,12 @@ public class DrawerMenuFragment extends Fragment implements
 
         switch (childPosition) {
             case 0:
+                SubmissionsListFragment fragment = SubmissionsListFragment.newInstance(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW);
+                ((MainActivity)getActivity()).showFragment(fragment, true);
+                return true;
+            case 1:
                 mListener.onLogoutClick();
                 return true;
-//            case 1:
-//                return true;
         }
 
         return false;

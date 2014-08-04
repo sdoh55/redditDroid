@@ -15,7 +15,7 @@
 
     <!-- Drawer Menu Items -->
     <array name="drawer_menu_logged_in_user_items">
-        <!--<item>View Profile</item>-->
+        <item>View Saved</item>
         <item>Log Out</item>
     </array>
 

@@ -31,7 +31,7 @@
     <dimen name="dialog_input_vertical_margin">16dp</dimen>
 
     <!-- Submission Dimensions -->
-    <dimen name="submission_icon_size">50dp</dimen>
+    <dimen name="submission_icon_size">60dp</dimen>
     <dimen name="submission_icon_margin">5dp</dimen>
     <dimen name="submission_title_font_size">14sp</dimen>
     <dimen name="submission_title_margin">5dp</dimen>
