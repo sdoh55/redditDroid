@@ -73,7 +73,6 @@ public class SubmissionAdapter extends BaseAdapter {
         try {
             mListener = (OnSubmissionAdapterInteractionListener)context;
         } catch (ClassCastException ce) {
-            ce.printStackTrace();
             throw new ClassCastException("Parent activity of SubmissionAdapter must implement OnSubmissionAdapterInteractionListener interface.");
         }
 

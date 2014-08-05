@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import com.github.jreddit.entity.User;
 import com.github.jreddit.entity.UserInfo;
 import com.github.jreddit.exception.ActionFailedException;
+import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.ActorDriven;
 import com.github.jreddit.utils.ApiEndpointUtils;
 import com.github.jreddit.utils.restclient.Response;
@@ -124,13 +125,17 @@ public class ProfileActions implements ActorDriven {
             return null;
         }
 
-        JSONObject jsonObject = (JSONObject) restClient.get(ApiEndpointUtils.USER_INFO, user.getCookie()).getResponseObject();
-        JSONObject info = (JSONObject) jsonObject.get("data");
+        try {
+            JSONObject jsonObject = (JSONObject) restClient.get(ApiEndpointUtils.USER_INFO, user.getCookie()).getResponseObject();
+            JSONObject info = (JSONObject) jsonObject.get("data");
 
-        if (info != null)
-            return new UserInfo(info);
-        else
-            return null;
+            if (info != null)
+                return new UserInfo(info);
+            else
+                return null;
+        } catch (RetrievalFailedException e) {
+            throw new ActionFailedException("Failed to retrieve user info.");
+        }
     }
 
     /**

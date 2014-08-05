@@ -1,5 +1,7 @@
 package com.danny_oh.reddit.retrieval;
 
+import android.util.Log;
+
 import com.danny_oh.reddit.util.RedditRestClient;
 import com.github.jreddit.entity.Kind;
 import com.github.jreddit.entity.Submission;
@@ -69,8 +71,7 @@ public class AsyncSubmissions extends Submissions {
                 onParseFinished(submissions);
 
             } catch (ParseException pe) {
-                pe.printStackTrace();
-
+                Log.e("AsyncSubmissions", "Failed to parse response. Localized message: " + pe.getLocalizedMessage());
             }
 
         }
@@ -184,7 +185,7 @@ public class AsyncSubmissions extends Submissions {
         try {
             params = ParamFormatter.addParameter(params, "q", URLEncoder.encode(query, "ISO-8859-1"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Log.e("AsyncSubmissions", "Bad encoding. Localized message: " + e.getLocalizedMessage());
         }
         params = ParamFormatter.addParameter(params, "syntax", syntax);
         params = ParamFormatter.addParameter(params, "sort", sort);

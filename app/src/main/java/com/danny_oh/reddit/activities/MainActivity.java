@@ -28,12 +28,13 @@ import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
 import java.text.ParseException;
 
 
 public class MainActivity
-        extends ActionBarActivity
+        extends SlidingActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
         SubmissionsListFragment.OnSubmissionsListInteractionListener,
         DrawerMenuFragment.OnDrawerMenuInteractionListener,                 // handles side drawer menu item clicks
@@ -123,10 +124,9 @@ public class MainActivity
                     index = mLastSubmissionClicked.getUrl().indexOf(".be/");
                     index += 4;
 
-                    // TODO handle 't' parameter to offset YouTube Player's initial position
-                    // strip url parameters if any
-                    endIndex = mLastSubmissionClicked.getUrl().indexOf("?t=", index);
 
+                    // extract the 't' parameter if it exists
+                    endIndex = mLastSubmissionClicked.getUrl().indexOf("?t=", index);
                     if (endIndex > 0) {
                         videoId = url.substring(index, endIndex);
 
@@ -139,8 +139,7 @@ public class MainActivity
                             // convert to millis
                             playOffset *= 1000;
                         } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                            Log.d("MainActivity", "Failed to parse youtu.be url.");
+                            Log.e("MainActivity", "Failed to parse youtu.be url. Stack trace: " + e.getLocalizedMessage());
                             playOffset = 0;
                         }
                     } else {
@@ -197,7 +196,6 @@ public class MainActivity
     public void onCommentsListFragmentDetach(Submission submission) {
         Log.d("MainActivity", "CommentsListFragment detach listener");
 
-        // TODO: update the submission's score and voted status within the SubmissionListFragment
         if (mLastSubmissionClicked != null) {
             mLastSubmissionClicked.setLiked(submission.isLiked());
             mLastSubmissionClicked.setScore(submission.getScore());
@@ -302,7 +300,7 @@ public class MainActivity
      * Fragment Lifecycle Methods
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         Log.d("MainActivity", "onCreate()");
         super.onCreate(savedInstanceState);
 
@@ -318,25 +316,24 @@ public class MainActivity
         // register for changes to fragment manager back stack
         mFragmentManager.addOnBackStackChangedListener(this);
 
-        
+        mSessionManager = SessionManager.getInstance(this);
 
+/*
         // set up the sliding side menu
         mSlidingMenu = new SlidingMenu(this);
+*/
+        setBehindContentView(R.layout.menu_frame);
+
+        mSlidingMenu = getSlidingMenu();
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//        mSlidingMenu.setTouchmodeMarginThreshold();
         mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
         mSlidingMenu.setFadeDegree(0.35f);
-        mSlidingMenu.setMenu(R.layout.menu_frame);
-        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 
+//        mSlidingMenu.setMenu(R.layout.menu_frame);
+//        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
 
-        mSessionManager = SessionManager.getInstance(this);
-
-//        mSlidingMenu.setSelectorEnabled(true);
-//        mSlidingMenu.setSelectorDrawable(R.drawable.ic_drawer);
-//        mSlidingMenu.setSelectedView(mSlidingMenu.getContent());
 
 
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -350,16 +347,14 @@ public class MainActivity
         if (savedInstanceState == null) {
             Log.d("MainActivity", "savedInstanceState is null. Instantiating fragments.");
 
-            mFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.menu_frame, new DrawerMenuFragment())
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.menu_frame, DrawerMenuFragment.newInstance())
                     .commit();
 
             mFragmentManager.beginTransaction()
                     .replace(R.id.content_frame, SubmissionsListFragment.newInstance("", null), SUBMISSIONS_LIST_FRAGMENT_TAG)  // null defaults to frontpage and SubmissionSort.HOT
                     .commit();
         }
-
 
     }
 

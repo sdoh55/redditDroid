@@ -1,5 +1,7 @@
 package com.danny_oh.reddit.retrieval;
 
+import android.util.Log;
+
 import com.danny_oh.reddit.util.RedditRestClient;
 import com.github.jreddit.entity.Kind;
 import com.github.jreddit.entity.Subreddit;
@@ -42,7 +44,7 @@ public class AsyncSubreddits extends Subreddits {
             try {
                 array = (JSONArray) ((JSONObject) object.get("data")).get("children");
             } catch (JSONException je) {
-                je.printStackTrace();
+                Log.e("AsyncSubreddits", "Failed to parse JSON response. Localized message: " + je.getLocalizedMessage());
                 return;
             }
 

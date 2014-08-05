@@ -47,6 +47,8 @@ public class DrawerMenuFragment extends Fragment implements
 
     private SessionManager mSessionManager;
 
+    private RelativeLayout mLoginLayout;
+
     public interface OnDrawerMenuInteractionListener {
         public void onLoginClick();
         public void onLogoutClick();
@@ -122,6 +124,8 @@ public class DrawerMenuFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         Log.d("DrawerMenuFragment", "onCreate()");
         super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
     }
 
     @Override
@@ -132,6 +136,9 @@ public class DrawerMenuFragment extends Fragment implements
         // the logged in user's expandable menu
         mUserListView = (ExpandableListView)view.findViewById(R.id.user_menu_list_view);
 
+        // the RelativeLayout that contains the "Log In" button
+        mLoginLayout = (RelativeLayout)view.findViewById(R.id.login_button_view);
+
         return view;
     }
 
@@ -140,8 +147,7 @@ public class DrawerMenuFragment extends Fragment implements
         Log.d("DrawerMenuFragment", "onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
 
-        // the RelativeLayout that contains the "Log In" button
-        RelativeLayout loginLayout = (RelativeLayout)getView().findViewById(R.id.login_button_view);
+
 
         mSessionManager = SessionManager.getInstance(getActivity());
 
@@ -156,7 +162,7 @@ public class DrawerMenuFragment extends Fragment implements
         // if user is logged in
         if (mSessionManager.isUserLoggedIn()) {
             // hide the "Log In" portion of the drawer menu
-            loginLayout.setVisibility(View.GONE);
+            mLoginLayout.setVisibility(View.GONE);
 
             prepareUserMenuData();
 
@@ -183,7 +189,7 @@ public class DrawerMenuFragment extends Fragment implements
             // hide the "Logged In User" portion of the drawer menu
             mUserListView.setVisibility(View.GONE);
 
-            loginLayout.setOnClickListener(new View.OnClickListener() {
+            mLoginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.onLoginClick();

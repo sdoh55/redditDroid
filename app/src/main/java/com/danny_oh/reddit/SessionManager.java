@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.github.jreddit.action.ProfileActions;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.github.jreddit.entity.UserInfo;
+import com.github.jreddit.exception.ActionFailedException;
+import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
@@ -34,6 +37,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -73,13 +77,11 @@ public class SessionManager {
             try {
                 mUser.connect(password, true);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
-                Log.e("SessionManager","IO Exception while attempting to connect user.");
+                Log.e("SessionManager","IO Exception while attempting to connect user. Localized message: " + ioe.getLocalizedMessage());
             } catch (ParseException pe) {
-                pe.printStackTrace();
-                Log.e("SessionManager","Parse Exception while attempting to connect user.");
+                Log.e("SessionManager","Parse Exception while attempting to connect user. Localized message: " + pe.getLocalizedMessage());
             } catch (NullPointerException npe) {
-                Log.e("SessionManager", "Failed to log in. Likely due to wrong password.");
+                Log.e("SessionManager", "Failed to log in. Likely due to wrong password. Localized message: " + npe.getLocalizedMessage());
                 return null;
             }
 
@@ -169,9 +171,24 @@ public class SessionManager {
 
         protected List<Submission> doInBackground(SubmissionFetchParam... params) {
             SubmissionFetchParam param = params[0];
-            List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
 
-            return list;
+            try {
+                List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
+
+                return list;
+            } catch (RetrievalFailedException e) {
+                Log.e("SessionManager", "Failed to retrieve submissions. Localized message: " + e.getLocalizedMessage());
+
+
+                ((ActionBarActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "Failed to fetch links. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                return new LinkedList<Submission>();
+            }
         }
 
         protected void onPostExecute(List<Submission> list) {
@@ -188,9 +205,15 @@ public class SessionManager {
 
         @Override
         protected UserInfo doInBackground(Void... voids) {
-            UserInfo info = mProfileActions.getUserInformation();
+            try {
+                UserInfo info = mProfileActions.getUserInformation();
 
-            return info;
+                return info;
+            } catch (ActionFailedException e) {
+                Log.e("SessionManager", "Failed to retrieve user info. Localized message: " + e.getLocalizedMessage());
+
+                return null;
+            }
         }
 
         @Override

@@ -124,7 +124,6 @@ public class CommentsListFragment extends Fragment {
         try {
             mListener = (OnCommentsListFragmentDetachListener)activity;
         } catch (ClassCastException ce) {
-            ce.printStackTrace();
             throw new ClassCastException("Parent activity of SelfSubmissionFragment must implement");
         }
     }

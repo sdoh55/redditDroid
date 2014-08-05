@@ -1,4 +1,35 @@
+buildscript {
+    repositories {
+        maven { url 'http://download.crashlytics.com/maven' }
+    }
+
+    dependencies {
+        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+    }
+}
+
+task readPasswordFromInput << {
+    def console = System.console()
+
+    def password = console.readPassword('\n\n\n> Enter keystore password: ')
+
+    android.signingConfigs.release.storePassword = new String(password)
+    android.signingConfigs.release.keyPassword = new String(password)
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'validateReleaseSigning') {
+        task.dependsOn readPasswordFromInput
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'crashlytics'
+
+repositories {
+    maven { url 'http://download.crashlytics.com/maven' }
+}
+
 
 android {
     signingConfigs {
@@ -13,8 +44,8 @@ android {
         applicationId "com.danny_oh.reddit"
         minSdkVersion 9
         targetSdkVersion 20
-        versionCode 4
-        versionName "0.12"
+        versionCode 6
+        versionName "0.14"
     }
     buildTypes {
         debug {
@@ -48,6 +79,7 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.5'
     //    compile 'in.uncod.android.bypass:bypass:1.1'
     compile files('libs/YouTubeAndroidPlayerApi.jar')
+    compile 'com.crashlytics.android:crashlytics:1.+'
 }
 
 configurations {

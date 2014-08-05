@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.danny_oh.reddit.R;
@@ -30,10 +32,12 @@ import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.SubredditAdapter;
 import com.danny_oh.reddit.tasks.SubredditSearchTask;
 import com.github.jreddit.entity.Subreddit;
+import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Subreddits;
 import com.github.jreddit.retrieval.params.SubredditsView;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -76,6 +80,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             view = subredditsView;
         }
         protected Void doInBackground(Void... voids) {
+            Log.d("SubredditFragment", "Fetching subreddits.");
             Subreddits subreddits;
 
             SessionManager manager = SessionManager.getInstance(getActivity());
@@ -86,7 +91,20 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
                 subreddits = new Subreddits(manager.getRestClient());
             }
 
-            mSubredditList = subreddits.get(view, 0, 30, null, null);
+            try {
+                mSubredditList = subreddits.get(view, 0, 30, null, null);
+            } catch (RetrievalFailedException e) {
+                Log.e("SubredditFragment", "Failed to fetch subreddits. Localized message: " + e.getLocalizedMessage());
+
+                mSubredditList = new LinkedList<Subreddit>();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Failed to fetch links. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
             return null;
         }
@@ -191,7 +209,6 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         try {
             mListener = (DrawerMenuFragment.OnDrawerMenuInteractionListener)activity;
         } catch (ClassCastException e) {
-            e.printStackTrace();
             throw new ClassCastException("The activity containing SubredditFragment must implement OnDrawerMenuInteractionListener");
         }
 
