@@ -41,6 +41,8 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
         private ImageViewWithVoteState downvote;
 
         private View depthIndicator;
+
+        private ImageViewWithVoteState gilded;
     }
 
     private Context mContext;
@@ -81,6 +83,7 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             viewHolder.upvote = (ImageViewWithVoteState)view.findViewById(R.id.comment_up_vote);
             viewHolder.downvote = (ImageViewWithVoteState)view.findViewById(R.id.comment_down_vote);
             viewHolder.depthIndicator = (View)view.findViewById(R.id.comment_depth_indicator);
+            viewHolder.gilded = (ImageViewWithVoteState)view.findViewById(R.id.comment_gilded);
 
             view.setTag(viewHolder);
         }
@@ -200,6 +203,12 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
                     });
                 }
             });
+
+            if (comment.getGilded() > 0) {
+                viewHolder.gilded.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.gilded.setVisibility(View.GONE);
+            }
 
         }
 

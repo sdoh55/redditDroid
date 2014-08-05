@@ -294,7 +294,8 @@ public class SessionManager {
     }
 
 
-    public void searchSubmissions(String query,
+    public void searchSubmissions(String subreddit,
+                                  String query,
                                   QuerySyntax syntax,
                                   SearchSort sort,
                                   TimeSpan time,
@@ -305,7 +306,7 @@ public class SessionManager {
                                   boolean show_all,
                                   AsyncSubmissions.SubmissionsResponseHandler responseHandler) {
 
-        mSubmissionsController.searchAsync(query, syntax, sort, time, count, limit, after, before, show_all, responseHandler);
+        mSubmissionsController.searchAsync(subreddit, query, syntax, sort, time, count, limit, after, before, show_all, responseHandler);
 
     }
 

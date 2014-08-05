@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
 import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.EndlessScrollListener;
@@ -35,6 +36,7 @@ import java.util.List;
  * Created by danny on 8/2/14.
  */
 public class SearchSubmissionsFragment extends Fragment {
+    private static final String ARG_SUBREDDIT_NAME = "submission_search_subreddit_name";
     private static final String ARG_QUERY_STRING = "submission_search_query_string";
 
     private MenuItem mSearchMenuItem;
@@ -43,8 +45,9 @@ public class SearchSubmissionsFragment extends Fragment {
     private Context mContext;
 
     // Search settings
+    private String mSubredditName;
     private String mQueryString;
-    private QuerySyntax mSyntax = QuerySyntax.PLAIN;
+    private QuerySyntax mSyntax = QuerySyntax.LUCENE;
     private SearchSort mSort = SearchSort.RELEVANCE;
     private TimeSpan mTime = TimeSpan.ALL;
     private int mCount = 0;
@@ -130,11 +133,16 @@ public class SearchSubmissionsFragment extends Fragment {
     }
 
 
-    public static SearchSubmissionsFragment newInstance(String query) {
+    public static SearchSubmissionsFragment newInstance(String subreddit, String query) {
         SearchSubmissionsFragment fragment = new SearchSubmissionsFragment();
 
         Bundle args = new Bundle();
 
+        if (subreddit == null || query == null) {
+            throw new Error("subreddit and query cannot be null. Pass an empty string for 'subreddit' to search all of reddit.");
+        }
+
+        args.putString(ARG_SUBREDDIT_NAME, subreddit);
         args.putString(ARG_QUERY_STRING, query);
 
         fragment.setArguments(args);
@@ -162,6 +170,7 @@ public class SearchSubmissionsFragment extends Fragment {
 
         Bundle args = getArguments();
 
+        mSubredditName = args.getString(ARG_SUBREDDIT_NAME);
         mQueryString = args.getString(ARG_QUERY_STRING);
 
         ((ActionBarActivity)mContext).getSupportActionBar().setTitle("\"" + mQueryString + "\"");
@@ -210,7 +219,7 @@ public class SearchSubmissionsFragment extends Fragment {
 
                 Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
 
-                SessionManager.getInstance(mContext).searchSubmissions(mQueryString, mSyntax, mSort, mTime, mCount, mLimit,
+                SessionManager.getInstance(mContext).searchSubmissions(mSubredditName, mQueryString, mSyntax, mSort, mTime, mCount, mLimit,
                         lastSubmission, null, mShowAll, new AsyncSubmissions.SubmissionsResponseHandler() {
                             @Override
                             public void onParseFinished(List<Submission> submissions) {
@@ -228,16 +237,26 @@ public class SearchSubmissionsFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
+        String title;
+        if (mSubredditName.isEmpty()) {
+            title = String.format("\"%s\" in %s", mQueryString, "reddit");
+        } else {
+            title = String.format("\"%s\" in %s", mQueryString, mSubredditName);
+        }
 
-
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(title);
+    }
 
     private void initList() {
         mPagedSubmissionsList.clear();
         mAdapter.notifyDataSetChanged();
 
 
-        SessionManager.getInstance(mContext).searchSubmissions(mQueryString, mSyntax, mSort, mTime,
+        SessionManager.getInstance(mContext).searchSubmissions(mSubredditName, mQueryString, mSyntax, mSort, mTime,
                 mCount, mLimit, null, null, mShowAll, new AsyncSubmissions.SubmissionsResponseHandler() {
                     @Override
                     public void onParseFinished(List<Submission> submissions) {

@@ -100,7 +100,7 @@ public class SubmissionsListFragment extends Fragment implements
     private OnSubmissionsListInteractionListener mListener;
 
     public interface OnSubmissionsListInteractionListener {
-        public void onSearchSubmissions(String queryString);
+        public void onSearchSubmissions(String subreddit, String queryString);
     }
 
 
@@ -128,7 +128,7 @@ public class SubmissionsListFragment extends Fragment implements
                 // collapse the action view
                 MenuItemCompat.collapseActionView(mSearchMenuItem);
 
-                mListener.onSearchSubmissions(search);
+                mListener.onSearchSubmissions(mSubredditName, search);
 
                 return true;
             }
@@ -510,6 +510,20 @@ public class SubmissionsListFragment extends Fragment implements
  * private methods
  */
     private void initList() {
+        // update the ActionBar title
+        if (mSubredditName.isEmpty()) {
+            // default to front page
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+        } else {
+            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+        }
+
+        // set the ActionBar search box hint
+        if (mSearchMenuEditText != null) {
+            mSearchMenuEditText.setHint(mSubredditName.isEmpty() ? "reddit" : mSubredditName);
+        }
+
+
         mPagedSubmissionsList.clear();
         mAdapter.notifyDataSetChanged();
 

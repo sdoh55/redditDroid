@@ -3,11 +3,13 @@ package com.danny_oh.reddit.fragments;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -119,10 +121,13 @@ public class SubmissionFragment extends Fragment {
 
         } else {
 
+            mWebView.setInitialScale(30);
+
             WebSettings webSettings = mWebView.getSettings();
 
-            webSettings.setLoadWithOverviewMode(true);
             webSettings.setUseWideViewPort(true);
+            webSettings.setLoadWithOverviewMode(true);
+
             webSettings.setSupportZoom(true);
             webSettings.setBuiltInZoomControls(true);
             webSettings.setJavaScriptEnabled(true);
@@ -144,6 +149,8 @@ public class SubmissionFragment extends Fragment {
                 }
 
             });
+
+
 
             mWebView.setWebViewClient(new WebViewClient() {
                 @Override

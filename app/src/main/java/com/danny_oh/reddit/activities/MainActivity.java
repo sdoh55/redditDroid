@@ -29,6 +29,8 @@ import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import java.text.ParseException;
+
 
 public class MainActivity
         extends ActionBarActivity
@@ -76,22 +78,80 @@ public class MainActivity
 
             if (mLastSubmissionClicked.getDomain().equals("youtube.com") || mLastSubmissionClicked.getDomain().equals("youtu.be")) {
 
-                // youtube link format: http://www.youtube.com/watch?v=LkVZhEtaQCA
-                int index = mLastSubmissionClicked.getUrl().indexOf("watch?v=");
-                index += 8;
+                int index;
+                int endIndex;
+                int secondsEndIndex;
 
-                // strip url parameters if any
-                int endIndex = mLastSubmissionClicked.getUrl().indexOf('&', index);
+                String url = mLastSubmissionClicked.getUrl();
+
 
                 final String videoId;
+                int playOffset = 0;
 
-                if (endIndex < 0) {
-                    videoId = mLastSubmissionClicked.getUrl().substring(index);
+                if (mLastSubmissionClicked.getDomain().equals("youtube.com")) {
+                    // standard youtube link format: http://www.youtube.com/watch?v=LkVZhEtaQCA
+                    index = url.indexOf("watch?v=");
+
+                    if (index > 0) {
+                        // url is standard text format
+
+                        // skip the string "watch?v="
+                        index += 8;
+
+                        // strip url parameters if any
+                        endIndex = url.indexOf('&', index);
+
+                    } else {
+                        // url symbols are encoded in hex ASCII
+                        index = url.toLowerCase().indexOf("watch%3fv%3d");
+                        index += 12;
+
+                        // strip off params if any
+                        endIndex = url.indexOf('%', index);
+                    }
+
+
+                    if (endIndex < 0) {
+                        videoId = url.substring(index);
+                    } else {
+                        videoId = url.substring(index, endIndex);
+                    }
+
+
                 } else {
-                    videoId = mLastSubmissionClicked.getUrl().substring(index, endIndex);
+                    // youtube link format: http://www.youtu.be/LkVZhEtaQCA
+                    index = mLastSubmissionClicked.getUrl().indexOf(".be/");
+                    index += 4;
+
+                    // TODO handle 't' parameter to offset YouTube Player's initial position
+                    // strip url parameters if any
+                    endIndex = mLastSubmissionClicked.getUrl().indexOf("?t=", index);
+
+                    if (endIndex > 0) {
+                        videoId = url.substring(index, endIndex);
+
+                        endIndex += 3;
+                        secondsEndIndex = mLastSubmissionClicked.getUrl().indexOf('s', endIndex);
+
+                        try {
+                            // get the offset in seconds
+                            playOffset = Integer.parseInt(url.substring(endIndex, secondsEndIndex));
+                            // convert to millis
+                            playOffset *= 1000;
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                            Log.d("MainActivity", "Failed to parse youtu.be url.");
+                            playOffset = 0;
+                        }
+                    } else {
+
+                        videoId = url.substring(index);
+
+                    }
                 }
 
-                YouTubeSubmissionFragment submissionFragment = YouTubeSubmissionFragment.newInstance(videoId);
+
+                YouTubeSubmissionFragment submissionFragment = YouTubeSubmissionFragment.newInstance(videoId, mLastSubmissionClicked.getTitle(), playOffset);
                 mFragmentManager
                         .beginTransaction()
                         .addToBackStack(null)
@@ -146,8 +206,8 @@ public class MainActivity
     }
 
     @Override
-    public void onSearchSubmissions(String queryString) {
-        SearchSubmissionsFragment submissionsFragment = SearchSubmissionsFragment.newInstance(queryString);
+    public void onSearchSubmissions(String subreddit, String queryString) {
+        SearchSubmissionsFragment submissionsFragment = SearchSubmissionsFragment.newInstance(subreddit, queryString);
         mFragmentManager
                 .beginTransaction()
                 .addToBackStack(null)

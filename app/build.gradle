@@ -13,8 +13,8 @@ android {
         applicationId "com.danny_oh.reddit"
         minSdkVersion 9
         targetSdkVersion 20
-        versionCode 3
-        versionName "0.11"
+        versionCode 4
+        versionName "0.12"
     }
     buildTypes {
         debug {

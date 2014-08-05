@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.util.Constants;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
@@ -22,6 +23,9 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
 {
     // newInstance constructor argument key
     private static final String ARG_VIDEO_ID = "youtube_video_id";
+    private static final String ARG_VIDEO_OFFSET_MILLIS = "youtube_video_offset_millis";
+    private static final String ARG_SUBMISSION_TITLE = "youtube_submission_title";
+
 
     private static final String YOUTUBE_FRAGMENT_BUNDLE_KEY = "youtube_fragment_bundle_key";
 
@@ -29,6 +33,8 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
 
 
     private String mVideoId;
+    private String mTitle;
+    private int mVideoOffsetMillis;
 
     private YouTubePlayer mYouTubePlayer;
 
@@ -36,11 +42,14 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
 
 
 
-    public static YouTubeSubmissionFragment newInstance(String videoId) {
+    public static YouTubeSubmissionFragment newInstance(String videoId, String title, int offsetMillis) {
         YouTubeSubmissionFragment fragment = new YouTubeSubmissionFragment();
 
         Bundle args = new Bundle();
         args.putString(ARG_VIDEO_ID, videoId);
+        args.putString(ARG_SUBMISSION_TITLE, title);
+        args.putInt(ARG_VIDEO_OFFSET_MILLIS, offsetMillis);
+
         fragment.setArguments(args);
 
         return fragment;
@@ -52,6 +61,8 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
 
         if (getArguments() != null) {
             mVideoId = getArguments().getString(ARG_VIDEO_ID);
+            mTitle = getArguments().getString(ARG_SUBMISSION_TITLE);
+            mVideoOffsetMillis = getArguments().getInt(ARG_VIDEO_OFFSET_MILLIS);
         } else {
             throw new InstantiationException("Fragments must be instantiated using factory method newInstance.", new Exception());
         }
@@ -108,6 +119,13 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
         super.onDestroy();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(mTitle);
+    }
+
     /*
  * YouTubePlayer Interface Implementations
  */
@@ -121,7 +139,7 @@ public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer
 
         if (!wasRestored) {
             Log.d("YouTubeSubmissionFragment", "YouTubePlayer was not restored. Initializing video.");
-            youTubePlayer.loadVideo(mVideoId);
+            youTubePlayer.loadVideo(mVideoId, mVideoOffsetMillis);
 
         } else {
             Log.d("YouTubeSubmissionFragment", "YouTubePlayer was restored. Resuming video.");

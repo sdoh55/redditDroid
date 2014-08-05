@@ -27,10 +27,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="false"
         android:layout_toStartOf="@+id/comment_vote_container"
-        android:layout_toRightOf="@+id/comment_depth_indicator"
+        android:layout_toRightOf="@id/comment_depth_indicator"
         android:paddingBottom="@dimen/comment_bottom_padding"
         android:layout_marginRight="@dimen/comment_margin"
-        android:layout_toLeftOf="@+id/comment_vote_container">
+        android:layout_toLeftOf="@id/comment_vote_container">
 
 
 
@@ -68,7 +68,7 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="false"
-                android:layout_toRightOf="@+id/comment_username"
+                android:layout_toRightOf="@id/comment_username"
                 android:layout_toEndOf="@id/comment_username"
                 android:textStyle="bold" />
 
@@ -81,7 +81,14 @@
                 android:layout_centerVertical="true"
                 android:textSize="@dimen/comment_time_created_font_size"
                 android:layout_toEndOf="@id/comment_score"
-                android:layout_toRightOf="@+id/comment_score" />
+                android:layout_toRightOf="@id/comment_score" />
+
+            <com.danny_oh.reddit.util.ImageViewWithVoteState
+                android:layout_width="@dimen/comment_gilded_icon_size"
+                android:layout_height="@dimen/comment_gilded_icon_size"
+                android:id="@+id/comment_gilded"
+                android:src="@drawable/ic_coin"
+                android:layout_toRightOf="@id/comment_time_created" />
         </RelativeLayout>
 
         <TextView

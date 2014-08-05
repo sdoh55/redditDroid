@@ -58,6 +58,7 @@
     <dimen name="comment_score_font_size">13sp</dimen>
     <dimen name="comment_time_created_font_size">11sp</dimen>
     <dimen name="comment_body_font_size">12sp</dimen>
+    <dimen name="comment_gilded_icon_size">14dp</dimen>
 
 
 

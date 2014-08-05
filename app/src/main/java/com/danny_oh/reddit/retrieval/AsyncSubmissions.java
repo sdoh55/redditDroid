@@ -168,7 +168,8 @@ public class AsyncSubmissions extends Submissions {
      * @param show  			Show all (disables filters such as "hide links that I have voted on")
      * @return 					The linked list containing submissions
      */
-    protected void searchAsync(String query,
+    protected void searchAsync(String subreddit,
+                               String query,
                                String syntax,
                                String sort,
                                String time,
@@ -194,8 +195,15 @@ public class AsyncSubmissions extends Submissions {
         params = ParamFormatter.addParameter(params, "before", before);
         params = ParamFormatter.addParameter(params, "show", show);
 
+        String url;
+
+        if (subreddit.isEmpty())
+            url = ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params);
+        else
+            url = ApiEndpointUtils.REDDIT_BASE_URL + "/r/" + subreddit + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params) + "&restrict_sr=true";
+
         // Retrieve submissions from the given URL
-        mRestClient.getAsyncClient().get(ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params), responseHandler);
+        mRestClient.getAsyncClient().get(url, responseHandler);
 
     }
 
@@ -212,7 +220,8 @@ public class AsyncSubmissions extends Submissions {
      * @param before			The submission before which needs to be retrieved
      * @param show_all			Show all (disables filters such as "hide links that I have voted on")
      */
-    public void searchAsync(String query,
+    public void searchAsync(String subreddit,
+                            String query,
                             QuerySyntax syntax,
                             SearchSort sort,
                             TimeSpan time,
@@ -232,6 +241,7 @@ public class AsyncSubmissions extends Submissions {
         }
 
         searchAsync(
+                subreddit,
                 query,
                 (syntax != null) ? syntax.value() : "",
                 (sort != null) ? sort.value() : "",
