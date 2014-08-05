@@ -174,7 +174,7 @@ public class DrawerMenuFragment extends Fragment implements
             int width = metrics.widthPixels;
 
             // subtract the sliding menu offset from width to get displayed width of sliding menu
-            width -= (int)getResources().getDimension(R.dimen.slidingmenu_offset);
+            width -= (int)getResources().getDimension(R.dimen.slidingmenu_offset_left);
 
             // change the position of the group dropdown indicator
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {

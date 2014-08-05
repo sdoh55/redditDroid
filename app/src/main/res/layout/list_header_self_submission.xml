@@ -142,7 +142,7 @@
         android:text="@string/placeholder_self_text_html"
         android:textSize="@dimen/submission_self_text_font_size"
         android:layout_margin="@dimen/submission_self_text_margin"
-        />
+        android:autoLink="web" />
 
 </LinearLayout>
 

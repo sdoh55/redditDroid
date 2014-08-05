@@ -43,8 +43,10 @@ import in.uncod.android.bypass.Bypass;
 public class CommentsListFragment extends Fragment {
 
     private static final String ARG_SUBMISSION_KEY = "submission_key";
+    private static final String ARG_DELAYED_KEY = "delayed_key";
 
     private Submission mSubmission;
+    private boolean mDelayed;       // if this is true, the fragment doesn't load comments right away and must call initList();
 
     private TextView mScoreLabel;
     private ImageViewWithVoteState mUpvoteIndicator;
@@ -102,9 +104,14 @@ public class CommentsListFragment extends Fragment {
  * constructors and instantiation methods
  */
     public static CommentsListFragment newInstance(ExtendedSubmission submission) {
+        return newInstance(submission, false);
+    }
+
+    public static CommentsListFragment newInstance(ExtendedSubmission submission, boolean delayed) {
         CommentsListFragment fragment = new CommentsListFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_SUBMISSION_KEY, submission);
+        args.putBoolean(ARG_DELAYED_KEY, delayed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -139,11 +146,12 @@ public class CommentsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mSubmission = (ExtendedSubmission)getArguments().getParcelable(ARG_SUBMISSION_KEY);
+            mDelayed = getArguments().getBoolean(ARG_DELAYED_KEY);
         } else {
             throw new InstantiationException("Fragments must be instantiated using factory method newInstance.", new Exception());
         }
 
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
         setRetainInstance(true);
     }
 
@@ -177,8 +185,10 @@ public class CommentsListFragment extends Fragment {
             mCommentArray = new SparseArray<CommentsListHelper.CommentContainer>();
             mAdapter = new CommentSparseArrayAdapter(getActivity(), mCommentArray, mSubmission);
 
-            // retrieves comments for the selected submission
-            initList();
+            if (!mDelayed) {
+                // retrieves comments for the selected submission
+                initList();
+            }
         }
 
 
@@ -344,7 +354,8 @@ public class CommentsListFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        mCommentTask.cancel(true);
+        if (mCommentTask != null)
+            mCommentTask.cancel(true);
         super.onDestroy();
     }
 
@@ -435,7 +446,7 @@ public class CommentsListFragment extends Fragment {
     }
 
 
-    private void initList() {
+    public void initList() {
         mCommentArray.clear();
         mAdapter.notifyDataSetChanged();
 
@@ -443,4 +454,7 @@ public class CommentsListFragment extends Fragment {
         mCommentTask.execute(mSubmission.getIdentifier());
     }
 
+    public boolean isLoaded() {
+        return mCommentArray.size() > 0;
+    }
 }

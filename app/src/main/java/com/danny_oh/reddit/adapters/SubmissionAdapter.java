@@ -127,7 +127,7 @@ public class SubmissionAdapter extends BaseAdapter {
 
         if (submission != null) {
             viewHolder.score.setText(submission.getScore().toString());
-            viewHolder.title.setText(submission.getTitle().toString());
+            viewHolder.title.setText(submission.getTitle());
 
             if (submission.isVisited()) {
                 viewHolder.title.setTextColor(mVisitedSubmissionTitleColor);

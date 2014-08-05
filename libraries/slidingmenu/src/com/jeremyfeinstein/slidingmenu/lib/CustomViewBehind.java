@@ -218,9 +218,24 @@ public class CustomViewBehind extends ViewGroup {
 			if (x >= content.getLeft()) vis = View.INVISIBLE;
 			scrollTo((int)((x + getBehindWidth())*mScrollScale), y);
 		} else if (mMode == SlidingMenu.RIGHT) {
-			if (x <= content.getLeft()) vis = View.INVISIBLE;
+            /*
+            This code was modified by Danny Oh on 8/5/2014
+            the behind view on the right side is always the secondary menu
+             */
+            mContent.setVisibility(x >= content.getLeft() ? View.INVISIBLE : View.VISIBLE);
+            mSecondaryContent.setVisibility(x <= content.getLeft() ? View.INVISIBLE : View.VISIBLE);
+            vis = x == 0 ? View.INVISIBLE : View.VISIBLE;
+            if (x <= content.getLeft()) {
+                scrollTo((int)((x + getBehindWidth())*mScrollScale), y);
+            } else {
+                scrollTo((int)(getBehindWidth() - getWidth() +
+                        (x-getBehindWidth())*mScrollScale), y);
+            }
+            /*
+            if (x <= content.getLeft()) vis = View.INVISIBLE;
 			scrollTo((int)(getBehindWidth() - getWidth() + 
 					(x-getBehindWidth())*mScrollScale), y);
+            */
 		} else if (mMode == SlidingMenu.LEFT_RIGHT) {
 			mContent.setVisibility(x >= content.getLeft() ? View.INVISIBLE : View.VISIBLE);
 			mSecondaryContent.setVisibility(x <= content.getLeft() ? View.INVISIBLE : View.VISIBLE);

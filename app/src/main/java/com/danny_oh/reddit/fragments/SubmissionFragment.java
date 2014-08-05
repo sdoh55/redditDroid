@@ -2,14 +2,11 @@ package com.danny_oh.reddit.fragments;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,10 +20,8 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
-import com.danny_oh.reddit.util.Constants;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Submission;
-import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
@@ -52,6 +47,13 @@ public class SubmissionFragment extends Fragment {
     private YouTubePlayer mYouTubePlayer;
 
     private boolean mWebViewFinishedLoading = false;
+
+    private SubmissionFragmentListener mListener;
+
+
+    public interface SubmissionFragmentListener {
+        public void onRequestShowSideMenuComments();
+    }
 
 
     /**
@@ -83,6 +85,12 @@ public class SubmissionFragment extends Fragment {
     public void onAttach(Activity activity) {
         Log.d("SubmissionFragment", "onAttach() called.");
         super.onAttach(activity);
+
+        try {
+            mListener = (SubmissionFragmentListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Parent activity must implement SubmissionFragmentListener");
+        }
     }
 
     @Override
@@ -245,11 +253,12 @@ public class SubmissionFragment extends Fragment {
 
         switch (id) {
             case R.id.show_comments:
-                getFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.content_frame, CommentsOnlyListFragment.newInstance((ExtendedSubmission) mSubmission))
-                        .commit();
+//                getFragmentManager()
+//                        .beginTransaction()
+//                        .addToBackStack(null)
+//                        .replace(R.id.content_frame, CommentsOnlyListFragment.newInstance((ExtendedSubmission) mSubmission))
+//                        .commit();
+                mListener.onRequestShowSideMenuComments();
                 return true;
         }
 

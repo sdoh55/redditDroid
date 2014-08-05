@@ -14,6 +14,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
 import com.danny_oh.reddit.fragments.CommentsListFragment;
@@ -41,12 +42,15 @@ public class MainActivity
         LoginDialogFragment.LoginDialogListener,                            // handles user login dialog interaction
         CommentsListFragment.OnCommentsListFragmentDetachListener,
         // listener for items contained inside each individual submissions list view cell (e.g. up/down vote buttons)
-        SubmissionAdapter.OnSubmissionAdapterInteractionListener
+        SubmissionAdapter.OnSubmissionAdapterInteractionListener,
+        SubmissionFragment.SubmissionFragmentListener
 {
 
     public static final String SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG = "self_submission_fragment_transaction";
     private static final String LAST_SUBMISSION_CLICKED_SAVE_INSTANCE_KEY = "last_submission_clicked";
     private static final String SUBMISSIONS_LIST_FRAGMENT_TAG = "submissions_list_fragment_key";
+
+    private static final String COMMENTS_SECONDARY_MENU_TRANSACTION_TAG = "comments_secondary_menu_transaction";
 
     private SlidingMenu mSlidingMenu;
     private FragmentManager mFragmentManager;
@@ -166,9 +170,16 @@ public class MainActivity
                         .replace(R.id.content_frame, submissionFragment)
                         .commit();
             }
+
+            mFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.secondary_menu_frame, CommentsListFragment.newInstance(new ExtendedSubmission(mLastSubmissionClicked), true), COMMENTS_SECONDARY_MENU_TRANSACTION_TAG)
+                    .commit();
+
         }
 
-        mSlidingMenu.setSlidingEnabled(false);
+//        mSlidingMenu.setSlidingEnabled(false);
+
     }
 
     /**
@@ -211,6 +222,11 @@ public class MainActivity
                 .addToBackStack(null)
                 .replace(R.id.content_frame, submissionsFragment)
                 .commit();
+    }
+
+    @Override
+    public void onRequestShowSideMenuComments() {
+        mSlidingMenu.showMenu();
     }
 
     /*
@@ -272,6 +288,8 @@ public class MainActivity
     @Override
     public void onBackStackChanged() {
         refreshActionBar();
+
+
     }
 
     @Override
@@ -303,6 +321,7 @@ public class MainActivity
     public void onCreate(Bundle savedInstanceState) {
         Log.d("MainActivity", "onCreate()");
         super.onCreate(savedInstanceState);
+        Crashlytics.start(this);
 
         // request FEATURE_PROGRESS to show progress bar while loading links
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
@@ -318,28 +337,41 @@ public class MainActivity
 
         mSessionManager = SessionManager.getInstance(this);
 
-/*
+
         // set up the sliding side menu
-        mSlidingMenu = new SlidingMenu(this);
-*/
-        setBehindContentView(R.layout.menu_frame);
+//        mSlidingMenu = new SlidingMenu(this);
+//        mSlidingMenu.setMenu(R.layout.menu_frame);
 
         mSlidingMenu = getSlidingMenu();
+        setBehindContentView(R.layout.menu_frame);
+
+        mSlidingMenu.setSecondaryMenu(R.layout.secondary_menu_frame);
+
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+
         mSlidingMenu.setFadeDegree(0.35f);
 
-//        mSlidingMenu.setMenu(R.layout.menu_frame);
-//        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_WINDOW);
+//        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
+        mSlidingMenu.setSecondaryOnOpenListner(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                Log.d("MainActivity", "Secondary Menu is open.");
+                CommentsListFragment fragment = (CommentsListFragment)getSupportFragmentManager().findFragmentByTag(COMMENTS_SECONDARY_MENU_TRANSACTION_TAG);
 
+                if (fragment != null && !fragment.isLoaded()) {
+                    fragment.initList();
+                }
+            }
+        });
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
+        refreshActionBar();
 
         // enables dropdown menu of action bar
 //        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -363,7 +395,7 @@ public class MainActivity
         Log.d("MainActivity", "onResume()");
         super.onResume();
 
-        refreshActionBar();
+//        refreshActionBar();
     }
 
     @Override
@@ -447,16 +479,40 @@ public class MainActivity
 
     private void refreshActionBar() {
         boolean backStackIsEmpty = mFragmentManager.getBackStackEntryCount() == 0;
-        mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+//        mSlidingMenu.setSlidingEnabled(backStackIsEmpty);
+
 
         if (backStackIsEmpty) {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer);
 
             Log.d("MainActivity", "Back stack is empty. Refreshing SubmissionsListFragment");
-            SubmissionsListFragment submissionsListFragment = (SubmissionsListFragment) getSupportFragmentManager().findFragmentByTag(SUBMISSIONS_LIST_FRAGMENT_TAG);
-            submissionsListFragment.updateList();
+
+            // if back stack is empty, the comments list displayed on the secondary menu should also be removed
+            CommentsListFragment fragment = (CommentsListFragment)getSupportFragmentManager().findFragmentByTag(COMMENTS_SECONDARY_MENU_TRANSACTION_TAG);
+
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .remove(fragment)
+                        .commit();
+            }
+
+            mSlidingMenu.setSlidingEnabled(true);
+            mSlidingMenu.setMode(SlidingMenu.LEFT);
+            mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_left);
+
+
         } else {
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_previous_item);
+
+            // don't allow the right side panel to work when the submission is a self link
+            CommentsListFragment fragment = (CommentsListFragment)mFragmentManager.findFragmentByTag(SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG);
+            if (fragment == null) {
+                mSlidingMenu.setSlidingEnabled(true);
+                mSlidingMenu.setMode(SlidingMenu.RIGHT);
+                mSlidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset_right);
+            } else {
+                mSlidingMenu.setSlidingEnabled(false);
+            }
         }
     }
 
