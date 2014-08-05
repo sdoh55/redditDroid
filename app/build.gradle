@@ -44,8 +44,8 @@ android {
         applicationId "com.danny_oh.reddit"
         minSdkVersion 9
         targetSdkVersion 20
-        versionCode 6
-        versionName "0.14"
+        versionCode 8
+        versionName "0.16"
     }
     buildTypes {
         debug {

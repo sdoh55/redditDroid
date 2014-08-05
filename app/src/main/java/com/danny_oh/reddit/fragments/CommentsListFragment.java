@@ -15,8 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -167,6 +170,25 @@ public class CommentsListFragment extends Fragment {
 
         mListView.addHeaderView(mHeaderView);
         mListView.setEmptyView(view.findViewById(android.R.id.empty));
+
+        Spinner spinner = new Spinner(getActivity());
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.comments_sort_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                onOptionsItemSelected(i);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        mListView.addHeaderView(spinner);
 
         return view;
     }
@@ -395,6 +417,44 @@ public class CommentsListFragment extends Fragment {
                 break;
             case R.id.comments_sort_confidence:
                 sort = CommentSort.CONFIDENCE;
+                break;
+
+            default:
+                return false;
+        }
+
+        if (mCommentSort != sort) {
+            mCommentSort = sort;
+            initList();
+        }
+
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(int id) {
+        CommentSort sort;
+
+        switch (id) {
+            case 0:
+                sort = CommentSort.CONFIDENCE;
+                break;
+            case 1:
+                sort = CommentSort.NEW;
+                break;
+            case 2:
+                sort = CommentSort.HOT;
+                break;
+            case 3:
+                sort = CommentSort.TOP;
+                break;
+            case 4:
+                sort = CommentSort.CONTROVERSIAL;
+                break;
+            case 5:
+                sort = CommentSort.OLD;
+                break;
+            case 6:
+                sort = CommentSort.RANDOM;
                 break;
 
             default:

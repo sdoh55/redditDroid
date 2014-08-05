@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">redditDroid</string>
     <string name="action_settings">Settings</string>
@@ -11,6 +11,16 @@
         <item>rising</item>
         <item>controversial</item>
         <item>top</item>
+    </array>
+
+    <array name="comments_sort_array">
+        <item android:id="@+id/comments_sort_confidence">confidence</item>
+        <item android:id="@+id/comments_sort_new">new</item>
+        <item android:id="@+id/comments_sort_hot">hot</item>
+        <item android:id="@+id/comments_sort_top">top</item>
+        <item android:id="@+id/comments_sort_controversial">controversial</item>
+        <item android:id="@+id/comments_sort_old">old</item>
+        <item android:id="@+id/comments_sort_random">random</item>
     </array>
 
     <!-- Drawer Menu Items -->
