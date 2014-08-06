@@ -23,4 +23,13 @@
         android:title="@string/option_menu_submission_search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionLayout="@layout/action_search" />
+    <item
+        android:id="@+id/submit_post"
+        android:title="@string/submit_post"
+        app:showAsAction="never">
+        <menu>
+            <item android:id="@+id/text_post_submission" android:title="@string/text_post_submission"/>
+            <item android:id="@+id/link_post_submission" android:title="@string/link_post_submission"/>
+        </menu>
+    </item>
 </menu>

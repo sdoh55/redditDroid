@@ -14,29 +14,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.EndlessScrollListener;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.adapters.SubmissionAdapter;
-import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
-import com.github.jreddit.retrieval.params.QuerySyntax;
-import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
-import com.github.jreddit.retrieval.params.TimeSpan;
 import com.github.jreddit.retrieval.params.UserOverviewSort;
 import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 
@@ -58,7 +51,7 @@ public class SubmissionsListFragment extends Fragment implements
 
     private String mSubredditName = "";
 
-    private Context mContext;
+    private MainActivity mMainActivity;
 
     private UserSubmissionsCategory mUserSubmissionsCategory;
 
@@ -143,7 +136,7 @@ public class SubmissionsListFragment extends Fragment implements
         Log.d("SubmissionListFragment", "onOptionsItemSelected called.");
 
         int id = item.getItemId();
-        SubmissionSort sort;
+        SubmissionSort sort = null;
 
         switch (id) {
             case R.id.sort_hot:
@@ -169,12 +162,18 @@ public class SubmissionsListFragment extends Fragment implements
             case R.id.refresh_submissions:
                 initList();
                 return true;
+            case R.id.link_post_submission:
+                mMainActivity.showFragment(SubmitPostFragment.newInstance(SubmitPostFragment.PostType.Link, mSubredditName), true);
+                break;
+            case R.id.text_post_submission:
+                mMainActivity.showFragment(SubmitPostFragment.newInstance(SubmitPostFragment.PostType.Self, mSubredditName), true);
+                break;
 
             default:
                 return false;
         }
 
-        if (!mSubmissionSort.equals(sort.toString())) {
+        if (sort != null && !mSubmissionSort.equals(sort.toString())) {
             mSubmissionSort = sort.toString();
             initList();
         }
@@ -349,7 +348,7 @@ public class SubmissionsListFragment extends Fragment implements
 
                     mProgressBar.setVisibility(View.VISIBLE);
 
-                    SessionManager.getInstance(mContext).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, lastSubmission, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
+                    SessionManager.getInstance(mMainActivity).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, lastSubmission, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
                         @Override
                         public void onParseFinished(List<Submission> submissions) {
                             mPagedSubmissionsList.add(submissions);
@@ -377,13 +376,13 @@ public class SubmissionsListFragment extends Fragment implements
         super.onResume();
 
         if (mUserSubmissionsCategory != null) {
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mUserSubmissionsCategory.toString());
+            ((ActionBarActivity) mMainActivity).getSupportActionBar().setTitle(mUserSubmissionsCategory.toString());
         } else {
             if (mSubredditName.isEmpty()) {
                 // default to front page
-                ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+                ((ActionBarActivity) mMainActivity).getSupportActionBar().setTitle("front page");
             } else {
-                ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+                ((ActionBarActivity) mMainActivity).getSupportActionBar().setTitle(mSubredditName);
             }
         }
     }
@@ -399,7 +398,7 @@ public class SubmissionsListFragment extends Fragment implements
     public void onAttach(Activity activity) {
         Log.d("SubmissionListFragment", "onAttach()");
 
-        mContext = activity;
+        mMainActivity = (MainActivity) activity;
 
         super.onAttach(activity);
         try {
@@ -513,9 +512,9 @@ public class SubmissionsListFragment extends Fragment implements
         // update the ActionBar title
         if (mSubredditName.isEmpty()) {
             // default to front page
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle("front page");
+            ((ActionBarActivity) mMainActivity).getSupportActionBar().setTitle("front page");
         } else {
-            ((ActionBarActivity) mContext).getSupportActionBar().setTitle(mSubredditName);
+            ((ActionBarActivity) mMainActivity).getSupportActionBar().setTitle(mSubredditName);
         }
 
         // set the ActionBar search box hint
@@ -538,7 +537,7 @@ public class SubmissionsListFragment extends Fragment implements
             param.before = null;
             param.show = mShowAll;
 
-            SessionManager.getInstance(mContext).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+            SessionManager.getInstance(mMainActivity).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
                 @Override
                 public void onResponse(List<Submission> list) {
                     mPagedSubmissionsList.add(list);
@@ -549,7 +548,7 @@ public class SubmissionsListFragment extends Fragment implements
 
         } else {
 
-            SessionManager.getInstance(mContext).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, null, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
+            SessionManager.getInstance(mMainActivity).getUserSubmissions(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW, 0, 25, null, null, false, new AsyncSubmissions.SubmissionsResponseHandler() {
                 @Override
                 public void onParseFinished(List<Submission> submissions) {
                     mPagedSubmissionsList.add(submissions);

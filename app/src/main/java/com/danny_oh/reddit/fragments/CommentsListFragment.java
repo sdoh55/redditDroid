@@ -68,14 +68,9 @@ public class CommentsListFragment extends Fragment {
     private ListView mListView;
     private CommentSparseArrayAdapter mAdapter;
     private View mHeaderView;
-
-<<<<<<< HEAD
-    private OnSelfSubmissionFragmentDetachListener mListener;
     private MainActivity mActivity;
-=======
 
     private OnCommentsListFragmentDetachListener mListener;
->>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
 
     public interface OnCommentsListFragmentDetachListener {
         public void onCommentsListFragmentDetach(Submission submission);
@@ -138,12 +133,8 @@ public class CommentsListFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-<<<<<<< HEAD
-            mListener = (OnSelfSubmissionFragmentDetachListener)activity;
             mActivity = (MainActivity)activity;
-=======
             mListener = (OnCommentsListFragmentDetachListener)activity;
->>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
         } catch (ClassCastException ce) {
             throw new ClassCastException("Parent activity of SelfSubmissionFragment must implement");
         }
@@ -527,11 +518,7 @@ public class CommentsListFragment extends Fragment {
         mCommentTask = new GetCommentsAsyncTask();
         mCommentTask.execute(mSubmission.getIdentifier());
     }
-<<<<<<< HEAD
-=======
-
     public boolean isLoaded() {
         return mCommentArray.size() > 0;
     }
->>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
 }

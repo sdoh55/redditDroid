@@ -10,10 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
-import com.danny_oh.reddit.SessionManager;
-import com.github.jreddit.action.SubmitActions;
+import com.danny_oh.reddit.services.UserActionsServices;
 
 /**
  * Created by allen on 8/2/14.
@@ -116,11 +116,57 @@ public class SubmitPostFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_send:
-            //TODO
-//                UserActionsServices.getInstance().submitPost();
+                submitPost();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    private void submitPost() {
+        if (checkFieldsNotEmpty()) {
+            switch (mPostType) {
+                case Link:
+                    UserActionsServices.getInstance(mActivity).submitLinkPost(mTitleEditText.getText().toString(),
+                            mUrlEditText.getText().toString(),
+                            mSubredditName);
+                    break;
+                case Self:
+                    UserActionsServices.getInstance(mActivity).submitTextPost(mTitleEditText.getText().toString(),
+                            mTextPostEditText.getText().toString(),
+                            mSubredditName);
+                    break;
+                case Comment:
+                    UserActionsServices.getInstance(mActivity).sendComment(mTitleEditText.getText().toString(),
+                            mTextPostEditText.getText().toString());
+                    break;
+            }
+        } else {
+            Toast.makeText(mActivity, R.string.fields_blank, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean checkFieldsNotEmpty() {
+        if (mSubredditName.isEmpty()) {
+            return false;
+        }
+        switch (mPostType) {
+            case Link:
+                if (mTitleEditText.getText().length() == 0 || mUrlEditText.getText().length() == 0) {
+                    return false;
+                }
+                break;
+            case Self:
+                if (mTitleEditText.getText().length() == 0 || mTextPostEditText.getText().length() == 0) {
+                    return false;
+                }
+                break;
+            case Comment:
+                if (mTitleEditText.getText().length() == 0 || mTextPostEditText.getText().length() == 0) {
+                    return false;
+                }
+                break;
         }
         return true;
     }

@@ -79,6 +79,10 @@
     <string name="hint_subreddit">Subreddit</string>
     <string name="send_submission">Send</string>
     <string name="comment">Comment</string>
+    <string name="submit_post">Submit Post</string>
+    <string name="text_post_submission">Text Post</string>
+    <string name="link_post_submission">Link Post</string>
+    <string name="fields_blank">Fields cannot be blank</string>
 
     <!-- General -->
     <string name="ok">Ok</string>
@@ -110,11 +114,5 @@
 
     <string name="placeholder_comment_time_elapsed">time elapsed</string>
     <string name="placeholder_comment_body">comment body</string>
-
-<<<<<<< HEAD
-=======
     <string name="placeholder_menu_item">Menu Item</string>
-
-
->>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
 </resources>

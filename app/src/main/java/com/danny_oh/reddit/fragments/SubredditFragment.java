@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -176,15 +174,8 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-<<<<<<< HEAD
-                if (mSearchSubredditEditText.getText().length() > 0) {
-                    mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(), SubredditFragment.this).execute();
-                    mSearchSubredditEditText.clearFocus();
-                }
-=======
                 mSubredditsTask = new SubredditSearchTask(getActivity(), mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
                 mSearchSubredditEditText.clearFocus();
->>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
                 return true;
             }
         });
