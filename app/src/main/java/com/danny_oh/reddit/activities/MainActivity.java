@@ -33,7 +33,12 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
 import java.text.ParseException;
 
-
+/**
+ * The main Activity of the redditDroid app.
+ *
+ * This app has only one activity on purpose, in order to minimize load times and deliver the fastest
+ * user experience possible.
+ */
 public class MainActivity
         extends SlidingActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack

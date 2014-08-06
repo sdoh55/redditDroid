@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.github.jreddit.entity.Comment;
@@ -152,11 +153,10 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
                     }
 
 
-                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (comment.isLiked() == null) {
                                     comment.setScore(comment.getScore() + 1);
                                 } else {
@@ -184,11 +184,10 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
                         direction = 0;
                     }
 
-                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (comment.isLiked() == null) {
                                     comment.setScore(comment.getScore() - 1);
                                 } else {

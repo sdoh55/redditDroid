@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 /**
  * Created by danny on 7/23/14.
  *
- * A Parcelable Submission
+ * An extension of the jReddit Submission class that is parcelable.
  */
 public class ExtendedSubmission extends Submission implements Parcelable {
 

@@ -17,6 +17,8 @@ import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 /**
  * Created by danny on 8/2/14.
+ *
+ * A fragment that is responsible solely for displaying YouTube based submissions.
  */
 public class YouTubeSubmissionFragment extends Fragment implements YouTubePlayer.OnInitializedListener,
         YouTubePlayer.PlayerStateChangeListener

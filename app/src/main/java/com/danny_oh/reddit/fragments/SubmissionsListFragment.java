@@ -43,7 +43,8 @@ import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 import java.util.List;
 
 /**
- * A fragment that displays a list of jReddit Submissions
+ * A fragment that displays a list of submissions from a given subreddit or the "front page" if
+ * the subreddit name is not specified.
  */
 public class SubmissionsListFragment extends Fragment implements
         // listener for action bar search box
@@ -316,22 +317,14 @@ public class SubmissionsListFragment extends Fragment implements
                     Submission lastSubmission = (Submission) mAdapter.getItem(totalItemsCount - 1);
 
                     // passing empty string requests for the reddit frontpage
-                    SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-                    param.subreddit = mSubredditName;
-                    param.sort = SubmissionSort.valueOf(mSubmissionSort);
-                    param.count = 0;
-                    param.limit = mSubmissionsPerPage;
-                    param.after = lastSubmission;
-                    param.before = null;
-                    param.show = mShowAll;
-
-                    SessionManager.getInstance(getActivity()).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+                    SessionManager.getInstance(mContext).getSubredditSubmissions(mSubredditName, SubmissionSort.valueOf(mSubmissionSort), 0, mSubmissionsPerPage, lastSubmission, null, mShowAll, new AsyncSubmissions.SubmissionsResponseHandler() {
                         @Override
-                        public void onResponse(List<Submission> list) {
-                            mPagedSubmissionsList.add(list);
+                        public void onParseFinished(List<Submission> submissions) {
+                            mPagedSubmissionsList.add(submissions);
                             mAdapter.notifyDataSetChanged();
                         }
                     });
+
                     mProgressBar.setVisibility(View.VISIBLE);
                 }
 
@@ -359,8 +352,6 @@ public class SubmissionsListFragment extends Fragment implements
                         }
                     });
                 }
-
-                ;
 
                 @Override
                 public void onLoadComplete() {
@@ -529,23 +520,13 @@ public class SubmissionsListFragment extends Fragment implements
 
         if (mUserSubmissionsCategory == null) {
             // passing empty string requests for the reddit frontpage
-            SessionManager.SubmissionFetchParam param = new SessionManager.SubmissionFetchParam();
-            param.subreddit = mSubredditName;
-            param.sort = SubmissionSort.valueOf(mSubmissionSort);
-            param.count = 0;
-            param.limit = mSubmissionsPerPage;
-            param.after = null;
-            param.before = null;
-            param.show = mShowAll;
-
-            SessionManager.getInstance(mContext).fetchMoreSubmissions(param, new SessionManager.SessionListener<List<Submission>>() {
+            SessionManager.getInstance(mContext).getSubredditSubmissions(mSubredditName, SubmissionSort.valueOf(mSubmissionSort), 0, mSubmissionsPerPage, null, null, mShowAll, new AsyncSubmissions.SubmissionsResponseHandler() {
                 @Override
-                public void onResponse(List<Submission> list) {
-                    mPagedSubmissionsList.add(list);
+                public void onParseFinished(List<Submission> submissions) {
+                    mPagedSubmissionsList.add(submissions);
                     mAdapter.notifyDataSetChanged();
                 }
             });
-
 
         } else {
 

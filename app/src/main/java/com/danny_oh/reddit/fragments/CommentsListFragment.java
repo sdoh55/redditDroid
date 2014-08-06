@@ -42,6 +42,9 @@ import in.uncod.android.bypass.Bypass;
 
 /**
  * Created by danny on 7/31/14.
+ *
+ * A Fragment that displays a list of comments along with the submission's content and information
+ * in the header of the ListView.
  */
 public class CommentsListFragment extends Fragment {
 
@@ -325,11 +328,10 @@ public class CommentsListFragment extends Fragment {
                     direction = 0;
                 }
 
-                SessionManager.getInstance(context).vote(mSubmission.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                SessionManager.getInstance(context).vote(mSubmission.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                     @Override
-                    public void onResponse(Boolean object) {
-                        // if vote was successful
-                        if (object) {
+                    public void onSuccess(boolean actionSuccessful) {
+                        if (actionSuccessful) {
                             updateVoteIndicator(direction);
                         } else {
                             Toast.makeText(context, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();
@@ -351,11 +353,10 @@ public class CommentsListFragment extends Fragment {
                     direction = 0;
                 }
 
-                SessionManager.getInstance(context).vote(mSubmission.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                SessionManager.getInstance(context).vote(mSubmission.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                     @Override
-                    public void onResponse(Boolean object) {
-                        // if vote was successful
-                        if (object) {
+                    public void onSuccess(boolean actionSuccessful) {
+                        if (actionSuccessful) {
                             updateVoteIndicator(direction);
                         } else {
                             Toast.makeText(context, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();

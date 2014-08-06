@@ -24,6 +24,10 @@ import in.uncod.android.bypass.Bypass;
 
 /**
  * Created by danny on 7/23/14.
+ *
+ * Adapter for HashMap based comments list. Currently this is unused because it uses a
+ * SparseArray to hold the comments. However, in order to implement "load more" and other
+ * complex comments actions, it is likely that the comments will be held in a HashMap.
  */
 public class CommentMapAdapter extends BaseAdapter {
 

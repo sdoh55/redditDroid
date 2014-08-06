@@ -41,6 +41,11 @@ import static com.github.jreddit.utils.restclient.methodbuilders.HttpPostMethodB
 
 /**
  * Created by danny on 7/24/14.
+ *
+ * An implementation of the RestClient interface from the jReddit library with extended support
+ * for AsyncHttpClient from the android-async-http library by loopj.
+ *
+ * This RestClient also has built in cookies management via the PersistentCookieStore class.
  */
 public class RedditRestClient implements RestClient {
     private static final String BASE_URL = ApiEndpointUtils.REDDIT_BASE_URL;
@@ -49,10 +54,6 @@ public class RedditRestClient implements RestClient {
     private static PersistentCookieStore mCookieStore;
 
     private static RedditRestClient instance;
-
-    private Context mContext;
-
-
 
     public AsyncHttpClient getAsyncClient() {
         return mClient;
@@ -88,8 +89,7 @@ public class RedditRestClient implements RestClient {
         mHttpClient = mClient.getHttpClient();
         mResponseHandler = new RestResponseHandler();
 
-        mContext = context;
-        mCookieStore = new PersistentCookieStore(mContext);
+        mCookieStore = new PersistentCookieStore(context);
         mClient.setCookieStore(mCookieStore);
 
         setUserAgent(Constants.USER_AGENT);

@@ -7,6 +7,7 @@ import com.github.jreddit.exception.ActionFailedException;
 import com.github.jreddit.utils.ApiEndpointUtils;
 import com.github.jreddit.utils.restclient.RestClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -14,6 +15,9 @@ import org.json.simple.JSONObject;
 
 /**
  * Created by danny on 8/2/14.
+ *
+ * A class that extends the MarkActions class from the jReddit library that has been modified
+ * to extend support for AsyncHttpClient from the android-async-http library by loopj
  */
 public class AsyncMarkActions extends MarkActions {
     private RedditRestClient mRestClient;
@@ -25,7 +29,7 @@ public class AsyncMarkActions extends MarkActions {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, org.json.JSONObject response) {
-            if (response.length() == 0) {
+            if (statusCode == 200 && response.length() == 0) {
                 onSuccess(true);
             } else {
                 onSuccess(false);
@@ -34,7 +38,7 @@ public class AsyncMarkActions extends MarkActions {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-            if (response.length() == 0) {
+            if (statusCode == 200 && response.length() == 0) {
                 onSuccess(true);
             } else {
                 onSuccess(false);
@@ -91,5 +95,21 @@ public class AsyncMarkActions extends MarkActions {
     public void unsaveAsync(String fullName, MarkActionsResponseHandler responseHandler) {
         String url = ApiEndpointUtils.REDDIT_BASE_URL + ApiEndpointUtils.UNSAVE + "?id=" + fullName + "&uh=" + mUser.getModhash();
         mRestClient.getAsyncClient().post(url, responseHandler);
+    }
+
+    public void voteAsync(String fullName, int dir, MarkActionsResponseHandler responseHandler) throws ActionFailedException {
+
+        if (dir < -1 || dir > 1) {
+            throw new IllegalArgumentException("Vote direction needs to be -1 or 1.");
+        }
+
+        String url = ApiEndpointUtils.REDDIT_BASE_URL + ApiEndpointUtils.VOTE;
+
+        RequestParams params = new RequestParams();
+        params.put("dir", dir);
+        params.put("id", fullName);
+        params.put("uh", mUser.getModhash());
+
+        mRestClient.getAsyncClient().post(url, params, responseHandler);
     }
 }

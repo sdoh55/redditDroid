@@ -14,6 +14,8 @@ import java.util.List;
 
 /**
  * Created by danny on 7/19/14.
+ *
+ * Adapter for displaying subreddits
  */
 public class SubredditAdapter extends ArrayAdapter<Subreddit> {
 

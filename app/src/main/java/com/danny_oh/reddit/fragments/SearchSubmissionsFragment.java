@@ -34,6 +34,8 @@ import java.util.List;
 
 /**
  * Created by danny on 8/2/14.
+ *
+ * A fragment that displays a list of submissions that match a specified query string.
  */
 public class SearchSubmissionsFragment extends Fragment {
     private static final String ARG_SUBREDDIT_NAME = "submission_search_subreddit_name";

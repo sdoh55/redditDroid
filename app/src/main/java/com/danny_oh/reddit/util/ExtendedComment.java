@@ -6,6 +6,12 @@ import org.json.simple.JSONObject;
 
 /**
  * Created by danny on 7/23/14.
+ *
+ * An extension of the Comment class from the jReddit library that allows the creation of
+ * 'abstract comments' that only have IDs with no content that has been loaded.
+ *
+ * This class will be required in order to support 'load more' of comments that has not been
+ * fully fetched from the initial request.
  */
 public class ExtendedComment extends Comment {
     private boolean mShouldDisplay = true;

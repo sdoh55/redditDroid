@@ -42,6 +42,9 @@ import java.util.List;
 
 /**
  * Created by danny on 7/24/14.
+ *
+ * SessionManager is the central class that handles a reddit user session (maintaining user cookies and modhash)
+ * and communicating with the reddit service via retrieval helper classes.
  */
 public class SessionManager {
     private static final String SHARED_PREFERENCES_USER_FILE = "com.danny_oh.reddit.PREFERENCE_USER_FILE_KEY";
@@ -56,177 +59,11 @@ public class SessionManager {
     private Context mContext;
     private RestClient mRestClient;
     private User mUser;
+
+    // controllers that start with 'Async' are ones that have been ported from jReddit to be usable on Android
     private AsyncMarkActions mMarkActions;
     private AsyncSubmissions mSubmissionsController;
     private ProfileActions mProfileActions;
-
-
-    private class LoginAsyncTask extends AsyncTask<String, Void, User> {
-        SessionListener<User> mListener;
-
-        public LoginAsyncTask(SessionListener listener) {
-            this.mListener = listener;
-        }
-
-        @Override
-        protected User doInBackground(String... strings) {
-            String username = strings[0];
-            String password = strings[1];
-
-            mUser = new User(mRestClient, username);
-            try {
-                mUser.connect(password, true);
-            } catch (IOException ioe) {
-                Log.e("SessionManager","IO Exception while attempting to connect user. Localized message: " + ioe.getLocalizedMessage());
-            } catch (ParseException pe) {
-                Log.e("SessionManager","Parse Exception while attempting to connect user. Localized message: " + pe.getLocalizedMessage());
-            } catch (NullPointerException npe) {
-                Log.e("SessionManager", "Failed to log in. Likely due to wrong password. Localized message: " + npe.getLocalizedMessage());
-                return null;
-            }
-
-            return mUser;
-        }
-
-        @Override
-        protected void onPostExecute(User user) {
-            if (user != null) {
-
-                SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                editor.putString(SHARED_PREFERENCES_USERNAME, user.getUsername());
-                editor.putString(SHARED_PREFERENCES_USER_COOKIE, user.getCookie());
-                editor.putString(SHARED_PREFERENCES_USER_MODHASH, user.getModhash());
-                editor.commit();
-
-                mMarkActions.switchActor(user);
-                mSubmissionsController.switchActor(user);
-                mProfileActions.switchActor(user);
-                mListener.onResponse(user);
-            } else {
-                ((FragmentActivity)mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        }
-    }
-
-    private class MarkAsyncTask extends AsyncTask<String, Void, Boolean> {
-        private SessionListener<Boolean> mListener;
-
-        public MarkAsyncTask(SessionListener<Boolean> listener) {
-            this.mListener = listener;
-        }
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            if (isUserLoggedIn()) {
-                Log.d("SessionManager", "User is logged in. Voting.");
-                String fullname = strings[0];
-                int dir = Integer.parseInt(strings[1]);
-                return mMarkActions.vote(fullname, dir);
-            } else {
-                Log.d("SessionManager", "User is not logged in. Returning.");
-                ((FragmentActivity)mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            this.mListener.onResponse(aBoolean);
-        }
-    }
-
-
-    public static class SubmissionFetchParam {
-        public String subreddit;
-        public SubmissionSort sort;
-        public int count;
-        public int limit;
-        public Submission before;
-        public Submission after;
-        public boolean show;
-    }
-
-    /**
-     * AsyncTask subclass that retrieves submissions from a specified subreddit
-     */
-    private class SubmissionsAsyncTask extends AsyncTask<SubmissionFetchParam, Integer, List<Submission>> {
-        private SessionListener<List<Submission>> mListener;
-
-        public SubmissionsAsyncTask(SessionListener<List<Submission>> listener) {
-            this.mListener = listener;
-        }
-
-        protected List<Submission> doInBackground(SubmissionFetchParam... params) {
-            SubmissionFetchParam param = params[0];
-
-            try {
-                List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
-
-                return list;
-            } catch (RetrievalFailedException e) {
-                Log.e("SessionManager", "Failed to retrieve submissions. Localized message: " + e.getLocalizedMessage());
-
-
-                ((ActionBarActivity)mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mContext, "Failed to fetch links. Please try again later.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                return new LinkedList<Submission>();
-            }
-        }
-
-        protected void onPostExecute(List<Submission> list) {
-            mListener.onResponse(list);
-        }
-    }
-
-    private class ProfileActionsAsynsTask extends AsyncTask<Void, Void, UserInfo> {
-        private SessionListener<UserInfo> mListener;
-
-        ProfileActionsAsynsTask(SessionListener<UserInfo> listener) {
-            mListener = listener;
-        }
-
-        @Override
-        protected UserInfo doInBackground(Void... voids) {
-            try {
-                UserInfo info = mProfileActions.getUserInformation();
-
-                return info;
-            } catch (ActionFailedException e) {
-                Log.e("SessionManager", "Failed to retrieve user info. Localized message: " + e.getLocalizedMessage());
-
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(UserInfo userInfo) {
-            mListener.onResponse(userInfo);
-        }
-    }
-
-
-
-
-
-
 
 
     private static SessionManager mManager;
@@ -303,19 +140,13 @@ public class SessionManager {
         return mRestClient;
     }
 
-    public void vote(String fullname, int dir, SessionListener<Boolean> listener) {
+    public void vote(String fullname, int dir, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
         if (isUserLoggedIn()) {
-            new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));
+            mMarkActions.voteAsync(fullname, dir, responseHandler);
         } else {
             Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-    public void fetchMoreSubmissions(SubmissionFetchParam param, SessionListener<List<Submission>> listener) {
-        new SubmissionsAsyncTask(listener).execute(param);
-    }
-
 
     public void searchSubmissions(String subreddit,
                                   String query,
@@ -353,4 +184,97 @@ public class SessionManager {
         if (isUserLoggedIn())
             mSubmissionsController.ofUserAsync(mUser.getUsername(), category, sort, count, limit, after, before, show_given, handler);
     }
+
+    public void getSubredditSubmissions(String subreddit, SubmissionSort sort, int count, int limit, Submission after, Submission before, boolean show_all, AsyncSubmissions.SubmissionsResponseHandler handler) {
+        mSubmissionsController.ofSubredditAsync(subreddit, sort, count, limit, after, before, show_all, handler);
+    }
+
+
+
+/*
+ * these AsyncTasks are temporary wrappers for jReddit (Java based library) to be usable on Android
+ * and should be reimplemented soon.
+ */
+    private class LoginAsyncTask extends AsyncTask<String, Void, User> {
+        SessionListener<User> mListener;
+
+        public LoginAsyncTask(SessionListener listener) {
+            this.mListener = listener;
+        }
+
+        @Override
+        protected User doInBackground(String... strings) {
+            String username = strings[0];
+            String password = strings[1];
+
+            mUser = new User(mRestClient, username);
+            try {
+                mUser.connect(password, true);
+            } catch (IOException ioe) {
+                Log.e("SessionManager","IO Exception while attempting to connect user. Localized message: " + ioe.getLocalizedMessage());
+            } catch (ParseException pe) {
+                Log.e("SessionManager","Parse Exception while attempting to connect user. Localized message: " + pe.getLocalizedMessage());
+            } catch (NullPointerException npe) {
+                Log.e("SessionManager", "Failed to log in. Likely due to wrong password. Localized message: " + npe.getLocalizedMessage());
+                return null;
+            }
+
+            return mUser;
+        }
+
+        @Override
+        protected void onPostExecute(User user) {
+            if (user != null) {
+
+                SharedPreferences sharedPreferences = mContext.getSharedPreferences(SHARED_PREFERENCES_USER_FILE, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                editor.putString(SHARED_PREFERENCES_USERNAME, user.getUsername());
+                editor.putString(SHARED_PREFERENCES_USER_COOKIE, user.getCookie());
+                editor.putString(SHARED_PREFERENCES_USER_MODHASH, user.getModhash());
+                editor.apply();
+
+                mMarkActions.switchActor(user);
+                mSubmissionsController.switchActor(user);
+                mProfileActions.switchActor(user);
+                mListener.onResponse(user);
+            } else {
+                ((FragmentActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "Wrong password. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
+    }
+
+    /*
+     * temporary AsyncTask that verifies if a logged in user session is valid
+     */
+    private class ProfileActionsAsynsTask extends AsyncTask<Void, Void, UserInfo> {
+        private SessionListener<UserInfo> mListener;
+
+        ProfileActionsAsynsTask(SessionListener<UserInfo> listener) {
+            mListener = listener;
+        }
+
+        @Override
+        protected UserInfo doInBackground(Void... voids) {
+            try {
+                return mProfileActions.getUserInformation();
+            } catch (ActionFailedException e) {
+                Log.e("SessionManager", "Failed to retrieve user info. Localized message: " + e.getLocalizedMessage());
+
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(UserInfo userInfo) {
+            mListener.onResponse(userInfo);
+        }
+    }
+
+
 }

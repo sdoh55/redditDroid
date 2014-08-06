@@ -41,13 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A fragment representing a list of Items.
- * <p />
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p />
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * A fragment that displays subreddits in a simple ListView
  */
 public class SubredditFragment extends Fragment implements AbsListView.OnItemClickListener,
         SubredditSearchTask.SubredditSearchListener{

@@ -29,7 +29,10 @@ import com.github.jreddit.retrieval.params.CommentSort;
 import java.util.HashMap;
 import java.util.List;
 
-
+/**
+ * A fragment that displays ONLY the list of comments from a given submission without the content
+ * and other information.
+ */
 public class CommentsOnlyListFragment extends ListFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_SUBMISSION = "submission";

@@ -9,6 +9,8 @@ import com.danny_oh.reddit.R;
 
 /**
  * Created by danny on 7/24/14.
+ *
+ * A custom ImageView with custom states
  */
 public class ImageViewWithVoteState extends ImageView implements Checkable {
     private static final int[] STATE_VOTED = {R.attr.submission_vote_state};
