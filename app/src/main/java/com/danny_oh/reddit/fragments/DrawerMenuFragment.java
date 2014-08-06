@@ -1,10 +1,12 @@
 package com.danny_oh.reddit.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +20,10 @@ import android.widget.TextView;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.UserMenuExpandableListAdapter;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +43,11 @@ public class DrawerMenuFragment extends Fragment implements
     private List<Pair<String, String>> mUserHeaderList;
     private HashMap<String, List<String>> mUserItemList;
 
+    private SubredditFragment mSubredditFragment;
 
     private SessionManager mSessionManager;
+
+    private RelativeLayout mLoginLayout;
 
     public interface OnDrawerMenuInteractionListener {
         public void onLoginClick();
@@ -70,10 +78,12 @@ public class DrawerMenuFragment extends Fragment implements
 
         switch (childPosition) {
             case 0:
+                SubmissionsListFragment fragment = SubmissionsListFragment.newInstance(UserSubmissionsCategory.SAVED, UserOverviewSort.NEW);
+                ((MainActivity)getActivity()).showFragment(fragment, true);
+                return true;
+            case 1:
                 mListener.onLogoutClick();
                 return true;
-//            case 1:
-//                return true;
         }
 
         return false;
@@ -93,9 +103,8 @@ public class DrawerMenuFragment extends Fragment implements
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d("DrawerMenuFragment", "onAttach()");
         super.onAttach(activity);
-
-        mSessionManager = SessionManager.getInstance(activity);
 
         try {
             mListener = (OnDrawerMenuInteractionListener)activity;
@@ -106,30 +115,54 @@ public class DrawerMenuFragment extends Fragment implements
     }
 
     @Override
+    public void onDetach() {
+        Log.d("DrawerMenuFragment", "onDetach()");
+        super.onDetach();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onCreate()");
         super.onCreate(savedInstanceState);
 
-//        if (getArguments() != null) {
-//            // TODO: do something with arguments if needed
-//        } else {
-//            throw new InstantiationException("Use factory method newInstance to instantiate fragment.", new Exception());
-//        }
-
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onCreateView()");
         View view = inflater.inflate(R.layout.activity_main_drawer, container, false);
 
-        // the RelativeLayout that contains the "Log In" button
-        RelativeLayout loginLayout = (RelativeLayout)view.findViewById(R.id.login_button_view);
         // the logged in user's expandable menu
         mUserListView = (ExpandableListView)view.findViewById(R.id.user_menu_list_view);
+
+        // the RelativeLayout that contains the "Log In" button
+        mLoginLayout = (RelativeLayout)view.findViewById(R.id.login_button_view);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("DrawerMenuFragment", "onActivityCreated()");
+        super.onActivityCreated(savedInstanceState);
+
+
+
+        mSessionManager = SessionManager.getInstance(getActivity());
+
+        if (mSubredditFragment == null) {
+            Log.d("DrawerMenuFragment", "mSubredditFragment is null. Instantiating SubredditFragment and user menu list headers and items.");
+            mSubredditFragment = SubredditFragment.newInstance();
+
+            getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, mSubredditFragment).commit();
+        }
+
 
         // if user is logged in
         if (mSessionManager.isUserLoggedIn()) {
             // hide the "Log In" portion of the drawer menu
-            loginLayout.setVisibility(View.GONE);
+            mLoginLayout.setVisibility(View.GONE);
 
             prepareUserMenuData();
 
@@ -141,13 +174,13 @@ public class DrawerMenuFragment extends Fragment implements
             int width = metrics.widthPixels;
 
             // subtract the sliding menu offset from width to get displayed width of sliding menu
-            width -= (int)getResources().getDimension(R.dimen.slidingmenu_offset);
+            width -= (int)getResources().getDimension(R.dimen.slidingmenu_offset_left);
 
             // change the position of the group dropdown indicator
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 mUserListView.setIndicatorBounds(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
             } else {
-                mUserListView.setIndicatorBoundsRelative(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
+                setIndicatorBounds(width);
             }
 
             mUserListView.setOnChildClickListener(this);
@@ -156,27 +189,30 @@ public class DrawerMenuFragment extends Fragment implements
             // hide the "Logged In User" portion of the drawer menu
             mUserListView.setVisibility(View.GONE);
 
-            loginLayout.setOnClickListener(new View.OnClickListener() {
+            mLoginLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mListener.onLoginClick();
                 }
             });
         }
+    }
 
-        getFragmentManager().beginTransaction().replace(R.id.subreddit_list_view, new SubredditFragment()).commit();
+    @TargetApi(18)
+    private void setIndicatorBounds(int width) {
+        mUserListView.setIndicatorBoundsRelative(width-GetPixelFromDips(35), width-GetPixelFromDips(5));
+    }
 
-//        mListView = (ListView)view.findViewById(R.id.subreddit_list_view);
-//
-//        mListView.setOnItemClickListener(this);
-//        mListView.setSelector(R.drawable.selector_drawer_list_item);
-//
-//        final String[] drawerMenuItems = getResources().getStringArray(R.array.drawer_menu_items);
-//        mListView.setAdapter(new DrawerMenuAdapter(getActivity(), drawerMenuItems));
+    @Override
+    public void onResume() {
+        Log.d("DrawerMenuFragment", "onResume");
+        super.onResume();
+    }
 
-
-
-        return view;
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("DrawerMenuFragment", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
     }
 
     private int GetPixelFromDips(float pixels) {

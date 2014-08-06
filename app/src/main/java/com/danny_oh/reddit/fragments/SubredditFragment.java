@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.danny_oh.reddit.R;
@@ -30,10 +32,12 @@ import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.SubredditAdapter;
 import com.danny_oh.reddit.tasks.SubredditSearchTask;
 import com.github.jreddit.entity.Subreddit;
+import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Subreddits;
 import com.github.jreddit.retrieval.params.SubredditsView;
 import com.github.jreddit.utils.restclient.PoliteHttpRestClient;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -76,6 +80,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             view = subredditsView;
         }
         protected Void doInBackground(Void... voids) {
+            Log.d("SubredditFragment", "Fetching subreddits.");
             Subreddits subreddits;
 
             SessionManager manager = SessionManager.getInstance(getActivity());
@@ -83,10 +88,23 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
             if (manager.isUserLoggedIn()) {
                 subreddits = new Subreddits(manager.getRestClient(), manager.getUser());
             } else {
-                subreddits = new Subreddits(new PoliteHttpRestClient());
+                subreddits = new Subreddits(manager.getRestClient());
             }
 
-            mSubredditList = subreddits.get(view, 0, 30, null, null);
+            try {
+                mSubredditList = subreddits.get(view, 0, 30, null, null);
+            } catch (RetrievalFailedException e) {
+                Log.e("SubredditFragment", "Failed to fetch subreddits. Localized message: " + e.getLocalizedMessage());
+
+                mSubredditList = new LinkedList<Subreddit>();
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Failed to fetch links. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
             return null;
         }
@@ -99,7 +117,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     }
 
     // TODO: Rename and change types of parameters
-    public static SubredditFragment newInstance(String param1, String param2) {
+    public static SubredditFragment newInstance() {
         SubredditFragment fragment = new SubredditFragment();
         Bundle args = new Bundle();
 
@@ -109,11 +127,14 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onCreate()");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
 
         }
+
+        setRetainInstance(true);
 
         // disabled for side drawer integration
 //        setHasOptionsMenu(true);
@@ -122,22 +143,48 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onCreateView()");
+
         View view = inflater.inflate(R.layout.fragment_subreddit_list, container, false);
 
         // Set the adapter
         mListView = (ListView)view.findViewById(R.id.subreddit_list_listview);
 
+        mSearchSubredditEditText = (EditText)view.findViewById(R.id.search_subreddits);
+
+        mListView.addHeaderView(inflater.inflate(R.layout.list_header_subreddit, mListView, false));
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("SubredditFragment", "onActivityCreated()");
+
+        super.onActivityCreated(savedInstanceState);
+
+        if (mSubredditList != null && mSubredditAdapter != null) {
+            // fragment was restored
+            mListView.setAdapter(mSubredditAdapter);
+        } else {
+            mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
+        }
+
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
-        mSearchSubredditEditText = (EditText)view.findViewById(R.id.search_subreddits);
         mSearchSubredditEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+<<<<<<< HEAD
                 if (mSearchSubredditEditText.getText().length() > 0) {
                     mSubredditsTask = new SubredditSearchTask(mSearchSubredditEditText.getText().toString(), SubredditFragment.this).execute();
                     mSearchSubredditEditText.clearFocus();
                 }
+=======
+                mSubredditsTask = new SubredditSearchTask(getActivity(), mSearchSubredditEditText.getText().toString(),SubredditFragment.this).execute();
+                mSearchSubredditEditText.clearFocus();
+>>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
                 return true;
             }
         });
@@ -151,21 +198,17 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
                 }
             }
         });
-
-        mListView.addHeaderView(inflater.inflate(R.layout.list_header_subreddit, mListView, false));
-
-        return view;
     }
 
     @Override
     public void onResume() {
+        Log.d("SubredditFragment", "onResume()");
         super.onResume();
-
-        mSubredditsTask = new GetSubredditsTask(SubredditsView.POPULAR).execute();
     }
 
     @Override
     public void onAttach(Activity activity) {
+        Log.d("SubredditFragment", "onAttach()");
         super.onAttach(activity);
         mActivity = (MainActivity)activity;
 
@@ -173,7 +216,6 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         try {
             mListener = (DrawerMenuFragment.OnDrawerMenuInteractionListener)activity;
         } catch (ClassCastException e) {
-            e.printStackTrace();
             throw new ClassCastException("The activity containing SubredditFragment must implement OnDrawerMenuInteractionListener");
         }
 
@@ -182,9 +224,18 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
 
     @Override
     public void onDetach() {
+        Log.d("SubredditFragment", "onDetach()");
         super.onDetach();
-        mListener = null;
     }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        Log.d("SubredditFragment", "onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+    }
+
+
 
 
     /**
@@ -269,7 +320,7 @@ public class SubredditFragment extends Fragment implements AbsListView.OnItemCli
         alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                mSubredditsTask = new SubredditSearchTask(input.getText().toString(),SubredditFragment.this).execute();
+                mSubredditsTask = new SubredditSearchTask(getActivity(), input.getText().toString(),SubredditFragment.this).execute();
                 dialog.dismiss();
             }
         });

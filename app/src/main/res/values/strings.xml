@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <string name="app_name">Reddit</string>
+    <string name="app_name">redditDroid</string>
     <string name="action_settings">Settings</string>
 
     <!-- MainActivity Action Bar Navigation Items -->
@@ -13,9 +13,19 @@
         <item>top</item>
     </array>
 
+    <array name="comments_sort_array">
+        <item android:id="@+id/comments_sort_confidence">confidence</item>
+        <item android:id="@+id/comments_sort_new">new</item>
+        <item android:id="@+id/comments_sort_hot">hot</item>
+        <item android:id="@+id/comments_sort_top">top</item>
+        <item android:id="@+id/comments_sort_controversial">controversial</item>
+        <item android:id="@+id/comments_sort_old">old</item>
+        <item android:id="@+id/comments_sort_random">random</item>
+    </array>
+
     <!-- Drawer Menu Items -->
     <array name="drawer_menu_logged_in_user_items">
-        <!--<item>View Profile</item>-->
+        <item>View Saved</item>
         <item>Log Out</item>
     </array>
 
@@ -31,11 +41,13 @@
 
     <!-- Options Menu Strings -->
     <string name="option_menu_sort">Sort</string>
+        <string name="option_sort_title_relevance">relevance</string>
         <string name="option_sort_title_hot">hot</string>
         <string name="option_sort_title_new">new</string>
         <string name="option_sort_title_rising">rising</string>
         <string name="option_sort_title_controversial">controversial</string>
         <string name="option_sort_title_top">top</string>
+        <string name="option_sort_title_comments">comments</string>
         <string name="option_comment_sort_title_new">new</string>
         <string name="option_comment_sort_title_hot">hot</string>
         <string name="option_comment_sort_title_top">top</string>
@@ -59,7 +71,7 @@
     <!-- Log In Dialog Strings -->
     <string name="dialog_login_hint_username">username</string>
     <string name="dialog_login_hint_password">password</string>
-    <string name="dialog_login_text">Log In to Reddit</string>
+    <string name="dialog_login_text">Log in to reddit</string>
 
     <!-- Submission Post Strings -->
     <string name="hint_url">URL</string>
@@ -99,4 +111,10 @@
     <string name="placeholder_comment_time_elapsed">time elapsed</string>
     <string name="placeholder_comment_body">comment body</string>
 
+<<<<<<< HEAD
+=======
+    <string name="placeholder_menu_item">Menu Item</string>
+
+
+>>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
 </resources>

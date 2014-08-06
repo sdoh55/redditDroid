@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.Constants;
 import com.danny_oh.reddit.util.RedditRestClient;
@@ -15,11 +17,15 @@ import com.github.jreddit.action.ProfileActions;
 import com.github.jreddit.entity.Submission;
 import com.github.jreddit.entity.User;
 import com.github.jreddit.entity.UserInfo;
+import com.github.jreddit.exception.ActionFailedException;
+import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.retrieval.params.TimeSpan;
+import com.github.jreddit.retrieval.params.UserOverviewSort;
+import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
 import com.github.jreddit.utils.restclient.HttpRestClient;
 import com.github.jreddit.utils.restclient.RestClient;
 import com.github.jreddit.utils.restclient.RestResponseHandler;
@@ -31,6 +37,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -49,7 +56,7 @@ public class SessionManager {
     private Context mContext;
     private RestClient mRestClient;
     private User mUser;
-    private MarkActions mMarkActions;
+    private AsyncMarkActions mMarkActions;
     private AsyncSubmissions mSubmissionsController;
     private ProfileActions mProfileActions;
 
@@ -70,13 +77,11 @@ public class SessionManager {
             try {
                 mUser.connect(password, true);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
-                Log.e("SessionManager","IO Exception while attempting to connect user.");
+                Log.e("SessionManager","IO Exception while attempting to connect user. Localized message: " + ioe.getLocalizedMessage());
             } catch (ParseException pe) {
-                pe.printStackTrace();
-                Log.e("SessionManager","Parse Exception while attempting to connect user.");
+                Log.e("SessionManager","Parse Exception while attempting to connect user. Localized message: " + pe.getLocalizedMessage());
             } catch (NullPointerException npe) {
-                Log.e("SessionManager", "Failed to log in. Likely due to wrong password.");
+                Log.e("SessionManager", "Failed to log in. Likely due to wrong password. Localized message: " + npe.getLocalizedMessage());
                 return null;
             }
 
@@ -166,9 +171,24 @@ public class SessionManager {
 
         protected List<Submission> doInBackground(SubmissionFetchParam... params) {
             SubmissionFetchParam param = params[0];
-            List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
 
-            return list;
+            try {
+                List<Submission> list = mSubmissionsController.ofSubreddit(param.subreddit, param.sort, param.count, param.limit, param.after, param.before, param.show);
+
+                return list;
+            } catch (RetrievalFailedException e) {
+                Log.e("SessionManager", "Failed to retrieve submissions. Localized message: " + e.getLocalizedMessage());
+
+
+                ((ActionBarActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, "Failed to fetch links. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                return new LinkedList<Submission>();
+            }
         }
 
         protected void onPostExecute(List<Submission> list) {
@@ -185,9 +205,15 @@ public class SessionManager {
 
         @Override
         protected UserInfo doInBackground(Void... voids) {
-            UserInfo info = mProfileActions.getUserInformation();
+            try {
+                UserInfo info = mProfileActions.getUserInformation();
 
-            return info;
+                return info;
+            } catch (ActionFailedException e) {
+                Log.e("SessionManager", "Failed to retrieve user info. Localized message: " + e.getLocalizedMessage());
+
+                return null;
+            }
         }
 
         @Override
@@ -206,7 +232,7 @@ public class SessionManager {
     private static SessionManager mManager;
 
     public static SessionManager getInstance(Context context) {
-        if (mManager == null) {// if vote was successful
+        if (mManager == null) {
             mManager = new SessionManager(context, RedditRestClient.getInstance(context));
         }
 
@@ -217,7 +243,7 @@ public class SessionManager {
         mContext = context;
         mRestClient = restClient;
         mRestClient.setUserAgent(Constants.USER_AGENT);
-        mMarkActions = new MarkActions(mRestClient);
+        mMarkActions = new AsyncMarkActions((RedditRestClient)mRestClient);
         mSubmissionsController = new AsyncSubmissions((RedditRestClient)mRestClient);
         mProfileActions = new ProfileActions(mRestClient);
 
@@ -278,7 +304,11 @@ public class SessionManager {
     }
 
     public void vote(String fullname, int dir, SessionListener<Boolean> listener) {
-        new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));
+        if (isUserLoggedIn()) {
+            new MarkAsyncTask(listener).execute(fullname, Integer.toString(dir));
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to vote.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -287,7 +317,8 @@ public class SessionManager {
     }
 
 
-    public void searchSubmissions(String query,
+    public void searchSubmissions(String subreddit,
+                                  String query,
                                   QuerySyntax syntax,
                                   SearchSort sort,
                                   TimeSpan time,
@@ -298,8 +329,28 @@ public class SessionManager {
                                   boolean show_all,
                                   AsyncSubmissions.SubmissionsResponseHandler responseHandler) {
 
-        mSubmissionsController.searchAsync(query, syntax, sort, time, count, limit, after, before, show_all, responseHandler);
+        mSubmissionsController.searchAsync(subreddit, query, syntax, sort, time, count, limit, after, before, show_all, responseHandler);
 
     }
 
+    public void saveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
+        if (isUserLoggedIn()) {
+            mMarkActions.saveAsync(fullName, responseHandler);
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to save links.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void unsaveThing(String fullName, AsyncMarkActions.MarkActionsResponseHandler responseHandler) {
+        if (isUserLoggedIn()) {
+            mMarkActions.unsaveAsync(fullName, responseHandler);
+        } else {
+            Toast.makeText(mContext, "You need to be logged in to unsave links.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void getUserSubmissions(UserSubmissionsCategory category, UserOverviewSort sort, int count, int limit, Submission after, Submission before, boolean show_given, AsyncSubmissions.SubmissionsResponseHandler handler) {
+        if (isUserLoggedIn())
+            mSubmissionsController.ofUserAsync(mUser.getUsername(), category, sort, count, limit, after, before, show_given, handler);
+    }
 }

@@ -11,9 +11,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
+import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.util.CommentsListHelper;
+import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.github.jreddit.entity.Comment;
 import com.github.jreddit.entity.Submission;
 
@@ -34,10 +37,12 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
         private TextView timeCreated;
         private TextView body;
 
-        private ImageView upvote;
-        private ImageView downvote;
+        private ImageViewWithVoteState upvote;
+        private ImageViewWithVoteState downvote;
 
         private View depthIndicator;
+
+        private ImageViewWithVoteState gilded;
     }
 
     private Context mContext;
@@ -75,15 +80,16 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             viewHolder.score = (TextView)view.findViewById(R.id.comment_score);
             viewHolder.timeCreated = (TextView)view.findViewById(R.id.comment_time_created);
             viewHolder.body = (TextView)view.findViewById(R.id.comment_body);
-            viewHolder.upvote = (ImageView)view.findViewById(R.id.comment_up_vote);
-            viewHolder.downvote = (ImageView)view.findViewById(R.id.comment_down_vote);
+            viewHolder.upvote = (ImageViewWithVoteState)view.findViewById(R.id.comment_up_vote);
+            viewHolder.downvote = (ImageViewWithVoteState)view.findViewById(R.id.comment_down_vote);
             viewHolder.depthIndicator = (View)view.findViewById(R.id.comment_depth_indicator);
+            viewHolder.gilded = (ImageViewWithVoteState)view.findViewById(R.id.comment_gilded);
 
             view.setTag(viewHolder);
         }
 
         // get comment at position
-        Comment comment = mComments.get(position).comment;
+        final Comment comment = mComments.get(position).comment;
         int depth = mComments.get(position).depth;
 
         if (mDepthColors.size() < depth + 1) {
@@ -117,7 +123,104 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             }
 
             // TODO: onClickListener for upvote and downvote
+
+
+            if (comment.isLiked() == null) {
+
+                viewHolder.upvote.setStateVoted(false);
+                viewHolder.downvote.setStateVoted(false);
+            } else {
+                if (comment.isLiked()) {
+                    viewHolder.upvote.setStateVoted(true);
+                    viewHolder.downvote.setStateVoted(false);
+                } else {
+                    viewHolder.upvote.setStateVoted(false);
+                    viewHolder.downvote.setStateVoted(true);
+                }
+            }
+
+
+            viewHolder.upvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View view) {
+                    final int direction;
+
+                    if (comment.isLiked() == null || !comment.isLiked()) {
+                        direction = 1;
+                    } else {
+                        direction = 0;
+                    }
+
+
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                        @Override
+                        public void onResponse(Boolean object) {
+                            // if vote was successful
+                            if (object) {
+                                if (comment.isLiked() == null) {
+                                    comment.setScore(comment.getScore() + 1);
+                                } else {
+                                    comment.setScore(comment.getScore() + (comment.isLiked() ? -1 : 2));
+                                }
+                                comment.setLiked(direction);
+                                notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(mContext, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            viewHolder.downvote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final int direction;
+
+                    if (comment.isLiked() == null || comment.isLiked()) {
+                        direction = -1;
+                    } else {
+                        direction = 0;
+                    }
+
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                        @Override
+                        public void onResponse(Boolean object) {
+                            // if vote was successful
+                            if (object) {
+                                if (comment.isLiked() == null) {
+                                    comment.setScore(comment.getScore() - 1);
+                                } else {
+                                    comment.setScore(comment.getScore() - (comment.isLiked() ? 2 : -1));
+                                }
+                                comment.setLiked(direction);
+                                notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(mContext, "Failed to vote. Please try again later.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (comment.getGilded() > 0) {
+                viewHolder.gilded.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.gilded.setVisibility(View.GONE);
+            }
+
         }
+
+
+
+
+
+
+
+
+
+
 
         return view;
     }

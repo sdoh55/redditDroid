@@ -6,13 +6,14 @@
 
     <!-- Action Bar Dimensions -->
     <dimen name="action_bar_progress_bar_height">6dp</dimen>
-    <dimen name="action_bar_navigation_item_font_size">18dp</dimen>
+    <dimen name="action_bar_navigation_item_font_size">18sp</dimen>
     <dimen name="action_bar_navigation_item_horizontal_padding">4dp</dimen>
     <dimen name="action_bar_navigation_item_vertical_padding">8dp</dimen>
 
     <!-- Drawer Menu Dimensions -->
     <dimen name="drawer_icon_size">26dp</dimen>
-    <dimen name="slidingmenu_offset">160dp</dimen>
+    <dimen name="slidingmenu_offset_left">160dp</dimen>
+    <dimen name="slidingmenu_offset_right">40dp</dimen>
     <dimen name="list_padding">10dp</dimen>
     <dimen name="shadow_width">5dp</dimen>
     <integer name="num_cols">1</integer>
@@ -31,7 +32,7 @@
     <dimen name="dialog_input_vertical_margin">16dp</dimen>
 
     <!-- Submission Dimensions -->
-    <dimen name="submission_icon_size">50dp</dimen>
+    <dimen name="submission_icon_size">60dp</dimen>
     <dimen name="submission_icon_margin">5dp</dimen>
     <dimen name="submission_title_font_size">14sp</dimen>
     <dimen name="submission_title_margin">5dp</dimen>
@@ -58,6 +59,7 @@
     <dimen name="comment_score_font_size">13sp</dimen>
     <dimen name="comment_time_created_font_size">11sp</dimen>
     <dimen name="comment_body_font_size">12sp</dimen>
+    <dimen name="comment_gilded_icon_size">14dp</dimen>
 
 
 

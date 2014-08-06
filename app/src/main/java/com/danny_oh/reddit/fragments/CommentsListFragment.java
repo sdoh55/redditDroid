@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
@@ -14,9 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HeaderViewListAdapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +27,7 @@ import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.activities.MainActivity;
 import com.danny_oh.reddit.adapters.CommentSparseArrayAdapter;
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
@@ -43,8 +47,10 @@ import in.uncod.android.bypass.Bypass;
 public class CommentsListFragment extends Fragment {
 
     private static final String ARG_SUBMISSION_KEY = "submission_key";
+    private static final String ARG_DELAYED_KEY = "delayed_key";
 
     private Submission mSubmission;
+    private boolean mDelayed;       // if this is true, the fragment doesn't load comments right away and must call initList();
 
     private TextView mScoreLabel;
     private ImageViewWithVoteState mUpvoteIndicator;
@@ -63,11 +69,16 @@ public class CommentsListFragment extends Fragment {
     private CommentSparseArrayAdapter mAdapter;
     private View mHeaderView;
 
+<<<<<<< HEAD
     private OnSelfSubmissionFragmentDetachListener mListener;
     private MainActivity mActivity;
+=======
 
-    public interface OnSelfSubmissionFragmentDetachListener {
-        public void onSelfSubmissionFragmentDetach(Submission submission);
+    private OnCommentsListFragmentDetachListener mListener;
+>>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
+
+    public interface OnCommentsListFragmentDetachListener {
+        public void onCommentsListFragmentDetach(Submission submission);
     }
 
 
@@ -102,9 +113,14 @@ public class CommentsListFragment extends Fragment {
  * constructors and instantiation methods
  */
     public static CommentsListFragment newInstance(ExtendedSubmission submission) {
+        return newInstance(submission, false);
+    }
+
+    public static CommentsListFragment newInstance(ExtendedSubmission submission, boolean delayed) {
         CommentsListFragment fragment = new CommentsListFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_SUBMISSION_KEY, submission);
+        args.putBoolean(ARG_DELAYED_KEY, delayed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -122,17 +138,20 @@ public class CommentsListFragment extends Fragment {
         super.onAttach(activity);
 
         try {
+<<<<<<< HEAD
             mListener = (OnSelfSubmissionFragmentDetachListener)activity;
             mActivity = (MainActivity)activity;
+=======
+            mListener = (OnCommentsListFragmentDetachListener)activity;
+>>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
         } catch (ClassCastException ce) {
-            ce.printStackTrace();
             throw new ClassCastException("Parent activity of SelfSubmissionFragment must implement");
         }
     }
 
     @Override
     public void onDetach() {
-        mListener.onSelfSubmissionFragmentDetach(mSubmission);
+        mListener.onCommentsListFragmentDetach(mSubmission);
         super.onDetach();
     }
 
@@ -141,11 +160,12 @@ public class CommentsListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mSubmission = (ExtendedSubmission)getArguments().getParcelable(ARG_SUBMISSION_KEY);
+            mDelayed = getArguments().getBoolean(ARG_DELAYED_KEY);
         } else {
             throw new InstantiationException("Fragments must be instantiated using factory method newInstance.", new Exception());
         }
 
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
         setRetainInstance(true);
     }
 
@@ -161,6 +181,25 @@ public class CommentsListFragment extends Fragment {
 
         mListView.addHeaderView(mHeaderView);
         mListView.setEmptyView(view.findViewById(android.R.id.empty));
+
+        Spinner spinner = new Spinner(getActivity());
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.comments_sort_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                onOptionsItemSelected(i);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        mListView.addHeaderView(spinner);
 
         return view;
     }
@@ -179,8 +218,10 @@ public class CommentsListFragment extends Fragment {
             mCommentArray = new SparseArray<CommentsListHelper.CommentContainer>();
             mAdapter = new CommentSparseArrayAdapter(getActivity(), mCommentArray, mSubmission);
 
-            // retrieves comments for the selected submission
-            initList();
+            if (!mDelayed) {
+                // retrieves comments for the selected submission
+                initList();
+            }
         }
 
 
@@ -214,7 +255,7 @@ public class CommentsListFragment extends Fragment {
         TextView subreddit = (TextView) mHeaderView.findViewById(R.id.subreddit_label);
         mUpvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_up_vote);
         mDownvoteIndicator = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_down_vote);
-
+        final ImageViewWithVoteState saved = (ImageViewWithVoteState) mHeaderView.findViewById(R.id.submission_saved);
 
         title.setText(mSubmission.getTitle());
         mScoreLabel.setText(mSubmission.getScore().toString());
@@ -235,6 +276,54 @@ public class CommentsListFragment extends Fragment {
 
 
         final Context context = getActivity();
+
+
+        if (mSubmission.isSaved()) {
+            saved.setStateVoted(true);
+        } else {
+            saved.setStateVoted(false);
+        }
+
+        saved.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mSubmission.isSaved()) {
+                    SessionManager.getInstance(context).saveThing(mSubmission.getFullName(),
+                            new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                @Override
+                                public void onSuccess(boolean actionSuccessful) {
+                                    if (actionSuccessful) {
+                                        mSubmission.setSaved(true);
+                                        saved.setStateVoted(true);
+                                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Failed to save. Please try again later.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                } else {
+                    SessionManager.getInstance(context).unsaveThing(mSubmission.getFullName(),
+                            new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                @Override
+                                public void onSuccess(boolean actionSuccessful) {
+                                    if (actionSuccessful) {
+                                        mSubmission.setSaved(false);
+                                        saved.setStateVoted(false);
+                                        Toast.makeText(context, "Unsaved", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(context, "Failed to unsave. Please try again later.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+
+
+
 
         mUpvoteIndicator.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,8 +378,17 @@ public class CommentsListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        Log.d("CommentsListFragment", "onResume()");
+
+        super.onResume();
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(mSubmission.getTitle());
+    }
+
+    @Override
     public void onDestroy() {
-        mCommentTask.cancel(true);
+        if (mCommentTask != null)
+            mCommentTask.cancel(true);
         super.onDestroy();
     }
 
@@ -347,6 +445,44 @@ public class CommentsListFragment extends Fragment {
         return true;
     }
 
+    public boolean onOptionsItemSelected(int id) {
+        CommentSort sort;
+
+        switch (id) {
+            case 0:
+                sort = CommentSort.CONFIDENCE;
+                break;
+            case 1:
+                sort = CommentSort.NEW;
+                break;
+            case 2:
+                sort = CommentSort.HOT;
+                break;
+            case 3:
+                sort = CommentSort.TOP;
+                break;
+            case 4:
+                sort = CommentSort.CONTROVERSIAL;
+                break;
+            case 5:
+                sort = CommentSort.OLD;
+                break;
+            case 6:
+                sort = CommentSort.RANDOM;
+                break;
+
+            default:
+                return false;
+        }
+
+        if (mCommentSort != sort) {
+            mCommentSort = sort;
+            initList();
+        }
+
+        return true;
+    }
+
 
 
     /**
@@ -384,11 +520,18 @@ public class CommentsListFragment extends Fragment {
     }
 
 
-    private void initList() {
+    public void initList() {
         mCommentArray.clear();
         mAdapter.notifyDataSetChanged();
 
         mCommentTask = new GetCommentsAsyncTask();
         mCommentTask.execute(mSubmission.getIdentifier());
     }
+<<<<<<< HEAD
+=======
+
+    public boolean isLoaded() {
+        return mCommentArray.size() > 0;
+    }
+>>>>>>> 4c8501f77a126fe839206aa5219f16d77236940b
 }

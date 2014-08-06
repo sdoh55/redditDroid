@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.danny_oh.reddit" >
+    package="com.danny_oh.reddit"
+    >
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -18,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="39373432117153daa916f9e864284553e048ae04"/>
     </application>
 
 </manifest>

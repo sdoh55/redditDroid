@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#fff</color>
+    <color name="reddit_background">#cee2f5</color>
 
     <color name="drawer_background_light">#ffececec</color>
     <color name="drawer_background_dark">#767c8d</color>

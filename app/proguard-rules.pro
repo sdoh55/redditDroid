@@ -16,7 +16,13 @@
 #   public *;
 #}
 
+-dontwarn com.squareup.picasso.OkHttpDownloader
+
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
 }
+
+-keep class in.uncod.android.bypass.** { *; }
+
+-keep class com.loopj.android.** { *; }

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.danny_oh.reddit.util.PagedSubmissionsList;
 import com.github.jreddit.entity.Submission;
@@ -60,6 +61,7 @@ public class SubmissionAdapter extends BaseAdapter {
         private TextView subtitle;
         private TextView numComments;
         private LinearLayout titleContainer;
+        private ImageViewWithVoteState saved;
     }
 
 //    public SubmissionAdapter(Context context, List<Submission> submissions) {
@@ -71,7 +73,6 @@ public class SubmissionAdapter extends BaseAdapter {
         try {
             mListener = (OnSubmissionAdapterInteractionListener)context;
         } catch (ClassCastException ce) {
-            ce.printStackTrace();
             throw new ClassCastException("Parent activity of SubmissionAdapter must implement OnSubmissionAdapterInteractionListener interface.");
         }
 
@@ -115,6 +116,7 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.subtitle = (TextView)view.findViewById(R.id.submission_subtitle);
             viewHolder.numComments = (TextView)view.findViewById(R.id.submission_num_comments);
             viewHolder.titleContainer = (LinearLayout)view.findViewById(R.id.submission_title_container);
+            viewHolder.saved = (ImageViewWithVoteState)view.findViewById(R.id.submission_saved);
 
             view.setTag(viewHolder);
         } else {
@@ -125,7 +127,7 @@ public class SubmissionAdapter extends BaseAdapter {
 
         if (submission != null) {
             viewHolder.score.setText(submission.getScore().toString());
-            viewHolder.title.setText(submission.getTitle().toString());
+            viewHolder.title.setText(submission.getTitle());
 
             if (submission.isVisited()) {
                 viewHolder.title.setTextColor(mVisitedSubmissionTitleColor);
@@ -143,13 +145,13 @@ public class SubmissionAdapter extends BaseAdapter {
             viewHolder.subtitle.setText(buildSubtitle(timeElapsed, submission.getAuthor(), submission.getSubreddit(), submission.getDomain()));
 
 
+
+
+
             // TODO: thumbnail types/strings to consider
             // - "nsfw"
             // - "default"
             // - sometimes thumbnails are embeded in { media } (extend Submission to save media)
-
-
-
             if (!submission.getThumbnail().equals("") && !submission.isSelf()) {
                 viewHolder.thumbnail.setVisibility(View.VISIBLE);
                 Picasso.with(mContext)
@@ -177,7 +179,51 @@ public class SubmissionAdapter extends BaseAdapter {
                 });
             }
 
-//            if (submission.is)
+
+            if (submission.isSaved()) {
+                viewHolder.saved.setStateVoted(true);
+            } else {
+                viewHolder.saved.setStateVoted(false);
+            }
+
+            viewHolder.saved.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!submission.isSaved()) {
+                        SessionManager.getInstance(mContext).saveThing(submission.getFullName(),
+                                new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                @Override
+                                public void onSuccess(boolean actionSuccessful) {
+                                    if (actionSuccessful) {
+                                        submission.setSaved(true);
+                                        notifyDataSetChanged();
+                                        Toast.makeText(mContext, "Saved", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(mContext, "Failed to save. Please try again later.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                    } else {
+                        SessionManager.getInstance(mContext).unsaveThing(submission.getFullName(),
+                                new AsyncMarkActions.MarkActionsResponseHandler(){
+
+                                    @Override
+                                    public void onSuccess(boolean actionSuccessful) {
+                                        if (actionSuccessful) {
+                                            submission.setSaved(false);
+                                            notifyDataSetChanged();
+                                            Toast.makeText(mContext, "Unsaved", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(mContext, "Failed to unsave. Please try again later.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    }
+                }
+            });
+
 
             if (submission.isLiked() == null) {
 
@@ -204,6 +250,7 @@ public class SubmissionAdapter extends BaseAdapter {
                     } else {
                         direction = 0;
                     }
+
 
                     SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
                         @Override
@@ -257,6 +304,8 @@ public class SubmissionAdapter extends BaseAdapter {
                 }
             });
         }
+
+
 
         return view;
     }

@@ -78,31 +78,41 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:id="@+id/submission_score_container"
         android:layout_marginLeft="5dp">
 
         <com.danny_oh.reddit.util.ImageViewWithVoteState
             android:id="@+id/submission_up_vote"
             android:src="@drawable/selector_up_vote"
+            android:background="@drawable/selectable_item_background"
             android:contentDescription="@string/content_description_submission_up_vote"
             android:layout_width="@dimen/submission_self_vote_button_size"
             android:layout_height="@dimen/submission_self_vote_button_size"
             app:submission_vote_state="false"
-            android:layout_alignParentLeft="true" />
+             />
 
         <com.danny_oh.reddit.util.ImageViewWithVoteState
             android:id="@+id/submission_down_vote"
             android:src="@drawable/selector_down_vote"
+            android:background="@drawable/selectable_item_background"
             android:contentDescription="@string/content_description_submission_down_vote"
             android:layout_width="@dimen/submission_self_vote_button_size"
             android:layout_height="@dimen/submission_self_vote_button_size"
-            android:layout_centerHorizontal="true"
             android:clickable="true"
             app:submission_vote_state="false"
-            android:layout_toRightOf="@id/submission_up_vote" />
+            />
+
+        <com.danny_oh.reddit.util.ImageViewWithVoteState
+            android:layout_width="@dimen/submission_self_vote_button_size"
+            android:layout_height="@dimen/submission_self_vote_button_size"
+            android:id="@+id/submission_saved"
+            android:src="@drawable/selector_favorited"
+            android:background="@drawable/selectable_item_background"
+            />
 
         <TextView
             android:id="@+id/submission_score"
@@ -110,23 +120,20 @@
             android:layout_height="wrap_content"
             android:text="@string/placeholder_score"
             android:gravity="center_horizontal"
-            android:layout_centerVertical="true"
             android:textSize="@dimen/submission_self_score_font_size"
-            android:layout_toRightOf="@id/submission_down_vote"
             android:layout_marginLeft="@dimen/submission_self_score_margin"
             android:textStyle="bold"
-            android:layout_marginRight="@dimen/submission_self_score_margin" />
+            android:layout_marginRight="@dimen/submission_self_score_margin"
+            android:layout_gravity="center_vertical" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pts"
             android:id="@+id/textView"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/submission_score"
-            android:layout_toEndOf="@id/submission_score" />
+            android:layout_gravity="center_vertical" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/submission_self_text_html"
@@ -135,7 +142,7 @@
         android:text="@string/placeholder_self_text_html"
         android:textSize="@dimen/submission_self_text_font_size"
         android:layout_margin="@dimen/submission_self_text_margin"
-        />
+        android:autoLink="web" />
 
 </LinearLayout>
 

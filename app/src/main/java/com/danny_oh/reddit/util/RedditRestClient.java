@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
 
 import com.github.jreddit.utils.restclient.methodbuilders.HttpGetMethodBuilder;
@@ -117,11 +118,11 @@ public class RedditRestClient implements RestClient {
 
         try {
             Response result = get(httpGetMethod().withUrl(ApiEndpointUtils.REDDIT_BASE_URL + urlPath));
-            if (result == null) {
-                throw new RetrievalFailedException("The given URI path does not exist on Reddit: " + urlPath);
-            } else {
+//            if (result == null) {
+//                throw new RetrievalFailedException("The given URI path does not exist on Reddit: " + urlPath);
+//            } else {
                 return result;
-            }
+//            }
         } catch (URISyntaxException e) {
             throw new RetrievalFailedException("The syntax of the URI path was incorrect: " + urlPath);
         } catch (InvalidURIException e) {

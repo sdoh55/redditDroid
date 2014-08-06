@@ -33,3 +33,9 @@ build/
 
 # custom resources (illustrator/photoshop files)
 custom_resources/
+original_resources/
+
+# crashlytics secret key
+crashlytics.properties
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
