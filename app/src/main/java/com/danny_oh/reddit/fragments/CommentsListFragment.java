@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
-import com.danny_oh.reddit.adapters.CommentSparseArrayAdapter;
+import com.danny_oh.reddit.adapters.CommentAdapter;
 import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
@@ -35,6 +35,7 @@ import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Comments;
 import com.github.jreddit.retrieval.params.CommentSort;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.uncod.android.bypass.Bypass;
@@ -65,10 +66,10 @@ public class CommentsListFragment extends Fragment {
 
     private List<Comment> mCommentsList;
 
-    private SparseArray<CommentsListHelper.CommentContainer> mCommentArray;
+    private ArrayList<CommentsListHelper.CommentContainer> mCommentArray;
 
     private ListView mListView;
-    private CommentSparseArrayAdapter mAdapter;
+    private CommentAdapter mAdapter;
     private View mHeaderView;
 
 
@@ -88,7 +89,7 @@ public class CommentsListFragment extends Fragment {
 
             // params: submissionId, commentId, parentsShown, depth, limit, CommentSort
             mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort);
-            mCommentArray = CommentsListHelper.listToSparseArray(mCommentsList);
+            mCommentArray = CommentsListHelper.listToArray(mCommentsList);
 
             Log.d("CommentListFragment", "mCommentList count: " + mCommentsList.size());
             Log.d("CommentListFragment", "mCommentArray count: " + mCommentArray.size());
@@ -99,7 +100,7 @@ public class CommentsListFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             mCommentsList = null;
-            mAdapter = new CommentSparseArrayAdapter(getActivity(), mCommentArray, mSubmission);
+            mAdapter = new CommentAdapter(getActivity(), mCommentArray, mSubmission);
             mListView.setAdapter(mAdapter);
         }
     }
@@ -207,8 +208,8 @@ public class CommentsListFragment extends Fragment {
 
         } else {
             // otherwise instantiate fragment
-            mCommentArray = new SparseArray<CommentsListHelper.CommentContainer>();
-            mAdapter = new CommentSparseArrayAdapter(getActivity(), mCommentArray, mSubmission);
+            mCommentArray = new ArrayList<CommentsListHelper.CommentContainer>();
+            mAdapter = new CommentAdapter(getActivity(), mCommentArray, mSubmission);
 
             if (!mDelayed) {
                 // retrieves comments for the selected submission

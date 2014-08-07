@@ -31,7 +31,7 @@ import in.uncod.android.bypass.Bypass;
 /**
  * Created by danny on 7/31/14.
  */
-public class CommentSparseArrayAdapter extends BaseAdapter {
+public class CommentAdapter extends BaseAdapter {
 
     static class ViewHolder {
         private TextView username;
@@ -48,7 +48,7 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
     }
 
     private Context mContext;
-    private SparseArray<CommentsListHelper.CommentContainer> mComments;
+    private ArrayList<CommentsListHelper.CommentContainer> mComments;
 
     private Submission mSubmission;
 
@@ -56,7 +56,7 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
 
     private Bypass mBypass;
 
-    public CommentSparseArrayAdapter(Context context, SparseArray<CommentsListHelper.CommentContainer> comments, Submission submission) {
+    public CommentAdapter(Context context, ArrayList<CommentsListHelper.CommentContainer> comments, Submission submission) {
         mContext = context;
         mComments = comments;
         mSubmission = submission;
@@ -118,7 +118,7 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             viewHolder.timeCreated.setText(timeElapsed);
 
             viewHolder.body.setText(mBypass.markdownToSpannable(comment.getBody()));
-            viewHolder.body.setMovementMethod(LinkMovementMethod.getInstance());
+//            viewHolder.body.setMovementMethod(LinkMovementMethod.getInstance());
 
             viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
@@ -133,8 +133,6 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             } else {
                 viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_username_font_color));
             }
-
-            // TODO: onClickListener for upvote and downvote
 
 
             if (comment.isLiked() == null) {

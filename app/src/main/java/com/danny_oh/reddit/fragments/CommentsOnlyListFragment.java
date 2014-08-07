@@ -18,7 +18,7 @@ import android.widget.ListView;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.activities.MainActivity;
-import com.danny_oh.reddit.adapters.CommentMapAdapter;
+import com.danny_oh.reddit.adapters.CommentAdapter;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.github.jreddit.entity.Comment;
@@ -26,6 +26,7 @@ import com.github.jreddit.entity.Submission;
 import com.github.jreddit.retrieval.Comments;
 import com.github.jreddit.retrieval.params.CommentSort;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,9 +45,7 @@ public class CommentsOnlyListFragment extends ListFragment {
 
     private GetCommentsAsyncTask mCommentTask;
 
-    private List<Comment> mCommentsList;
-
-    private HashMap<Integer, CommentsListHelper.CommentContainer> mCommentMap;
+    private ArrayList<CommentsListHelper.CommentContainer> mCommentList;
 
     private Submission mSubmission;
 
@@ -59,20 +58,18 @@ public class CommentsOnlyListFragment extends ListFragment {
             Comments comments = new Comments(manager.getRestClient(), manager.getUser());
 
             // params: submissionId, commentId, parentsShown, depth, limit, CommentSort
-            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort);
-            mCommentMap = CommentsListHelper.listToMap(mCommentsList);
 
-            Log.d("CommentListFragment", "mCommentList count: " + mCommentsList.size());
-            Log.d("CommentListFragment", "mCommentMap count: " + mCommentMap.size());
+            mCommentList = CommentsListHelper.listToArray(comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort));
+
+            Log.d("CommentListFragment", "mCommentList count: " + mCommentList.size());
 
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            mCommentsList = null;
-            setListAdapter(new CommentMapAdapter(getActivity(), mCommentMap, mSubmission));
-            ((CommentMapAdapter)getListAdapter()).notifyDataSetChanged();
+            setListAdapter(new CommentAdapter(getActivity(), mCommentList, mSubmission));
+            ((CommentAdapter)getListAdapter()).notifyDataSetChanged();
         }
     }
 
@@ -133,7 +130,7 @@ public class CommentsOnlyListFragment extends ListFragment {
     }
     public CommentsOnlyListFragment() {
         // Required empty public constructor
-        mCommentMap = new HashMap<Integer, CommentsListHelper.CommentContainer>();
+        mCommentList = new ArrayList<CommentsListHelper.CommentContainer>();
     }
 
     @Override
@@ -199,9 +196,9 @@ public class CommentsOnlyListFragment extends ListFragment {
     }
 
     private void initList() {
-        if (!mCommentMap.isEmpty()) {
-            mCommentMap.clear();
-            ((CommentMapAdapter)getListAdapter()).notifyDataSetChanged();
+        if (!mCommentList.isEmpty()) {
+            mCommentList.clear();
+            ((CommentAdapter)getListAdapter()).notifyDataSetChanged();
         }
 
         mCommentTask = new GetCommentsAsyncTask();

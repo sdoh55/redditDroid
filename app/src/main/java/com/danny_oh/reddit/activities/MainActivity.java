@@ -356,6 +356,8 @@ public class MainActivity
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mSlidingMenu.setShadowWidth(2);
+//        mSlidingMenu.setShadowDrawable(android.R.color.transparent);
 
         mSlidingMenu.setFadeDegree(0.35f);
 
