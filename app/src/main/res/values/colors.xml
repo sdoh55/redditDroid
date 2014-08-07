@@ -22,7 +22,7 @@
     <color name="drawer_subreddit_search_background">#f3f4f4</color>
     <color name="drawer_subreddit_search_hint_font_color">#ffc2c2c2</color>
 
-    <color name="action_bar_background">#8f87a7</color>
+    <color name="action_bar_background">#ff829fc0</color>
     <color name="action_bar_home_background_selected">#ffe3620f</color>
     <color name="action_bar_search_hint_font_color">#ffe1e1e1</color>
     <color name="action_bar_menu_item_selected">#ffccd4e8</color>

@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/redditandroid_icon"
+        android:icon="@drawable/redditdroid_icon_blue"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
