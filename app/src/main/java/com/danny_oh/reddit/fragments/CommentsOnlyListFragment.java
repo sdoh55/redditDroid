@@ -190,10 +190,10 @@ public class CommentsOnlyListFragment extends ListFragment {
 
         // if SelfSubmissionFragment is in the back stack, pop it.
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentByTag(MainActivity.SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG);
+        Fragment fragment = fragmentManager.findFragmentByTag(MainActivity.COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG);
 
         if (fragment != null) {
-            boolean status = fragmentManager.popBackStackImmediate(MainActivity.SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            boolean status = fragmentManager.popBackStackImmediate(MainActivity.COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             Log.d("CommentListFragment", "Found SelfSubmissionFragment and popped with status: " + status);
         }
     }

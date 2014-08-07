@@ -7,7 +7,7 @@
 
     <View
         android:id="@+id/comment_depth_indicator"
-        android:layout_width="6dp"
+        android:layout_width="3dp"
         android:layout_height="10dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"

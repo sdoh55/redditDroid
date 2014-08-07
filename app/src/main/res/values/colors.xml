@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="white">#fff</color>
     <color name="reddit_background">#cee2f5</color>
 
     <color name="drawer_background_light">#ffececec</color>
@@ -42,4 +41,24 @@
 
     <color name="pressed_state">#ccc</color>
     <color name="unselected_state">#0000</color>
+
+
+
+    <!-- Comment depth indicator colors -->
+    <array name="comment_depth_colors">
+        <item>#ffb9b1ce</item>
+        <item>#ff7cbae8</item>
+        <item>#ffb1cebe</item>
+        <item>#ffceb9ac</item>
+        <item>#ff99d582</item>
+        <item>#ffce93a3</item>
+        <item>#ffe8a94a</item>
+        <item>#ffa4aece</item>
+        <item>#ffcecba8</item>
+        <item>#ffadcecd</item>
+        <item>#ff6b92ce</item>
+        <item>#ffe3afbb</item>
+        <item>#ffb094c9</item>
+        <item>#ffce6d73</item>
+    </array>
 </resources>

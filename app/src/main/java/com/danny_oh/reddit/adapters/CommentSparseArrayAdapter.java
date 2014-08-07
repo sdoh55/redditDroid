@@ -2,6 +2,7 @@ package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.method.LinkMovementMethod;
 import android.util.SparseArray;
@@ -62,6 +63,12 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
 
         mDepthColors = new ArrayList<Integer>();
         mBypass = new Bypass();
+
+        TypedArray typedArray = context.getResources().obtainTypedArray(R.array.comment_depth_colors);
+        for (int i = 0; i < typedArray.length(); i++) {
+            mDepthColors.add(typedArray.getColor(i, 0));
+        }
+        typedArray.recycle();
     }
 
     @Override
@@ -115,7 +122,11 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
 
             viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
-            layoutParams.setMargins(depth * 10, layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
+
+            // Get the screen's density scale
+            final float scale = mContext.getResources().getDisplayMetrics().density;
+
+            layoutParams.setMargins((int)(depth * 3 * scale), layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
 
             if (comment.getAuthor().equals(mSubmission.getAuthor())) {
                 viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_author_font_color));
