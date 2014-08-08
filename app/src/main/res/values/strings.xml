@@ -14,13 +14,13 @@
     </array>
 
     <array name="comments_sort_array">
-        <item android:id="@+id/comments_sort_confidence">confidence</item>
-        <item android:id="@+id/comments_sort_new">new</item>
-        <item android:id="@+id/comments_sort_hot">hot</item>
-        <item android:id="@+id/comments_sort_top">top</item>
-        <item android:id="@+id/comments_sort_controversial">controversial</item>
-        <item android:id="@+id/comments_sort_old">old</item>
-        <item android:id="@+id/comments_sort_random">random</item>
+        <item>confidence</item>
+        <item>new</item>
+        <item>hot</item>
+        <item>top</item>
+        <item>controversial</item>
+        <item>old</item>
+        <item>random</item>
     </array>
 
     <!-- Drawer Menu Items -->

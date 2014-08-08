@@ -10,8 +10,8 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true" />
     <!--Apply padding when using ActionBar overlay mode

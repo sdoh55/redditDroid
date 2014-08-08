@@ -11,6 +11,7 @@ import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Submissions;
 import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
+import com.github.jreddit.retrieval.params.SubmissionSort;
 import com.github.jreddit.retrieval.params.TimeSpan;
 import com.github.jreddit.retrieval.params.UserOverviewSort;
 import com.github.jreddit.retrieval.params.UserSubmissionsCategory;
@@ -43,6 +44,9 @@ import static com.github.jreddit.utils.restclient.JsonUtils.safeJsonToString;
 
 /**
  * Created by danny on 8/1/14.
+ *
+ * A class that extends the Submissions class from the jReddit library that has been modified
+ * to extend support for AsyncHttpClient from the android-async-http library by loopj
  */
 public class AsyncSubmissions extends Submissions {
     private RedditRestClient mRestClient;
@@ -152,61 +156,6 @@ public class AsyncSubmissions extends Submissions {
     }
 
 
-    /**
-     * Searches with the given query using the constraints given as parameters.
-     * The parameters here are in Strings instead of wrapper objects, which allows users
-     * to manually adjust the parameters (if the API changes and jReddit is not updated
-     * in time yet).
-     *
-     * @param query 			The query
-     * @param syntax			The query syntax
-     * @param sort				Search sorting method
-     * @param time				Search time
-     * @param count				Count at which the submissions are started being numbered
-     * @param limit				Maximum amount of submissions that can be returned (0-100, 25 default (see Reddit API))
-     * @param after				The submission after which needs to be retrieved
-     * @param before			The submission before which needs to be retrieved
-     * @param show  			Show all (disables filters such as "hide links that I have voted on")
-     * @return 					The linked list containing submissions
-     */
-    protected void searchAsync(String subreddit,
-                               String query,
-                               String syntax,
-                               String sort,
-                               String time,
-                               String count,
-                               String limit,
-                               String after,
-                               String before,
-                               String show,
-                               SubmissionsResponseHandler responseHandler) throws RetrievalFailedException, RedditError {
-        // Format parameters
-        String params = "";
-        try {
-            params = ParamFormatter.addParameter(params, "q", URLEncoder.encode(query, "ISO-8859-1"));
-        } catch (UnsupportedEncodingException e) {
-            Log.e("AsyncSubmissions", "Bad encoding. Localized message: " + e.getLocalizedMessage());
-        }
-        params = ParamFormatter.addParameter(params, "syntax", syntax);
-        params = ParamFormatter.addParameter(params, "sort", sort);
-        params = ParamFormatter.addParameter(params, "t", time);
-        params = ParamFormatter.addParameter(params, "count", count);
-        params = ParamFormatter.addParameter(params, "limit", limit);
-        params = ParamFormatter.addParameter(params, "after", after);
-        params = ParamFormatter.addParameter(params, "before", before);
-        params = ParamFormatter.addParameter(params, "show", show);
-
-        String url;
-
-        if (subreddit.isEmpty())
-            url = ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params);
-        else
-            url = ApiEndpointUtils.REDDIT_BASE_URL + "/r/" + subreddit + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params) + "&restrict_sr=true";
-
-        // Retrieve submissions from the given URL
-        mRestClient.getAsyncClient().get(url, responseHandler);
-
-    }
 
     /**
      * Searches with the given query using the constraints given as parameters.
@@ -241,54 +190,27 @@ public class AsyncSubmissions extends Submissions {
             throw new IllegalArgumentException("The limit needs to be between 0 and 100 (or -1 for default).");
         }
 
-        searchAsync(
-                subreddit,
-                query,
-                (syntax != null) ? syntax.value() : "",
-                (sort != null) ? sort.value() : "",
-                (time != null) ? time.value() : "",
-                String.valueOf(count),
-                String.valueOf(limit),
-                (after != null) ? after.getFullName() : "",
-                (before != null) ? before.getFullName() : "",
-                (show_all) ? "all" : "",
-                responseHandler
-        );
-    }
-
-
-
-    /**
-     * Get the submissions of a user.
-     * In this variant all parameters are Strings.
-     *
-     * @param username	 		Username of the user you want to retrieve from.
-     * @param category    		(Optional, set null/empty if not used) Category in the user overview to retrieve submissions from
-     * @param sort	    		(Optional, set null/empty if not used) Sorting method.
-     * @param time		 		(Optional, set null/empty is not used) Time window
-     * @param count        		(Optional, set null/empty if not used) Number at which the counter starts
-     * @param limit        		(Optional, set null/empty if not used) Integer representing the maximum number of comments to return
-     * @param after				(Optional, set null/empty if not used) After which comment to retrieve
-     * @param before			(Optional, set null/empty if not used) Before which comment to retrieve
-     * @param show				(Optional, set null/empty if not used) Show parameter ('given' is only acceptable value)
-     *
-     * @return Comments of a user.
-     */
-    protected void ofUserAsync(String username, String category, String sort, String count, String limit, String after, String before, String show, SubmissionsResponseHandler handler) throws RetrievalFailedException, RedditError {
-
-        // Format parameters
         String params = "";
-        params = ParamFormatter.addParameter(params, "sort", sort);
-        params = ParamFormatter.addParameter(params, "count", count);
-        params = ParamFormatter.addParameter(params, "limit", limit);
-        params = ParamFormatter.addParameter(params, "after", after);
-        params = ParamFormatter.addParameter(params, "before", before);
-        params = ParamFormatter.addParameter(params, "show", show);
+        params = ParamFormatter.addParameter(params, "syntax", syntax != null ? syntax.value() : "");
+        params = ParamFormatter.addParameter(params, "sort", sort != null ? sort.value() : "");
+        params = ParamFormatter.addParameter(params, "t", time != null ? time.value() : "");
+        params = ParamFormatter.addParameter(params, "count", String.valueOf(count));
+        params = ParamFormatter.addParameter(params, "limit", String.valueOf(limit));
+        params = ParamFormatter.addParameter(params, "after", after != null ? after.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "before", before != null ? before.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "show", show_all ? "all" : "");
 
-        // Retrieve submissions from the given URL
-        mRestClient.getAsyncClient().get(ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.USER_SUBMISSIONS_INTERACTION, username, category, params), handler);
+        String url;
 
+        if (subreddit.isEmpty())
+            url = ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params);
+        else
+            url = ApiEndpointUtils.REDDIT_BASE_URL + "/r/" + subreddit + String.format(ApiEndpointUtils.SUBMISSIONS_SEARCH, params) + "&restrict_sr=true";
+
+
+        getSubmissions(url, responseHandler);
     }
+
 
     /**
      * Get the submissions of a user.
@@ -320,17 +242,63 @@ public class AsyncSubmissions extends Submissions {
             throw new IllegalArgumentException("The limit needs to be between 0 and 100 (or -1 for default).");
         }
 
-        ofUserAsync(
-                username,
-                (category != null) ? category.value() : "",
-                (sort != null) ? sort.value() : "",
-                String.valueOf(count),
-                String.valueOf(limit),
-                (after != null) ? after.getFullName() : "",
-                (before != null) ? before.getFullName() : "",
-                (show_given) ? "given" : "",
-                handler
-        );
+        // Format parameters
+        String params = "";
+        params = ParamFormatter.addParameter(params, "sort", sort != null ? sort.value() : "");
+        params = ParamFormatter.addParameter(params, "count", String.valueOf(count));
+        params = ParamFormatter.addParameter(params, "limit", String.valueOf(limit));
+        params = ParamFormatter.addParameter(params, "after", after != null ? after.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "before", before != null ? before.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "show", show_given ? "given" : "");
+
+        String url = ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.USER_SUBMISSIONS_INTERACTION, username, category, params);
+
+        getSubmissions(url, handler);
+    }
+
+
+
+    public void ofSubredditAsync(String subreddit, SubmissionSort sort, int count, int limit, Submission after, Submission before, boolean show_all, SubmissionsResponseHandler handler) throws RetrievalFailedException, RedditError {
+
+        if (subreddit == null) { // || subreddit.isEmpty()) {
+            throw new IllegalArgumentException("The subreddit must be defined.");
+        }
+
+        // Encode the reddit name for the URL:
+        try {
+            subreddit = URLEncoder.encode(subreddit, "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
+        // Format parameters
+        String params = "";
+
+        params = ParamFormatter.addParameter(params, "count", String.valueOf(count));
+        params = ParamFormatter.addParameter(params, "limit", String.valueOf(limit));
+        params = ParamFormatter.addParameter(params, "after", after != null ? after.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "before", before != null ? before.getFullName() : "");
+        params = ParamFormatter.addParameter(params, "show", show_all ? "all" : "");
+
+        String url;
+
+        // if no subreddit is specified, fetch front page
+        if (subreddit.isEmpty()) {
+            // for frontpage items, sort is dependent on the url (e.g. for RISING: www.reddit.com/rising)
+            url = ApiEndpointUtils.REDDIT_BASE_URL + String.format("/%s/.json?%s", sort.value(), params);
+        } else {
+            url = ApiEndpointUtils.REDDIT_BASE_URL + String.format(ApiEndpointUtils.SUBMISSIONS_GET, subreddit, sort.value(), params);
+        }
+
+        getSubmissions(url, handler);
+
+    }
+
+
+    public void getSubmissions(String url, SubmissionsResponseHandler handler) {
+        // Retrieve submissions from the given URL
+        mRestClient.getAsyncClient().get(url, handler);
     }
 
 }

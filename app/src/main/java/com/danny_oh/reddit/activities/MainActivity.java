@@ -3,7 +3,6 @@ package com.danny_oh.reddit.activities;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -31,9 +30,14 @@ import com.github.jreddit.entity.User;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
 
-import java.text.ParseException;
+import java.util.Locale;
 
-
+/**
+ * The main Activity of the redditDroid app.
+ *
+ * This app has only one activity on purpose, in order to minimize load times and deliver the fastest
+ * user experience possible.
+ */
 public class MainActivity
         extends SlidingActivity
         implements FragmentManager.OnBackStackChangedListener,              // handles changes to fragment stack
@@ -46,7 +50,7 @@ public class MainActivity
         SubmissionFragment.SubmissionFragmentListener
 {
 
-    public static final String SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG = "self_submission_fragment_transaction";
+    public static final String COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG = "comments_list_fragment_transaction";
     private static final String LAST_SUBMISSION_CLICKED_SAVE_INSTANCE_KEY = "last_submission_clicked";
     private static final String SUBMISSIONS_LIST_FRAGMENT_TAG = "submissions_list_fragment_key";
 
@@ -76,7 +80,7 @@ public class MainActivity
             mFragmentManager
                     .beginTransaction()
                     .addToBackStack(null)
-                    .replace(R.id.content_frame, commentsListFragment, SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG)
+                    .replace(R.id.content_frame, commentsListFragment, COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG)
                     .commit();
 
         } else {
@@ -108,7 +112,7 @@ public class MainActivity
 
                     } else {
                         // url symbols are encoded in hex ASCII
-                        index = url.toLowerCase().indexOf("watch%3fv%3d");
+                        index = url.toLowerCase(Locale.US).indexOf("watch%3fv%3d");
                         index += 12;
 
                         // strip off params if any
@@ -194,8 +198,10 @@ public class MainActivity
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
-                .replace(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)))
+                .replace(R.id.content_frame, CommentsListFragment.newInstance(new ExtendedSubmission(submission)), COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG)
                 .commit();
+
+
     }
 
 
@@ -350,6 +356,8 @@ public class MainActivity
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mSlidingMenu.setShadowWidth(2);
+//        mSlidingMenu.setShadowDrawable(android.R.color.transparent);
 
         mSlidingMenu.setFadeDegree(0.35f);
 
@@ -505,7 +513,7 @@ public class MainActivity
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_previous_item);
 
             // don't allow the right side panel to work when the submission is a self link
-            CommentsListFragment fragment = (CommentsListFragment)mFragmentManager.findFragmentByTag(SELF_SUBMISSION_FRAGMENT_TRANSACTION_TAG);
+            CommentsListFragment fragment = (CommentsListFragment)mFragmentManager.findFragmentByTag(COMMENTS_LIST_FRAGMENT_TRANSACTION_TAG);
             if (fragment == null) {
                 mSlidingMenu.setSlidingEnabled(true);
                 mSlidingMenu.setMode(SlidingMenu.RIGHT);

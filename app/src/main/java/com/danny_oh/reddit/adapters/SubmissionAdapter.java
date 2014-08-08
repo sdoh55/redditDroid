@@ -28,6 +28,8 @@ import com.squareup.picasso.Picasso;
 
 /**
  * Created by danny on 7/21/14.
+ *
+ * Adapter for displaying submissions (links)
  */
 public class SubmissionAdapter extends BaseAdapter {
     private Context mContext;
@@ -252,11 +254,10 @@ public class SubmissionAdapter extends BaseAdapter {
                     }
 
 
-                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (submission.isLiked() == null) {
                                     submission.setScore(submission.getScore() + 1);
                                 } else {
@@ -284,11 +285,10 @@ public class SubmissionAdapter extends BaseAdapter {
                         direction = 0;
                     }
 
-                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(mPagedSubmissions.getSubmissionAtIndex(position).getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (submission.isLiked() == null) {
                                     submission.setScore(submission.getScore() - 1);
                                 } else {

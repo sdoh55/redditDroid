@@ -2,6 +2,7 @@ package com.danny_oh.reddit.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.text.method.LinkMovementMethod;
 import android.util.SparseArray;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
+import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.github.jreddit.entity.Comment;
@@ -29,7 +31,7 @@ import in.uncod.android.bypass.Bypass;
 /**
  * Created by danny on 7/31/14.
  */
-public class CommentSparseArrayAdapter extends BaseAdapter {
+public class CommentAdapter extends BaseAdapter {
 
     static class ViewHolder {
         private TextView username;
@@ -46,7 +48,7 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
     }
 
     private Context mContext;
-    private SparseArray<CommentsListHelper.CommentContainer> mComments;
+    private ArrayList<CommentsListHelper.CommentContainer> mComments;
 
     private Submission mSubmission;
 
@@ -54,13 +56,19 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
 
     private Bypass mBypass;
 
-    public CommentSparseArrayAdapter(Context context, SparseArray<CommentsListHelper.CommentContainer> comments, Submission submission) {
+    public CommentAdapter(Context context, ArrayList<CommentsListHelper.CommentContainer> comments, Submission submission) {
         mContext = context;
         mComments = comments;
         mSubmission = submission;
 
         mDepthColors = new ArrayList<Integer>();
         mBypass = new Bypass();
+
+        TypedArray typedArray = context.getResources().obtainTypedArray(R.array.comment_depth_colors);
+        for (int i = 0; i < typedArray.length(); i++) {
+            mDepthColors.add(typedArray.getColor(i, 0));
+        }
+        typedArray.recycle();
     }
 
     @Override
@@ -110,19 +118,21 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
             viewHolder.timeCreated.setText(timeElapsed);
 
             viewHolder.body.setText(mBypass.markdownToSpannable(comment.getBody()));
-            viewHolder.body.setMovementMethod(LinkMovementMethod.getInstance());
+//            viewHolder.body.setMovementMethod(LinkMovementMethod.getInstance());
 
             viewHolder.depthIndicator.setBackgroundColor(mDepthColors.get(depth));
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)viewHolder.depthIndicator.getLayoutParams();
-            layoutParams.setMargins(depth * 10, layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
+
+            // Get the screen's density scale
+            final float scale = mContext.getResources().getDisplayMetrics().density;
+
+            layoutParams.setMargins((int)(depth * 3 * scale), layoutParams.topMargin, layoutParams.rightMargin, layoutParams.bottomMargin);
 
             if (comment.getAuthor().equals(mSubmission.getAuthor())) {
                 viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_author_font_color));
             } else {
                 viewHolder.username.setTextColor(mContext.getResources().getColor(R.color.comment_username_font_color));
             }
-
-            // TODO: onClickListener for upvote and downvote
 
 
             if (comment.isLiked() == null) {
@@ -152,11 +162,10 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
                     }
 
 
-                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (comment.isLiked() == null) {
                                     comment.setScore(comment.getScore() + 1);
                                 } else {
@@ -184,11 +193,10 @@ public class CommentSparseArrayAdapter extends BaseAdapter {
                         direction = 0;
                     }
 
-                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new SessionManager.SessionListener<Boolean>() {
+                    SessionManager.getInstance(mContext).vote(comment.getFullName(), direction, new AsyncMarkActions.MarkActionsResponseHandler() {
                         @Override
-                        public void onResponse(Boolean object) {
-                            // if vote was successful
-                            if (object) {
+                        public void onSuccess(boolean actionSuccessful) {
+                            if (actionSuccessful) {
                                 if (comment.isLiked() == null) {
                                     comment.setScore(comment.getScore() - 1);
                                 } else {

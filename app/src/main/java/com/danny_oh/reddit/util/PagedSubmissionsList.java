@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * Created by danny on 7/23/14.
+ *
+ * An extension of ArrayList that supports paging
  */
 public class PagedSubmissionsList extends ArrayList<List<Submission>> {
     int mSubmissionsPerPage;

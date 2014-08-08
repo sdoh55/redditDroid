@@ -15,6 +15,9 @@ import java.util.List;
 
 /**
  * Created by danny on 7/25/14.
+ *
+ * Expandable list adapter for use with the left side drawer menu for user actions (e.g. view profile,
+ * view saved links, messages, etc).
  */
 public class UserMenuExpandableListAdapter extends BaseExpandableListAdapter {
 

@@ -27,10 +27,9 @@ import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 
 /**
- * A {@link Fragment} subclass for viewing submission links.
+ * A {@link Fragment} subclass for viewing a single selected submission.
  * Use the {@link SubmissionFragment#newInstance} factory method to
  * create an instance of this fragment.
- *
  */
 public class SubmissionFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

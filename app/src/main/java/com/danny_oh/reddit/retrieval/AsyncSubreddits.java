@@ -25,6 +25,9 @@ import static com.github.jreddit.utils.restclient.JsonUtils.safeJsonToString;
 
 /**
  * Created by danny on 8/3/14.
+ *
+ * A class that extends the Subreddits class from the jReddit library that has been modified
+ * to extend support for AsyncHttpClient from the android-async-http library by loopj
  */
 public class AsyncSubreddits extends Subreddits {
     private RedditRestClient mRestClient;

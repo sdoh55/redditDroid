@@ -90,7 +90,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/placeholder_submission_subtitle"
                     android:textSize="@dimen/submission_subtitle_font_size"
-                    android:layout_weight="0"
                     />
 
             </LinearLayout>
