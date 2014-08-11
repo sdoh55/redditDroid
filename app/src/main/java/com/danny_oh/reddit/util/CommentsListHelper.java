@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.github.jreddit.utils.restclient.JsonUtils.safeJsonToString;
@@ -26,8 +27,8 @@ public class CommentsListHelper {
     }
 
 
-    public static ArrayList<CommentContainer> listToArray(List<Comment> commentsList) {
-        ArrayList<CommentContainer> comments = new ArrayList<CommentContainer>();
+    public static List<CommentContainer> parseCommentsDepth(List<Comment> commentsList) {
+        LinkedList<CommentContainer> comments = new LinkedList<CommentContainer>();
 
         int index = 0;
         parseRecursiveArray(comments, commentsList, index);
@@ -35,7 +36,7 @@ public class CommentsListHelper {
         return comments;
     }
 
-    protected static void parseRecursiveArray(ArrayList<CommentContainer> comments, List<Comment> commentList, int depth) throws RetrievalFailedException, RedditError {
+    protected static void parseRecursiveArray(List<CommentContainer> comments, List<Comment> commentList, int depth) throws RetrievalFailedException, RedditError {
         assert comments != null : "List of comments must be instantiated.";
         assert commentList != null : "JSON Object must be instantiated.";
 
@@ -46,7 +47,7 @@ public class CommentsListHelper {
             comments.add(container);
 
             if (comment.hasRepliesSomewhere()) {
-                parseRecursiveArray(comments, comment.getReplies(), ++depth);
+                parseRecursiveArray(comments, comment.getReplies(), depth+1);
             }
         }
 

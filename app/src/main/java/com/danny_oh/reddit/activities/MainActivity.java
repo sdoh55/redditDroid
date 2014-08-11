@@ -327,7 +327,7 @@ public class MainActivity
     public void onCreate(Bundle savedInstanceState) {
         Log.d("MainActivity", "onCreate()");
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+//        Crashlytics.start(this);
 
         // request FEATURE_PROGRESS to show progress bar while loading links
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
@@ -353,7 +353,7 @@ public class MainActivity
 
         mSlidingMenu.setSecondaryMenu(R.layout.secondary_menu_frame);
 
-        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         mSlidingMenu.setShadowWidthRes(R.dimen.shadow_width);
         mSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mSlidingMenu.setShadowWidth(2);

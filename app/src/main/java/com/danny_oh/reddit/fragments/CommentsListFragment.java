@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,8 +25,10 @@ import android.widget.Toast;
 import com.danny_oh.reddit.R;
 import com.danny_oh.reddit.SessionManager;
 import com.danny_oh.reddit.adapters.CommentAdapter;
+import com.danny_oh.reddit.retrieval.AsyncComments;
 import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.util.CommentsListHelper;
+import com.danny_oh.reddit.util.ExtendedComment;
 import com.danny_oh.reddit.util.ExtendedSubmission;
 import com.danny_oh.reddit.util.ImageViewWithVoteState;
 import com.github.jreddit.entity.Comment;
@@ -36,6 +37,7 @@ import com.github.jreddit.retrieval.Comments;
 import com.github.jreddit.retrieval.params.CommentSort;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import in.uncod.android.bypass.Bypass;
@@ -62,11 +64,7 @@ public class CommentsListFragment extends Fragment {
 
     private CommentSort mCommentSort = CommentSort.CONFIDENCE;
 
-    private GetCommentsAsyncTask mCommentTask;
-
-    private List<Comment> mCommentsList;
-
-    private ArrayList<CommentsListHelper.CommentContainer> mCommentArray;
+    private List<ExtendedComment> mComments;
 
     private ListView mListView;
     private CommentAdapter mAdapter;
@@ -78,34 +76,6 @@ public class CommentsListFragment extends Fragment {
     public interface OnCommentsListFragmentDetachListener {
         public void onCommentsListFragmentDetach(Submission submission);
     }
-
-
-    private class GetCommentsAsyncTask extends AsyncTask<String, Integer, Void> {
-        @Override
-        protected Void doInBackground(String... submissionId) {
-            SessionManager manager = SessionManager.getInstance(getActivity());
-
-            Comments comments = new Comments(manager.getRestClient(), manager.getUser());
-
-            // params: submissionId, commentId, parentsShown, depth, limit, CommentSort
-            mCommentsList = comments.ofSubmission(submissionId[0], null, -1, -1, -1, mCommentSort);
-            mCommentArray = CommentsListHelper.listToArray(mCommentsList);
-
-            Log.d("CommentListFragment", "mCommentList count: " + mCommentsList.size());
-            Log.d("CommentListFragment", "mCommentArray count: " + mCommentArray.size());
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            mCommentsList = null;
-            mAdapter = new CommentAdapter(getActivity(), mCommentArray, mSubmission);
-            mListView.setAdapter(mAdapter);
-        }
-    }
-
-
 
 /*
  * constructors and instantiation methods
@@ -201,15 +171,15 @@ public class CommentsListFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (mCommentArray != null && mAdapter != null) {
+        if (mComments != null && mAdapter != null) {
             // fragment was restored from retained instance
             Log.d("SelfSubmissionFragment", "Fragment was restored from instance.");
             mListView.setAdapter(mAdapter);
 
         } else {
             // otherwise instantiate fragment
-            mCommentArray = new ArrayList<CommentsListHelper.CommentContainer>();
-            mAdapter = new CommentAdapter(getActivity(), mCommentArray, mSubmission);
+            mComments = new LinkedList<ExtendedComment>();
+            mAdapter = new CommentAdapter(getActivity(), mComments, mSubmission);
 
             if (!mDelayed) {
                 // retrieves comments for the selected submission
@@ -378,8 +348,8 @@ public class CommentsListFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (mCommentTask != null)
-            mCommentTask.cancel(true);
+//        if (mCommentTask != null)
+//            mCommentTask.cancel(true);
         super.onDestroy();
     }
 
@@ -509,14 +479,24 @@ public class CommentsListFragment extends Fragment {
 
 
     public void initList() {
-        mCommentArray.clear();
+        mComments.clear();
         mAdapter.notifyDataSetChanged();
 
-        mCommentTask = new GetCommentsAsyncTask();
-        mCommentTask.execute(mSubmission.getIdentifier());
+        SessionManager.getInstance(getActivity()).getCommentsFromSubmission(mSubmission, "", -1, -1, -1, mCommentSort, new AsyncComments.CommentsResponseHandler(){
+            @Override
+            public void onParseFinished(List<ExtendedComment> comments) {
+                mComments = comments;
+                mAdapter = new CommentAdapter(getActivity(), mComments, mSubmission);
+                mListView.setAdapter(mAdapter);
+            }
+        });
+
+
+//        mCommentTask = new GetCommentsAsyncTask();
+//        mCommentTask.execute(mSubmission.getIdentifier());
     }
 
     public boolean isLoaded() {
-        return mCommentArray.size() > 0;
+        return mComments.size() > 0;
     }
 }

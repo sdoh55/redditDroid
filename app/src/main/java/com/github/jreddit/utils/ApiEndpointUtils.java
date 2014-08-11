@@ -30,6 +30,8 @@ public class ApiEndpointUtils {
     /* API functions */
     
     public static final String COMMENT = REDDIT_BASE_API_ENDPOINT + "/comment";
+
+    public static final String MORE_CHILDREN = REDDIT_BASE_API_ENDPOINT + "/morechildren.json";
     
     public static final String SUBMISSION_MARK_AS_NSFW = REDDIT_BASE_API_ENDPOINT + "/marknsfw";
     

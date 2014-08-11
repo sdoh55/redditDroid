@@ -5,129 +5,155 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
-        android:id="@+id/comment_depth_indicator"
-        android:layout_width="3dp"
-        android:layout_height="10dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:background="#ffdaa34d"
-        android:layout_marginRight="@dimen/comment_margin"
-        android:layout_alignParentBottom="false"
-        android:layout_alignBottom="@+id/comment_container"
-        />
-
     <RelativeLayout
-        android:id="@+id/comment_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/comment_margin"
-        android:layout_marginTop="@dimen/comment_margin"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="false"
-        android:layout_toStartOf="@+id/comment_vote_container"
-        android:layout_toRightOf="@id/comment_depth_indicator"
-        android:paddingBottom="@dimen/comment_bottom_padding"
-        android:layout_marginRight="@dimen/comment_margin"
-        android:layout_toLeftOf="@id/comment_vote_container">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/comment_container">
 
-
+        <View
+            android:id="@+id/comment_depth_indicator"
+            android:layout_width="3dp"
+            android:layout_height="10dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="#ffdaa34d"
+            android:layout_marginRight="@dimen/comment_margin"
+            android:layout_alignParentBottom="false"
+            android:layout_alignBottom="@+id/comment_content"
+            />
 
         <RelativeLayout
-            android:id="@+id/comment_title_container"
+            android:id="@+id/comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="false"
+            android:layout_marginLeft="@dimen/comment_margin"
+            android:layout_marginTop="@dimen/comment_margin"
+            android:layout_alignParentStart="false"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginBottom="@dimen/comment_margin">
+            android:layout_alignParentLeft="false"
+            android:layout_toStartOf="@+id/comment_vote_container"
+            android:layout_toRightOf="@id/comment_depth_indicator"
+            android:paddingBottom="@dimen/comment_bottom_padding"
+            android:layout_marginRight="@dimen/comment_margin"
+            android:layout_toLeftOf="@id/comment_vote_container">
 
-            <TextView
-                android:id="@+id/comment_username"
-                android:text="@string/dialog_login_hint_username"
-                android:layout_width="wrap_content"
+
+
+            <RelativeLayout
+                android:id="@+id/comment_title_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="false"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="false"
-                android:layout_marginRight="@dimen/comment_margin"
-                android:layout_centerVertical="true"
-                android:textSize="@dimen/comment_username_font_size"
-                android:textStyle="bold"
-                android:textColor="@color/comment_username_font_color" />
+                android:layout_marginBottom="@dimen/comment_margin">
+
+                <TextView
+                    android:id="@+id/comment_username"
+                    android:text="@string/dialog_login_hint_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="false"
+                    android:layout_marginRight="@dimen/comment_margin"
+                    android:layout_centerVertical="true"
+                    android:textSize="@dimen/comment_username_font_size"
+                    android:textStyle="bold"
+                    android:textColor="@color/comment_username_font_color" />
+
+                <TextView
+                    android:id="@+id/comment_score"
+                    android:text="@string/placeholder_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/comment_score_font_size"
+                    android:layout_marginRight="@dimen/comment_margin"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentLeft="false"
+                    android:layout_toRightOf="@id/comment_username"
+                    android:layout_toEndOf="@id/comment_username"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/comment_time_created"
+                    android:text="@string/placeholder_comment_time_elapsed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/comment_margin"
+                    android:layout_centerVertical="true"
+                    android:textSize="@dimen/comment_time_created_font_size"
+                    android:layout_toEndOf="@id/comment_score"
+                    android:layout_toRightOf="@id/comment_score" />
+
+                <com.danny_oh.reddit.util.ImageViewWithVoteState
+                    android:layout_width="@dimen/comment_gilded_icon_size"
+                    android:layout_height="@dimen/comment_gilded_icon_size"
+                    android:id="@+id/comment_gilded"
+                    android:src="@drawable/ic_coin"
+                    android:layout_toRightOf="@id/comment_time_created" />
+            </RelativeLayout>
 
             <TextView
-                android:id="@+id/comment_score"
-                android:text="@string/placeholder_score"
+                android:id="@+id/comment_body"
+                android:text="@string/placeholder_comment_body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/comment_score_font_size"
-                android:layout_marginRight="@dimen/comment_margin"
-                android:layout_centerVertical="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="false"
-                android:layout_toRightOf="@id/comment_username"
-                android:layout_toEndOf="@id/comment_username"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/comment_time_created"
-                android:text="@string/placeholder_comment_time_elapsed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/comment_margin"
-                android:layout_centerVertical="true"
-                android:textSize="@dimen/comment_time_created_font_size"
-                android:layout_toEndOf="@id/comment_score"
-                android:layout_toRightOf="@id/comment_score" />
-
-            <com.danny_oh.reddit.util.ImageViewWithVoteState
-                android:layout_width="@dimen/comment_gilded_icon_size"
-                android:layout_height="@dimen/comment_gilded_icon_size"
-                android:id="@+id/comment_gilded"
-                android:src="@drawable/ic_coin"
-                android:layout_toRightOf="@id/comment_time_created" />
+                android:layout_below="@id/comment_title_container"
+                android:layout_alignLeft="@+id/comment_title_container"
+                android:textSize="@dimen/comment_body_font_size"
+                android:autoLink="web" />
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/comment_body"
-            android:text="@string/placeholder_comment_body"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/comment_title_container"
-            android:layout_alignLeft="@+id/comment_title_container"
-            android:textSize="@dimen/comment_body_font_size"
-            android:autoLink="web" />
+            android:layout_alignParentRight="true"
+            android:id="@+id/comment_vote_container"
+            android:visibility="visible"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="6dp">
+
+            <com.danny_oh.reddit.util.ImageViewWithVoteState
+                android:id="@+id/comment_up_vote"
+                android:src="@drawable/selector_up_vote"
+                android:background="@drawable/selectable_item_background"
+                android:contentDescription="@string/content_description_comment_up_vote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.danny_oh.reddit.util.ImageViewWithVoteState
+                android:id="@+id/comment_down_vote"
+                android:src="@drawable/selector_down_vote"
+                android:background="@drawable/selectable_item_background"
+                android:contentDescription="@string/content_description_comment_down_vote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </RelativeLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:id="@+id/comment_vote_container"
+        android:background="@color/comment_load_more_background"
+        android:id="@+id/load_more_overlay"
         android:visibility="visible"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="6dp"
-        android:layout_marginTop="6dp">
+        android:layout_alignLeft="@+id/comment_container">
 
-        <com.danny_oh.reddit.util.ImageViewWithVoteState
-            android:id="@+id/comment_up_vote"
-            android:src="@drawable/selector_up_vote"
-            android:background="@drawable/selectable_item_background"
-            android:contentDescription="@string/content_description_comment_up_vote"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.danny_oh.reddit.util.ImageViewWithVoteState
-            android:id="@+id/comment_down_vote"
-            android:src="@drawable/selector_down_vote"
-            android:background="@drawable/selectable_item_background"
-            android:contentDescription="@string/content_description_comment_down_vote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:text="Load More.."
+            android:id="@+id/load_more_label"
+            android:textStyle="italic"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="12dp" />
+    </RelativeLayout>
 
 </RelativeLayout>

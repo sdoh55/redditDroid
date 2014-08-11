@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.danny_oh.reddit.retrieval.AsyncComments;
 import com.danny_oh.reddit.retrieval.AsyncMarkActions;
 import com.danny_oh.reddit.retrieval.AsyncSubmissions;
 import com.danny_oh.reddit.util.Constants;
@@ -20,6 +21,7 @@ import com.github.jreddit.entity.UserInfo;
 import com.github.jreddit.exception.ActionFailedException;
 import com.github.jreddit.exception.RetrievalFailedException;
 import com.github.jreddit.retrieval.Submissions;
+import com.github.jreddit.retrieval.params.CommentSort;
 import com.github.jreddit.retrieval.params.QuerySyntax;
 import com.github.jreddit.retrieval.params.SearchSort;
 import com.github.jreddit.retrieval.params.SubmissionSort;
@@ -63,6 +65,7 @@ public class SessionManager {
     // controllers that start with 'Async' are ones that have been ported from jReddit to be usable on Android
     private AsyncMarkActions mMarkActions;
     private AsyncSubmissions mSubmissionsController;
+    private AsyncComments mCommentsController;
     private ProfileActions mProfileActions;
 
 
@@ -83,6 +86,7 @@ public class SessionManager {
         mMarkActions = new AsyncMarkActions((RedditRestClient)mRestClient);
         mSubmissionsController = new AsyncSubmissions((RedditRestClient)mRestClient);
         mProfileActions = new ProfileActions(mRestClient);
+        mCommentsController = new AsyncComments((RedditRestClient)mRestClient);
 
 
 
@@ -189,6 +193,13 @@ public class SessionManager {
         mSubmissionsController.ofSubredditAsync(subreddit, sort, count, limit, after, before, show_all, handler);
     }
 
+    public void getCommentsFromSubmission(Submission submission, String commentId, int parentsShown, int depth, int limit, CommentSort sort, AsyncComments.CommentsResponseHandler responseHandler) {
+        mCommentsController.ofSubmissionAsync(submission, commentId, parentsShown, depth, limit, sort, responseHandler);
+    }
+
+    public void getMoreChildren(Submission submission, List<String> children, CommentSort sort, AsyncComments.CommentsResponseHandler responseHandler) {
+        mCommentsController.moreChildrenAsync(submission, children, sort, responseHandler);
+    }
 
 
 /*
@@ -275,6 +286,7 @@ public class SessionManager {
             mListener.onResponse(userInfo);
         }
     }
+
 
 
 }
